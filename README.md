@@ -10,7 +10,7 @@ This is the final project of RS School 2025. Tis is API client integrated with C
 
 - mentor Andrey Voronin [AVor0n](https://github.com/AVor0n)
 - Aleksandr Pervykh [sashapervykh](https://github.com/sashapervykh)
-- Evgeni ?   [maxnope](https://github.com/maxnope)
+- Evgeniy Smirnov [maxnope](https://github.com/maxnope)
 - Grigori Konopelko [gkonopelko](https://github.com/gkonopelko)
 
 ## About eCommerce Application 🛍️🌐
