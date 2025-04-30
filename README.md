@@ -8,7 +8,7 @@ This is the final project of RS School 2025. Tis is API client integrated with C
 
 ![alt text](image.png)
 
-- mentor Andrey Voronin [helenaish](https://github.com/AVor0n)
+- mentor Andrey Voronin [AVor0n](https://github.com/AVor0n)
 - Aleksandr Pervykh [sashapervykh](https://github.com/sashapervykh)
 - Evgeni ?   [maxnope](https://github.com/maxnope)
 - Grigori Konopelko [gkonopelko](https://github.com/gkonopelko)
