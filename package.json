@@ -1,0 +1,19 @@
+{
+  "name": "ecommerce-application",
+  "version": "1.0.0",
+  "description": "Final task in RS School",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sashapervykh/eCommerce-Application.git"
+  },
+  "author": "Konopelko, Pervykh, Smirnov",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sashapervykh/eCommerce-Application/issues"
+  },
+  "homepage": "https://github.com/sashapervykh/eCommerce-Application#readme"
+}
