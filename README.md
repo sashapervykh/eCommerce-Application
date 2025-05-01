@@ -56,11 +56,14 @@ The decision on whether to use a framework for the project was hard for us becau
 
 ## Available scripts
 
-- "start": to start webpack server,
-- "build": to build page with webpack,
+- "dev": to start vite development server,
+- "build": to build page with vite,
+- "build:dev": to build page with vite,
 - "lint": to start eslint check,
 - "lint:fix" to fix eslint problems,
-- "prettier": to start prettier,
+- "prettier": to start prettier formatting,
+- "stylelint": to start stylelint check,
+- "test": to start test,
 - "prepare": to start husky
 
 ## Our project in commercetools
