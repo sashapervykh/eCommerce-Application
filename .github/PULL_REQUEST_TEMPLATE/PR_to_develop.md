@@ -1,3 +1,3 @@
-**Task/problem:**  
+**Task/problem:**
 
-**Solution:**  
+**Solution:**
