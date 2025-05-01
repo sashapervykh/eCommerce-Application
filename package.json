@@ -8,7 +8,9 @@
     "build": "tsc -b && vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "stylelint": "npx stylelint '**/*.css'",
+    "prettier":"prettier --write",
     "preview": "vite preview",
     "prepare": "husky",
     "test": "vitest"
@@ -41,7 +43,7 @@
   },
   "lint-staged": {
     "*.{js,ts,tsx}": "npm run lint",
-    "*.{js,ts,tsx,css,md}": "prettier --write",
+    "*.{js,ts,tsx,css,md}": "npm run prettier",
     "*.css": "npm run eslint"
   }
 }
