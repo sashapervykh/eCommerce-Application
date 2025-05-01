@@ -1,3 +1,3 @@
-import { a } from "./App";
+import { a } from "./app";
 
 console.log(a);
