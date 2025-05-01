@@ -4,18 +4,17 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import tseslint from 'typescript-eslint';
 import eslintPluginUnicorn from 'eslint-plugin-unicorn';
-import eslintConfigPrettier from "eslint-config-prettier/flat";
+import eslintConfigPrettier from 'eslint-config-prettier/flat';
 
 export default tseslint.config(
   { ignores: ['dist'] },
   {
     extends: [
       js.configs.recommended,
-      ...tseslint.configs.recommendedTypeChecked,
       ...tseslint.configs.strictTypeChecked,
       ...tseslint.configs.stylisticTypeChecked,
       eslintPluginUnicorn.configs.all,
-      eslintConfigPrettier
+      eslintConfigPrettier,
     ],
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
