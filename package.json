@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "stylelint": "npx stylelint '**/*.css'",
-    "prettier":"prettier --write",
+    "prettier": "prettier --write",
     "preview": "vite preview",
     "prepare": "husky",
     "test": "vitest"
@@ -36,6 +36,7 @@
     "lint-staged": "^15.5.1",
     "prettier": "3.5.3",
     "stylelint": "^16.19.1",
+    "stylelint-config-standard": "^38.0.0",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.26.1",
     "vite": "^6.3.1",
@@ -44,6 +45,6 @@
   "lint-staged": {
     "*.{js,ts,tsx}": "npm run lint",
     "*.{js,ts,tsx,css,md}": "npm run prettier",
-    "*.css": "npm run eslint"
+    "*.css": "npm run stylelint"
   }
 }
