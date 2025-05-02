@@ -41,10 +41,5 @@
     "typescript-eslint": "^8.26.1",
     "vite": "^6.3.1",
     "vitest": "^3.1.2"
-  },
-  "lint-staged": {
-    "*.{js,ts,tsx}": "npm run lint",
-    "*.{js,ts,tsx,css,md}": "npm run prettier",
-    "*.css": "npm run stylelint"
   }
 }
