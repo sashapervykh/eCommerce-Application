@@ -23,14 +23,14 @@ An important aspect of our application is that it's responsive 📲, ensuring it
 
 Key pages in the application include:
 
--   Login and Registration pages 🖥️
--   Main page 🏠
--   Catalog Product page 📋
--   Detailed Product page 🔎
--   User Profile page 👤
--   Basket page 🛒
--   About Us page 🙋‍♂️🙋‍♀️
-    The application is powered by CommerceTools 🌐.
+- Login and Registration pages 🖥️
+- Main page 🏠
+- Catalog Product page 📋
+- Detailed Product page 🔎
+- User Profile page 👤
+- Basket page 🛒
+- About Us page 🙋‍♂️🙋‍♀️
+  The application is powered by CommerceTools 🌐.
 
 ## Purpose of the Project
 
@@ -56,14 +56,16 @@ The decision on whether to use a framework for the project was hard for us becau
 
 ## Available scripts
 
--   "start": to start webpack server,
--   "build": to build page with webpack,
--   "lint": to start eslint check,
--   "lint:fix" to fix eslint problems,
--   "prettier": to start prettier,
--   "prepare": to start husky
+- "dev": to start vite development server,
+- "build": to build page with vite,
+- "build:dev": to build page with vite,
+- "lint": to start eslint check,
+- "lint:fix" to fix eslint problems,
+- "prettier": to start prettier formatting,
+- "stylelint": to start stylelint check,
+- "test": to start test,
+- "prepare": to start husky
 
 ## Our project in commercetools
 
 [merchant center](https://mc.us-central1.gcp.commercetools.com/space-real-estate/welcome)
-
