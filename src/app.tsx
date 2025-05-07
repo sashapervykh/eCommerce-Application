@@ -4,6 +4,7 @@ import { ThemeProvider } from '@gravity-ui/uikit';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/main/main';
 import LoginPage from './pages/login/login';
+import './style.css';
 
 function App() {
   return (
