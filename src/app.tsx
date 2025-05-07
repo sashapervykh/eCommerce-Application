@@ -1,18 +1,19 @@
 import '@gravity-ui/uikit/styles/styles.css';
 import '@gravity-ui/uikit/styles/fonts.css';
-import { Button } from '@gravity-ui/uikit';
-
 import { ThemeProvider } from '@gravity-ui/uikit';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import HomePage from './pages/main/main';
+import LoginPage from './pages/login/login';
 
 function App() {
   return (
     <ThemeProvider theme="light">
-      <div>
-        <h1>Space Real Estate</h1>
-        <Button view="action" size="l">
-          Buy me!
-        </Button>
-      </div>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<LoginPage />} />
+        </Routes>
+      </BrowserRouter>
     </ThemeProvider>
   );
 }
