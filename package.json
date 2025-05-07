@@ -18,6 +18,8 @@
   "dependencies": {
     "@commercetools/platform-sdk": "^8.8.0",
     "@commercetools/ts-client": "^3.3.0",
+    "@gravity-ui/icons": "^2.13.0",
+    "@gravity-ui/uikit": "^7.10.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
