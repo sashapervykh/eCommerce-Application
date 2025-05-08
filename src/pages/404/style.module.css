@@ -1,0 +1,10 @@
+.main {
+  margin: auto;
+  width: 90%;
+}
+
+.h1 {
+  text-align: center;
+  margin-top: 0;
+  line-height: 2rem;
+}
