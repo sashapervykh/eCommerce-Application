@@ -8,8 +8,8 @@ const authMiddlewareOptions: AuthMiddlewareOptions = {
   host: 'https://auth.us-central1.gcp.commercetools.com',
   projectKey: projectKey,
   credentials: {
-    clientId: 'a8_BnD5i-WO8yhDqQGLkR4oM',
-    clientSecret: 'nXteWuSfcmOLM5FAoTxlf33YwFVhdHfa',
+    clientId: import.meta.env.VITE_CLIENT_ID as string,
+    clientSecret: import.meta.env.VITE_CLIENT_SECRET as string,
   },
   scopes,
   httpClient: fetch,
