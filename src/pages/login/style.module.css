@@ -1,0 +1,11 @@
+.main {
+  margin: auto;
+  width: 80%;
+  max-width: 600px;
+}
+
+.h1 {
+  text-align: center;
+  margin-top: 0;
+  line-height: 2rem;
+}
