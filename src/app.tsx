@@ -8,7 +8,6 @@ import RegistrationPage from './pages/registration/registration';
 import CatalogPage from './pages/catalog/catalog';
 import AboutPage from './pages/about-us/about-us';
 import NotFoundPage from './pages/404/not-found';
-import { Navigate } from 'react-router-dom';
 import './style.css';
 
 function App() {
@@ -22,7 +21,7 @@ function App() {
           <Route path="/catalog" element={<CatalogPage />} />
           <Route path="/about-us" element={<AboutPage />} />
           <Route path="/404" element={<NotFoundPage />} />
-          <Route path="*" element={<Navigate to="/404" replace />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>
