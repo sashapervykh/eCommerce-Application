@@ -9,6 +9,7 @@ import CatalogPage from './pages/catalog/catalog';
 import AboutPage from './pages/about-us/about-us';
 import NotFoundPage from './pages/404/not-found';
 import { Navigate } from 'react-router-dom';
+import './style.css';
 
 function App() {
   return (
