@@ -1,13 +1,6 @@
-import fetch from 'node-fetch';
-import {
-  ClientBuilder,
+import { ClientBuilder, type AuthMiddlewareOptions, type HttpMiddlewareOptions } from '@commercetools/ts-client';
 
-  // Import middlewares
-  type AuthMiddlewareOptions, // Required for auth
-  type HttpMiddlewareOptions, // Required for sending HTTP requests
-} from '@commercetools/ts-client';
-
-const projectKey = 'space-real-estate';
+export const projectKey = 'space-real-estate';
 const scopes = ['manage_project:space-real-estate'];
 
 // Configure authMiddlewareOptions
@@ -15,8 +8,8 @@ const authMiddlewareOptions: AuthMiddlewareOptions = {
   host: 'https://auth.us-central1.gcp.commercetools.com',
   projectKey: projectKey,
   credentials: {
-    clientId: 'a8_BnD5i-WO8yhDqQGLkR4oM',
-    clientSecret: 'nXteWuSfcmOLM5FAoTxlf33YwFVhdHfa',
+    clientId: import.meta.env.VITE_CLIENT_ID as string,
+    clientSecret: import.meta.env.VITE_CLIENT_SECRET as string,
   },
   scopes,
   httpClient: fetch,

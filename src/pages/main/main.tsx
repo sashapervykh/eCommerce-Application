@@ -1,7 +1,24 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@gravity-ui/uikit';
 
+import { useEffect, useState } from 'react';
+import { createApiBuilderFromCtpClient, type CustomerPagedQueryResponse } from '@commercetools/platform-sdk';
+import { ctpClient, projectKey } from '../../commercetools-sdk';
+
+const api = createApiBuilderFromCtpClient(ctpClient).withProjectKey({ projectKey });
+
 export default function HomePage() {
+  const [projectDetails, setProjectDetails] = useState<CustomerPagedQueryResponse | undefined>();
+  useEffect(() => {
+    void api
+      .customers()
+      .get()
+      .execute()
+      .then((response) => {
+        setProjectDetails(response.body);
+      });
+  }, []);
+
   return (
     <div className="page">
       <h1>Main page</h1>
@@ -10,6 +27,7 @@ export default function HomePage() {
           To login
         </Button>
       </Link>
+      <pre>{JSON.stringify(projectDetails, undefined, 2)}</pre>
     </div>
   );
 }
