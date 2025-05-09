@@ -11,7 +11,7 @@ export default function LoginPage() {
       <Card type="container" view="outlined" style={{ padding: '40px' }}>
         <form>
           <h1 className={styles.h1}>Log Into Your Account</h1>
-          <FormLabel type="email" text="e-mail" />
+          <FormLabel type="text" text="e-mail" />
           <FormLabel type="password" text="password" InnerButton={InnerInputButton} />
           <NavigationButton route={Routes.main} text={'To main'} />
           <div style={{ marginTop: '15px' }}>
