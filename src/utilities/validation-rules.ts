@@ -12,4 +12,9 @@ z.setErrorMap(customErrorMap);
 
 export const schema = z.object({
   email: z.string().email(),
+  password: z
+    .string()
+    .min(5, { message: 'Password must be longer than 5 characters' })
+    .length(5, { message: 'Length shall be 5' })
+    .max(10, { message: 'Password must be longer than 10 characters' }),
 });

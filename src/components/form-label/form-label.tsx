@@ -9,10 +9,12 @@ import { schema } from '../../utilities/validation-rules';
 export default function FormLabel({
   type,
   text,
+  zScheme,
   InnerButton,
 }: {
   type: InputTypes;
   text: string;
+  zScheme?: 'email' | 'password';
   InnerButton?: typeof InnerInputButton;
 }) {
   const {
@@ -31,9 +33,9 @@ export default function FormLabel({
         className={styles.input}
         type={type}
         size="xl"
-        {...register('email')}
-        errorMessage={errors.email?.message}
-        validationState={errors.email ? 'invalid' : undefined}
+        {...(zScheme && register(zScheme))}
+        errorMessage={zScheme ? errors[zScheme]?.message : ''}
+        validationState={zScheme && errors[zScheme] ? 'invalid' : undefined}
       ></TextInput>
       {InnerButton && <InnerButton />}
     </label>
