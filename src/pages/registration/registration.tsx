@@ -1,15 +1,159 @@
-import { Link } from 'react-router-dom';
-import { Button } from '@gravity-ui/uikit';
+import { Card, Text, TextInput, Select, PasswordInput } from '@gravity-ui/uikit';
+import { DatePicker } from '@gravity-ui/date-components';
+import styles from './style.module.css';
+import NavigationButton from '../../components/navigation-button/navigation-button';
+import { Routes } from '../../components/navigation-button/type';
+import FormLabel from '../../components/form-label/form-label';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { schema } from '../../utilities/validation-config/validation-rules';
+import { z } from 'zod';
+
+const onSubmit = (data: z.infer<typeof schema>) => {
+  console.log(data);
+};
 
 export default function RegistrationPage() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    mode: 'onChange',
+    resolver: zodResolver(schema),
+  });
+
   return (
-    <div className="page">
-      <h1>Registration page</h1>
-      <Link to="/">
-        <Button view="action" size="l">
-          To main
-        </Button>
-      </Link>
-    </div>
+    <main className={styles.main}>
+      <Card type="container" view="outlined" className={styles.container}>
+        <form className={styles.form} onSubmit={void handleSubmit(onSubmit)}>
+          <h1 className={styles.h1}>Create a personal account</h1>
+          <fieldset className={styles.fieldset}>
+            <legend>Personal information</legend>
+            <FormLabel text="Please enter your e-mail">
+              <TextInput
+                {...register('email')}
+                placeholder="Enter e-mail"
+                className={styles.input}
+                size="xl"
+                errorMessage={errors.email?.message}
+                validationState={errors.email ? 'invalid' : undefined}
+              />
+            </FormLabel>
+            <FormLabel text="Please enter your password">
+              <PasswordInput
+                {...register('password')}
+                placeholder="Enter password"
+                className={styles.input}
+                size="xl"
+                errorMessage={errors.password?.message}
+                validationState={errors.password ? 'invalid' : undefined}
+                autoComplete="true"
+              />
+            </FormLabel>
+            <FormLabel text="Please enter your first name">
+              <TextInput
+                {...register('firstName')}
+                placeholder="Enter first name"
+                className={styles.input}
+                size="xl"
+                errorMessage={errors.firstName?.message}
+                validationState={errors.firstName ? 'invalid' : undefined}
+              />
+            </FormLabel>
+            <FormLabel text="Please enter your last name">
+              <TextInput
+                {...register('lastName')}
+                placeholder="Enter last name"
+                className={styles.input}
+                size="xl"
+                errorMessage={errors.lastName?.message}
+                validationState={errors.lastName ? 'invalid' : undefined}
+              />
+            </FormLabel>
+            <FormLabel text="Please enter your date of birth">
+              <DatePicker
+                {...register('dateOfBirth')}
+                placeholder="Enter date of birth"
+                className={styles.input}
+                size="xl"
+                format="DD-MM-YYYY"
+                onUpdate={(date) => {
+                  const dateString = date?.toISOString().split('T')[0] ?? '';
+                  return void register('dateOfBirth').onChange({
+                    target: {
+                      value: dateString,
+                      name: 'dateOfBirth',
+                    },
+                  });
+                }}
+                errorMessage={errors.dateOfBirth?.message}
+                validationState={errors.dateOfBirth ? 'invalid' : undefined}
+              />
+            </FormLabel>
+          </fieldset>
+          <fieldset className={styles.fieldset}>
+            <legend>Address information</legend>
+            <FormLabel text="Please enter your street">
+              <TextInput
+                {...register('street')}
+                placeholder="Enter street"
+                className={styles.input}
+                size="xl"
+                errorMessage={errors.street?.message}
+                validationState={errors.street ? 'invalid' : undefined}
+              />
+            </FormLabel>
+            <FormLabel text="Please enter your city">
+              <TextInput
+                {...register('city')}
+                placeholder="Enter city"
+                className={styles.input}
+                size="xl"
+                errorMessage={errors.city?.message}
+                validationState={errors.city ? 'invalid' : undefined}
+              />
+            </FormLabel>
+            <FormLabel text="Please select your country">
+              <Select
+                {...register('country')}
+                placeholder="Select country"
+                className={styles.input}
+                size="xl"
+                onUpdate={(selectedValues) => {
+                  const selectedValue = selectedValues[0] ?? '';
+                  return void register('country').onChange({
+                    target: {
+                      value: selectedValue,
+                      name: 'country',
+                    },
+                  });
+                }}
+                errorMessage={errors.country?.message}
+                validationState={errors.country ? 'invalid' : undefined}
+              >
+                <Select.Option value="US">United States</Select.Option>
+                <Select.Option value="CA">Canada</Select.Option>
+              </Select>
+            </FormLabel>
+            <FormLabel text="Please enter your postal code">
+              <TextInput
+                {...register('postalCode')}
+                placeholder="Enter postal code"
+                className={styles.input}
+                size="xl"
+                errorMessage={errors.postalCode?.message}
+                validationState={errors.postalCode ? 'invalid' : undefined}
+              />
+            </FormLabel>
+          </fieldset>
+          <NavigationButton route={Routes.main} text="Create" />
+          <div className={styles.wrapper}>
+            <Text variant="subheader-1">Already have an account? Sign in here:</Text>
+            <NavigationButton route={Routes.login} text="Sign in" />
+          </div>
+        </form>
+      </Card>
+    </main>
   );
 }

@@ -1,45 +1,63 @@
 import { Card, Text, Button } from '@gravity-ui/uikit';
+import { TextInput, PasswordInput } from '@gravity-ui/uikit';
 import styles from './style.module.css';
 import NavigationButton from '../../components/navigation-button/navigation-button';
 import { Routes } from '../../components/navigation-button/type';
 import FormLabel from '../../components/form-label/form-label';
-import InnerInputButton from '../../components/inner-input-button/inner-input-button';
-import { FormProvider, useForm } from 'react-hook-form';
-import { schema } from '../../utilities/validation-config/validation-rules';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { schema } from '../../utilities/validation-config/validation-rules';
+
+const loginSchema = schema.pick({ email: true, password: true });
 
 const onSubmit = (data: { email: string; password: string }) => {
   console.log(data);
 };
 
 export default function LoginPage() {
-  const methods = useForm({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
     mode: 'onChange',
-    resolver: zodResolver(schema),
+    resolver: zodResolver(loginSchema),
   });
-  const { handleSubmit } = methods;
 
   return (
     <main className={styles.main}>
-      <Card type="container" view="outlined" className={styles.card}>
-        <FormProvider {...methods}>
-          <form
-            onSubmit={(event) => {
-              void handleSubmit(onSubmit)(event);
-            }}
-          >
-            <h1 className={styles.h1}>Log Into Your Account</h1>
-            <FormLabel zScheme="email" type="text" text="e-mail" />
-            <FormLabel zScheme="password" type="password" text="password" InnerButton={InnerInputButton} />
-            <Button type="submit" view="action" size="xl" width="max">
-              Sign in
-            </Button>
-            <div className={styles['signup-wrapper']}>
-              <Text variant="subheader-1">Don't have an account? Sign up here:</Text>
-              <NavigationButton route={Routes.registration} text={'Sign up'} />
-            </div>
-          </form>
-        </FormProvider>
+      <Card type="container" view="outlined" className={styles.container}>
+        <form className={styles.form} onSubmit={void handleSubmit(onSubmit)}>
+          <h1 className={styles.h1}>Log into your account</h1>
+          <FormLabel text="">
+            <TextInput
+              {...register('email')}
+              placeholder="Enter e-mail"
+              className={styles.input}
+              size="xl"
+              errorMessage={errors.email?.message}
+              validationState={errors.email ? 'invalid' : undefined}
+            />
+          </FormLabel>
+          <FormLabel text="">
+            <PasswordInput
+              {...register('password')}
+              placeholder="Enter password"
+              className={styles.input}
+              size="xl"
+              errorMessage={errors.password?.message}
+              validationState={errors.password ? 'invalid' : undefined}
+              autoComplete="true"
+            />
+          </FormLabel>
+          <Button type="submit" view="action" size="xl" width="max">
+            Sign in
+          </Button>
+          <div className={styles['signup-wrapper']}>
+            <Text variant="subheader-1">Don't have an account? Sign up here:</Text>
+            <NavigationButton route={Routes.registration} text="Sign up" />
+          </div>
+        </form>
       </Card>
     </main>
   );
