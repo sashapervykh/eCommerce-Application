@@ -4,7 +4,7 @@ import { InputTypes } from './types';
 import InnerInputButton from '../inner-input-button/inner-input-button';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { schema } from '../../utilities/validation-rules';
+import { schema } from '../../utilities/validation-config/validation-rules';
 
 export default function FormLabel({
   type,
@@ -34,7 +34,7 @@ export default function FormLabel({
         type={type}
         size="xl"
         {...(zScheme && register(zScheme))}
-        errorMessage={zScheme ? errors[zScheme]?.message : ''}
+        errorMessage={zScheme && typeof errors[zScheme]?.message === 'string' ? errors[zScheme].message : ''}
         validationState={zScheme && errors[zScheme] ? 'invalid' : undefined}
       ></TextInput>
       {InnerButton && <InnerButton />}

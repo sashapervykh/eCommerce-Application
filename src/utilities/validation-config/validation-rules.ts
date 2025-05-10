@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { isValidPassword } from './validation-functions/is-valid-password';
 
 const customErrorMap: z.ZodErrorMap = (issue, context) => {
   if (issue.code === z.ZodIssueCode.invalid_string && issue.validation === 'email') {
@@ -11,10 +12,6 @@ const customErrorMap: z.ZodErrorMap = (issue, context) => {
 z.setErrorMap(customErrorMap);
 
 export const schema = z.object({
-  email: z.string().email(),
-  password: z
-    .string()
-    .min(5, { message: 'Password must be longer than 5 characters' })
-    .length(5, { message: 'Length shall be 5' })
-    .max(10, { message: 'Password must be longer than 10 characters' }),
+  email: z.string().superRefine(isValidPassword),
+  password: z.string().superRefine(isValidPassword),
 });
