@@ -1,10 +1,22 @@
 import { Button, Icon } from '@gravity-ui/uikit';
-import { Eye } from '@gravity-ui/icons';
+import { Eye, EyeSlash } from '@gravity-ui/icons';
+import styles from './styes.module.css';
+import { useState } from 'react';
 
-export default function InnerInputButton() {
+export default function InnerInputButton({ onClickFunction }: { onClickFunction: () => void }) {
+  const [visible, setVisible] = useState(false);
+
   return (
-    <Button size="l" view="flat-secondary" style={{ position: 'absolute', right: '1%', bottom: '22%' }}>
-      <Icon data={Eye} width="75%" height="75%"></Icon>
+    <Button
+      size="l"
+      view="flat-secondary"
+      onClick={() => {
+        onClickFunction();
+        setVisible((previous) => !previous);
+      }}
+      className={styles.button}
+    >
+      <Icon data={visible ? EyeSlash : Eye} className={styles.icon}></Icon>
     </Button>
   );
 }
