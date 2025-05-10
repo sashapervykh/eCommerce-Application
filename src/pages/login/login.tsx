@@ -13,7 +13,7 @@ export default function LoginPage() {
           <h1 className={styles.h1}>Log Into Your Account</h1>
           <FormLabel zScheme="email" type="text" text="e-mail" />
           <FormLabel zScheme="password" type="password" text="password" InnerButton={InnerInputButton} />
-          <NavigationButton route={Routes.main} text={'To main'} />
+          <NavigationButton route={Routes.main} text={'Sign in'} />
           <div style={{ marginTop: '15px' }}>
             <Text variant="subheader-1">Don't have an account? Sign up here:</Text>
             <NavigationButton route={Routes.registration} text={'Sign up'} />

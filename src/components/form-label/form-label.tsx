@@ -39,6 +39,7 @@ export default function FormLabel({
         {...(zScheme && register(zScheme))}
         errorMessage={zScheme && typeof errors[zScheme]?.message === 'string' ? errors[zScheme].message : ''}
         validationState={zScheme && errors[zScheme] ? 'invalid' : undefined}
+        autoComplete={zScheme === 'password' ? true : false}
       ></TextInput>
       {InnerButton && (
         <InnerButton
