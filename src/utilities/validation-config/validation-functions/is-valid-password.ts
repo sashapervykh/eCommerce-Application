@@ -12,11 +12,11 @@ export function isValidPassword(value: string, context: z.RefinementCtx) {
     messages.push('Password must not contain whitespaces.');
   }
 
-  if (!/[AB]/.test(value)) {
+  if (!/[A-Z]/.test(value)) {
     missedSymbols.push(`1 uppercase letter`);
   }
 
-  if (!/[ab]/.test(value)) {
+  if (!/[a-z]/.test(value)) {
     missedSymbols.push(`1 lowercase letter`);
   }
 
