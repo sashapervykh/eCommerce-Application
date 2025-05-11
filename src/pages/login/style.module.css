@@ -9,3 +9,11 @@
   margin-top: 0;
   line-height: 2rem;
 }
+
+.card {
+  padding: 40px;
+}
+
+.signup-wrapper {
+  margin-top: 15px;
+}

@@ -1,6 +1,6 @@
 import { Button, Icon } from '@gravity-ui/uikit';
 import { Eye, EyeSlash } from '@gravity-ui/icons';
-import styles from './styes.module.css';
+import styles from './styles.module.css';
 import { useState } from 'react';
 
 export default function InnerInputButton({ onClickFunction }: { onClickFunction: () => void }) {
