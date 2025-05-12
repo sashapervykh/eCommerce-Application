@@ -1,9 +1,9 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 
-// https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const isDevelopmentMode = mode === 'development';
+
   return {
     base: './',
     build: isDevelopmentMode
@@ -12,10 +12,12 @@ export default defineConfig(({ mode }) => {
           minify: false,
           rollupOptions: { output: { manualChunks: undefined } },
         }
-      : {},
+      : undefined,
     plugins: [react()],
     server: {
-      historyApiFallback: true,
+      fs: {
+        strict: true,
+      },
     },
   };
 });
