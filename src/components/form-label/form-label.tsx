@@ -2,9 +2,7 @@ import styles from './styles.module.css';
 import { TextInput, Text } from '@gravity-ui/uikit';
 import { InputTypes } from './types';
 import InnerInputButton from '../inner-input-button/inner-input-button';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { schema } from '../../utilities/validation-config/validation-rules';
+import { useFormContext } from 'react-hook-form';
 import { useState } from 'react';
 
 export default function FormLabel({
@@ -21,10 +19,7 @@ export default function FormLabel({
   const {
     register,
     formState: { errors },
-  } = useForm({
-    mode: 'onChange',
-    resolver: zodResolver(schema),
-  });
+  } = useFormContext();
 
   const [inputType, setInputType] = useState<InputTypes>(type);
 
