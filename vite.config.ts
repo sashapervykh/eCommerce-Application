@@ -14,10 +14,21 @@ export default defineConfig(({ mode }) => {
         }
       : undefined,
     plugins: [react()],
-    server: {
-      fs: {
-        strict: true,
+    test: {
+      globals: true,
+      environment: 'jsdom',
+      setupFiles: './setup-tests.ts',
+      coverage: {
+        provider: 'v8',
+        reporter: ['text', 'json', 'html'],
       },
+      server: {
+        deps: {
+          inline: ['@gravity-ui/uikit'],
+        },
+      },
+      css: true,
+      tsconfig: './tsconfig.test.json',
     },
   };
 });
