@@ -1,6 +1,6 @@
 // import { expect, test, describe, vi, afterEach } from 'vitest';
 // import { render, screen, fireEvent } from '@testing-library/react';
-// import { MemoryRouter, useLocation } from 'react-router-dom';
+// import { BrowserRouter } from 'react-router-dom';
 // import NotFoundPage from './not-found';
 // import { Routes } from '../../components/navigation-button/type';
 // import '@testing-library/jest-dom';
@@ -14,16 +14,24 @@ test('adds 1+2 to equal 3', () => {
 //   default: vi.fn(() => <div data-testid="lottie-animation" />),
 // }));
 
+// const mockLocation = {
+//   pathname: '',
+//   assign: vi.fn(),
+// };
+// vi.stubGlobal('location', mockLocation);
+
 // describe('NotFoundPage', () => {
 //   afterEach(() => {
 //     vi.clearAllMocks();
+//     mockLocation.pathname = '';
 //   });
 
 //   const renderWithRouter = (initialRoute = '/test-path') => {
+//     mockLocation.pathname = initialRoute;
 //     return render(
-//       <MemoryRouter initialEntries={[initialRoute]}>
+//       <BrowserRouter>
 //         <NotFoundPage />
-//       </MemoryRouter>,
+//       </BrowserRouter>,
 //     );
 //   };
 
@@ -37,22 +45,11 @@ test('adds 1+2 to equal 3', () => {
 //   });
 
 //   test('navigates to main page on button click', () => {
-//     let testLocation: ReturnType<typeof useLocation> | undefined;
-//     function LocationTracker() {
-//       testLocation = useLocation();
-//       return null;
-//     }
-
-//     render(
-//       <MemoryRouter initialEntries={['/test-path']}>
-//         <NotFoundPage />
-//         <LocationTracker />
-//       </MemoryRouter>,
-//     );
+//     renderWithRouter();
 
 //     const button = screen.getByRole('button', { name: /to main/i });
 //     fireEvent.click(button);
 
-//     expect(testLocation?.pathname).toBe(Routes.main);
+//     expect(location.pathname).toBe(Routes.main);
 //   });
 // });
