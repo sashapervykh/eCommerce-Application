@@ -7,9 +7,11 @@ import InnerInputButton from '../../components/inner-input-button/inner-input-bu
 import { FormProvider, useForm } from 'react-hook-form';
 import { schema } from '../../utilities/validation-config/validation-rules';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { api } from '../../api/api';
 
-const onSubmit = (data: { email: string; password: string }) => {
-  console.log(data);
+const onSubmit = async (data: { email: string; password: string }) => {
+  const response = await api.getAccessToken(data);
+  console.log(response);
 };
 
 export default function LoginPage() {
