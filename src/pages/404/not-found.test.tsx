@@ -1,55 +1,40 @@
-// import { expect, test, describe, vi, afterEach } from 'vitest';
-// import { render, screen, fireEvent } from '@testing-library/react';
-// import { BrowserRouter } from 'react-router-dom';
-// import NotFoundPage from './not-found';
-// import { Routes } from '../../components/navigation-button/type';
-// import '@testing-library/jest-dom';
-import { sum } from '../../functions';
+import { expect, test, describe, vi, afterEach } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { BrowserRouter } from 'react-router-dom';
+import NotFoundPage from './not-found';
+import { Routes } from '../../components/navigation-button/type';
+import '@testing-library/jest-dom';
 
-test('adds 1+2 to equal 3', () => {
-  expect(sum(1, 2)).toBe(3);
+vi.mock('lottie-react', () => ({
+  default: vi.fn(() => <div data-testid="lottie-animation" />),
+}));
+
+const renderWithRouter = (ui: React.ReactElement, { path = '/test-path' } = {}) => {
+  globalThis.history.pushState({}, '', path);
+  return render(ui, { wrapper: BrowserRouter });
+};
+
+describe('NotFoundPage', () => {
+  afterEach(() => {
+    globalThis.history.pushState({}, '', '/');
+    vi.clearAllMocks();
+  });
+
+  test('renders correctly with path', () => {
+    renderWithRouter(<NotFoundPage />);
+
+    expect(screen.getByText(/page not found/i)).toBeInTheDocument();
+    expect(screen.getByText(/the path \/test-path does not exist/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /to main/i })).toBeInTheDocument();
+    expect(screen.getByTestId('lottie-animation')).toBeInTheDocument();
+  });
+
+  test('navigates to main page on button click', () => {
+    renderWithRouter(<NotFoundPage />);
+
+    const button = screen.getByRole('button', { name: /to main/i });
+    fireEvent.click(button);
+
+    expect(globalThis.location.pathname).toBe(Routes.main);
+  });
 });
-
-// vi.mock('lottie-react', () => ({
-//   default: vi.fn(() => <div data-testid="lottie-animation" />),
-// }));
-
-// const mockLocation = {
-//   pathname: '',
-//   assign: vi.fn(),
-// };
-// vi.stubGlobal('location', mockLocation);
-
-// describe('NotFoundPage', () => {
-//   afterEach(() => {
-//     vi.clearAllMocks();
-//     mockLocation.pathname = '';
-//   });
-
-//   const renderWithRouter = (initialRoute = '/test-path') => {
-//     mockLocation.pathname = initialRoute;
-//     return render(
-//       <BrowserRouter>
-//         <NotFoundPage />
-//       </BrowserRouter>,
-//     );
-//   };
-
-//   test('renders correctly with path', () => {
-//     renderWithRouter();
-
-//     expect(screen.getByText(/page not found/i)).toBeInTheDocument();
-//     expect(screen.getByText(/the path \/test-path does not exist/i)).toBeInTheDocument();
-//     expect(screen.getByRole('button', { name: /to main/i })).toBeInTheDocument();
-//     expect(screen.getByTestId('lottie-animation')).toBeInTheDocument();
-//   });
-
-//   test('navigates to main page on button click', () => {
-//     renderWithRouter();
-
-//     const button = screen.getByRole('button', { name: /to main/i });
-//     fireEvent.click(button);
-
-//     expect(location.pathname).toBe(Routes.main);
-//   });
-// });
