@@ -8,10 +8,29 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { schema } from '../../utilities/validation-config/validation-rules';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { api } from '../../api/api';
+import { customerAPI } from '../../api/customer-api';
 
 const onSubmit = async (data: { email: string; password: string }) => {
-  const response = await api.getAccessToken(data);
-  console.log(response);
+  try {
+    const response = await api.getAccessToken(data);
+    if (response.access_token) customerAPI.createAuthenticatedCustomer(response.token_type, response.access_token);
+    void customerAPI
+      .apiRoot()
+      .me()
+      .login()
+      .post({
+        body: {
+          email: data.email,
+          password: data.password,
+        },
+      })
+      .execute()
+      .then((response) => {
+        console.log(response.body);
+      });
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 export default function LoginPage() {
