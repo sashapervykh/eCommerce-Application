@@ -10,6 +10,21 @@
   line-height: 2rem;
 }
 
+.fieldset {
+  margin-bottom: 20px;
+  border: 1px solid #d8d8d8;
+  border-radius: 10px;
+}
+
+.button {
+  margin: 15px auto;
+  display: block;
+}
+
+.wrapper {
+  margin: 15px 0;
+}
+
 .container {
   padding: 40px;
   margin: 20px auto;
