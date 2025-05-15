@@ -47,7 +47,12 @@ export default function LoginPage() {
   return (
     <main className={styles.main}>
       <Card type="container" view="outlined" className={styles.container}>
-        <form className={styles.form} onSubmit={void handleSubmit(onSubmit)}>
+        <form
+          className={styles.form}
+          onSubmit={(event) => {
+            void handleSubmit(onSubmit)(event);
+          }}
+        >
           <h1 className={styles.h1}>Log into your account</h1>
           <FormLabel text="Please enter your email:">
             <TextInput
