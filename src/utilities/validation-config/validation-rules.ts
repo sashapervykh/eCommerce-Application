@@ -31,7 +31,7 @@ z.setErrorMap(customErrorMap);
 
 export const schema = z.object({
   email: z.string().email(),
-  password: z.string().superRefine(isValidPassword),
+  password: z.string({ message: 'Password is required' }).superRefine(isValidPassword),
   firstName: z.string().regex(/^[A-Za-zА-я]+$/),
   lastName: z.string().regex(/^[A-Za-zА-я]+$/),
   dateOfBirth: z.string().min(1, 'Date is required').superRefine(isValidDOB),

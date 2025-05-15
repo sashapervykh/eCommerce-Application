@@ -4,13 +4,12 @@ import styles from './style.module.css';
 import NavigationButton from '../../components/navigation-button/navigation-button';
 import { Routes } from '../../components/navigation-button/type';
 import FormLabel from '../../components/form-label/form-label';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { api } from '../../api/api';
 import { customerAPI } from '../../api/customer-api';
 import { schema } from '../../utilities/validation-config/validation-rules';
 const loginSchema = schema.pick({ email: true, password: true });
-
 
 const onSubmit = async (data: { email: string; password: string }) => {
   try {
@@ -39,6 +38,7 @@ export default function LoginPage() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm({
     mode: 'onChange',
@@ -48,7 +48,12 @@ export default function LoginPage() {
   return (
     <main className={styles.main}>
       <Card type="container" view="outlined" className={styles.container}>
-        <form className={styles.form} onSubmit={void handleSubmit(onSubmit)}>
+        <form
+          className={styles.form}
+          onSubmit={(event) => {
+            void handleSubmit(onSubmit)(event);
+          }}
+        >
           <h1 className={styles.h1}>Log into your account</h1>
           <FormLabel text="">
             <TextInput
@@ -61,14 +66,23 @@ export default function LoginPage() {
             />
           </FormLabel>
           <FormLabel text="">
-            <PasswordInput
-              {...register('password')}
-              placeholder="Enter password"
-              className={styles.input}
-              size="xl"
-              errorMessage={errors.password?.message}
-              validationState={errors.password ? 'invalid' : undefined}
-              autoComplete="true"
+            <Controller
+              name="password"
+              control={control}
+              render={({ field, fieldState }) => (
+                <PasswordInput
+                  controlRef={field.ref}
+                  value={field.value || ''}
+                  onBlur={field.onBlur}
+                  onChange={field.onChange}
+                  placeholder="Enter password"
+                  className={styles.input}
+                  size="xl"
+                  errorMessage={fieldState.error?.message}
+                  validationState={fieldState.invalid ? 'invalid' : undefined}
+                  autoComplete="true"
+                />
+              )}
             />
           </FormLabel>
           <Button type="submit" view="action" size="xl" width="max">
