@@ -4,7 +4,7 @@ import styles from './style.module.css';
 import NavigationButton from '../../components/navigation-button/navigation-button';
 import { Routes } from '../../components/navigation-button/type';
 import FormLabel from '../../components/form-label/form-label';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { api } from '../../api/api';
 import { customerAPI } from '../../api/customer-api';
@@ -38,6 +38,7 @@ export default function LoginPage() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm({
     mode: 'onChange',
@@ -65,14 +66,22 @@ export default function LoginPage() {
             />
           </FormLabel>
           <FormLabel text="Please enter your password:">
-            <PasswordInput
-              {...register('password')}
-              placeholder="Enter password"
-              className={styles.input}
-              size="xl"
-              errorMessage={errors.password?.message}
-              validationState={errors.password ? 'invalid' : undefined}
-              autoComplete="true"
+            <Controller
+              name="password"
+              control={control}
+              render={({ field, fieldState }) => {
+                return (
+                  <PasswordInput
+                    controlRef={field.ref}
+                    placeholder="Enter password"
+                    className={styles.input}
+                    size="xl"
+                    errorMessage={fieldState.error?.message}
+                    validationState={fieldState.invalid ? 'invalid' : undefined}
+                    autoComplete="true"
+                  />
+                );
+              }}
             />
           </FormLabel>
           <Button type="submit" view="action" size="xl" width="max">
