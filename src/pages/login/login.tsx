@@ -55,7 +55,7 @@ export default function LoginPage() {
           }}
         >
           <h1 className={styles.h1}>Log into your account</h1>
-          <FormLabel text="Please enter your email:">
+          <FormLabel text="">
             <TextInput
               {...register('email')}
               placeholder="Enter e-mail"
@@ -65,7 +65,7 @@ export default function LoginPage() {
               validationState={errors.email ? 'invalid' : undefined}
             />
           </FormLabel>
-          <FormLabel text="Please enter your password:">
+          <FormLabel text="">
             <Controller
               name="password"
               control={control}
