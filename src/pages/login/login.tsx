@@ -11,7 +11,6 @@ import { customerAPI } from '../../api/customer-api';
 import { schema } from '../../utilities/validation-config/validation-rules';
 const loginSchema = schema.pick({ email: true, password: true });
 
-
 const onSubmit = async (data: { email: string; password: string }) => {
   try {
     const response = await api.getAccessToken(data);
@@ -50,7 +49,7 @@ export default function LoginPage() {
       <Card type="container" view="outlined" className={styles.container}>
         <form className={styles.form} onSubmit={void handleSubmit(onSubmit)}>
           <h1 className={styles.h1}>Log into your account</h1>
-          <FormLabel text="">
+          <FormLabel text="Please enter your email:">
             <TextInput
               {...register('email')}
               placeholder="Enter e-mail"
@@ -60,7 +59,7 @@ export default function LoginPage() {
               validationState={errors.email ? 'invalid' : undefined}
             />
           </FormLabel>
-          <FormLabel text="">
+          <FormLabel text="Please enter your password:">
             <PasswordInput
               {...register('password')}
               placeholder="Enter password"
