@@ -1,25 +1,18 @@
+import { z } from 'zod';
+
+const TokenResponseSchema = z.object({
+  access_token: z.string(),
+  expires_in: z.number(),
+  scope: z.string(),
+  refresh_token: z.string(),
+  token_type: z.string(),
+});
+
 export function returnCheckedTokenResponse(data: unknown) {
-  if (typeof data !== 'object' || !data) throw new Error('Token response has the wrong type');
-  if (
-    Object.keys(data).length !== 5 ||
-    !('access_token' in data) ||
-    !('expires_in' in data) ||
-    !('scope' in data) ||
-    !('refresh_token' in data) ||
-    !('token_type' in data) ||
-    typeof data.access_token !== 'string' ||
-    typeof data.expires_in !== 'number' ||
-    typeof data.scope !== 'string' ||
-    typeof data.refresh_token !== 'string' ||
-    typeof data.token_type !== 'string'
-  ) {
-    throw new Error('Token response has the wrong type');
+  try {
+    return TokenResponseSchema.parse(data);
+  } catch (error) {
+    console.error('Error parsing token response:', error);
+    throw new Error('Invalid token response');
   }
-  return {
-    access_token: data.access_token,
-    expires_in: data.expires_in,
-    scope: data.scope,
-    refresh_token: data.refresh_token,
-    token_type: data.token_type,
-  };
 }
