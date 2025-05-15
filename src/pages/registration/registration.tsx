@@ -4,7 +4,7 @@ import styles from './style.module.css';
 import NavigationButton from '../../components/navigation-button/navigation-button';
 import { Routes } from '../../components/navigation-button/type';
 import FormLabel from '../../components/form-label/form-label';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { schema } from '../../utilities/validation-config/validation-rules';
 import { z } from 'zod';
@@ -17,6 +17,7 @@ export default function RegistrationPage() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm({
     mode: 'onChange',
@@ -41,14 +42,23 @@ export default function RegistrationPage() {
               />
             </FormLabel>
             <FormLabel text="Please enter your password">
-              <PasswordInput
-                {...register('password')}
-                placeholder="Enter password"
-                className={styles.input}
-                size="xl"
-                errorMessage={errors.password?.message}
-                validationState={errors.password ? 'invalid' : undefined}
-                autoComplete="true"
+              <Controller
+                name="password"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <PasswordInput
+                    controlRef={field.ref}
+                    value={field.value || ''}
+                    onBlur={field.onBlur}
+                    onChange={field.onChange}
+                    placeholder="Enter password"
+                    className={styles.input}
+                    size="xl"
+                    errorMessage={fieldState.error?.message}
+                    validationState={fieldState.invalid ? 'invalid' : undefined}
+                    autoComplete="true"
+                  />
+                )}
               />
             </FormLabel>
             <FormLabel text="Please enter your first name">
@@ -72,23 +82,28 @@ export default function RegistrationPage() {
               />
             </FormLabel>
             <FormLabel text="Please enter your date of birth">
-              <DatePicker
-                {...register('dateOfBirth')}
-                placeholder="Enter date of birth"
-                className={styles.input}
-                size="xl"
-                format="DD-MM-YYYY"
-                onUpdate={(date) => {
-                  const dateString = date?.toISOString().split('T')[0] ?? '';
-                  return void register('dateOfBirth').onChange({
-                    target: {
-                      value: dateString,
-                      name: 'dateOfBirth',
-                    },
-                  });
-                }}
-                errorMessage={errors.dateOfBirth?.message}
-                validationState={errors.dateOfBirth ? 'invalid' : undefined}
+              <Controller
+                name="dateOfBirth"
+                control={control}
+                render={() => (
+                  <DatePicker
+                    placeholder="Enter date of birth"
+                    className={styles.input}
+                    size="xl"
+                    format="DD-MM-YYYY"
+                    onUpdate={(date) => {
+                      const dateString = date?.toISOString().split('T')[0] ?? '';
+                      return void register('dateOfBirth').onChange({
+                        target: {
+                          value: dateString,
+                          name: 'dateOfBirth',
+                        },
+                      });
+                    }}
+                    errorMessage={errors.dateOfBirth?.message}
+                    validationState={errors.dateOfBirth ? 'invalid' : undefined}
+                  />
+                )}
               />
             </FormLabel>
           </fieldset>
