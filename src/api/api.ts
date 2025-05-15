@@ -8,7 +8,7 @@ class API {
     const response = await fetch(this.authLink, {
       method: 'POST',
       headers: {
-        Authorization: `Basic ${btoa(`${import.meta.env.VITE_CLIENT_ID as string}:${import.meta.env.VITE_CLIENT_SECRET as string}`)}`,
+        Authorization: `Basic ${btoa(`${import.meta.env.VITE_CLIENT_ID}:${import.meta.env.VITE_CLIENT_SECRET}`)}`,
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({
