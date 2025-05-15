@@ -69,19 +69,20 @@ export default function LoginPage() {
             <Controller
               name="password"
               control={control}
-              render={({ field, fieldState }) => {
-                return (
-                  <PasswordInput
-                    controlRef={field.ref}
-                    placeholder="Enter password"
-                    className={styles.input}
-                    size="xl"
-                    errorMessage={fieldState.error?.message}
-                    validationState={fieldState.invalid ? 'invalid' : undefined}
-                    autoComplete="true"
-                  />
-                );
-              }}
+              render={({ field, fieldState }) => (
+                <PasswordInput
+                  controlRef={field.ref}
+                  value={field.value || ''}
+                  onBlur={field.onBlur}
+                  onChange={field.onChange}
+                  placeholder="Enter password"
+                  className={styles.input}
+                  size="xl"
+                  errorMessage={fieldState.error?.message}
+                  validationState={fieldState.invalid ? 'invalid' : undefined}
+                  autoComplete="true"
+                />
+              )}
             />
           </FormLabel>
           <Button type="submit" view="action" size="xl" width="max">
