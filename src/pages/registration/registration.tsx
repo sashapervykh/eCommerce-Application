@@ -6,11 +6,11 @@ import { Routes } from '../../components/navigation-button/type';
 import FormLabel from '../../components/form-label/form-label';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { schema } from '../../utilities/validation-config/validation-rules';
+import { registrationSchema } from '../../utilities/validation-config/validation-rules';
 import { z } from 'zod';
 
-const onSubmit = (data: z.infer<typeof schema>) => {
-  console.log(data);
+const onSubmit = (data: z.infer<typeof registrationSchema>) => {
+  console.log('Form submitted:', data);
 };
 
 export default function RegistrationPage() {
@@ -19,9 +19,21 @@ export default function RegistrationPage() {
     handleSubmit,
     control,
     formState: { errors },
+    trigger,
   } = useForm({
     mode: 'onChange',
-    resolver: zodResolver(schema),
+    resolver: zodResolver(registrationSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+      firstName: '',
+      lastName: '',
+      dateOfBirth: '',
+      street: '',
+      city: '',
+      country: undefined,
+      postalCode: '',
+    },
   });
 
   return (
@@ -130,34 +142,40 @@ export default function RegistrationPage() {
               />
             </FormLabel>
             <FormLabel text="Please select your country">
-              <Select
-                {...register('country')}
-                placeholder="Select country"
-                className={styles.input}
-                size="xl"
-                onUpdate={(selectedValues) => {
-                  const selectedValue = selectedValues[0] ?? '';
-                  return void register('country').onChange({
-                    target: {
-                      value: selectedValue,
-                      name: 'country',
-                    },
-                  });
-                }}
-                errorMessage={errors.country?.message}
-                validationState={errors.country ? 'invalid' : undefined}
-              >
-                <Select.Option value="US">United States</Select.Option>
-                <Select.Option value="CA">Canada</Select.Option>
-              </Select>
+              <Controller
+                name="country"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <Select
+                    value={field.value ? [field.value] : []}
+                    placeholder="Select country"
+                    className={styles.input}
+                    size="xl"
+                    onUpdate={(selectedValues) => {
+                      const selectedValue = selectedValues[0] ?? '';
+                      field.onChange(selectedValue);
+                      void trigger(['postalCode', 'country']);
+                    }}
+                    errorMessage={fieldState.error?.message}
+                    validationState={fieldState.invalid ? 'invalid' : undefined}
+                  >
+                    <Select.Option value="US">United States</Select.Option>
+                    <Select.Option value="CA">Canada</Select.Option>
+                  </Select>
+                )}
+              />
             </FormLabel>
             <FormLabel text="Please enter your postal code">
               <TextInput
-                {...register('postalCode')}
+                {...register('postalCode', {
+                  onChange: () => {
+                    void trigger(['postalCode', 'country']);
+                  },
+                })}
                 placeholder="Enter postal code"
                 className={styles.input}
                 size="xl"
-                errorMessage={errors.postalCode?.message}
+                errorMessage={errors.postalCode ? errors.postalCode.message : undefined}
                 validationState={errors.postalCode ? 'invalid' : undefined}
               />
             </FormLabel>

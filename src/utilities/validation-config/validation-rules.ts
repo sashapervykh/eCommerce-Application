@@ -29,14 +29,25 @@ const customErrorMap: z.ZodErrorMap = (issue, context) => {
 
 z.setErrorMap(customErrorMap);
 
+export const registrationSchema = z
+  .object({
+    email: z.string().email(),
+    password: z.string({ message: 'Password is required' }).superRefine(isValidPassword),
+    firstName: z.string().regex(/^[A-Za-zА-я]+$/),
+    lastName: z.string().regex(/^[A-Za-zА-я]+$/),
+    dateOfBirth: z.string().min(1, 'Date is required').superRefine(isValidDOB),
+    street: z.string().min(1, 'Street is required'),
+    city: z.string().regex(/^[A-Za-zА-я]+$/),
+    country: z.enum(['US', 'CA']).optional(),
+    postalCode: z.string().min(1, 'Postal code is required'),
+  })
+  .superRefine((data, context) => {
+    isValidPostalCode(data, context);
+  });
+
 export const schema = z.object({
-  email: z.string().email(),
+  email: z
+    .string()
+    .email({ message: 'Email must be well formatted (i.e. include @ and domain and not contain whitespaces)' }),
   password: z.string({ message: 'Password is required' }).superRefine(isValidPassword),
-  firstName: z.string().regex(/^[A-Za-zА-я]+$/),
-  lastName: z.string().regex(/^[A-Za-zА-я]+$/),
-  dateOfBirth: z.string().min(1, 'Date is required').superRefine(isValidDOB),
-  street: z.string().min(1, 'Street is required'),
-  city: z.string().regex(/^[A-Za-zА-я]+$/),
-  country: z.enum(['US', 'CA']),
-  postalCode: z.string().min(1, 'Postal code is required').superRefine(isValidPostalCode),
 });
