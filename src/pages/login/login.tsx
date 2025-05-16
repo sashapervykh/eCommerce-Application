@@ -73,7 +73,7 @@ export default function LoginPage() {
         >
           <h1 className={styles.h1}>Log into your account</h1>
           {errors.root && (
-            <Text variant="subheader-1" className={styles['server-error']}>
+            <Text variant="subheader-1" className={styles['server-error']} color="danger">
               {errors.root.message}
             </Text>
           )}
