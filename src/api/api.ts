@@ -1,5 +1,4 @@
 import { projectKey } from '../commercetools-sdk';
-import { returnCheckedTokenResponse } from '../utilities/return-checked-token-response';
 
 class API {
   authLink = `https://auth.us-central1.gcp.commercetools.com/oauth/${projectKey}/customers/token`;
@@ -21,7 +20,7 @@ class API {
 
     const result: unknown = await response.json();
 
-    return returnCheckedTokenResponse(result);
+    return result;
   }
 }
 
