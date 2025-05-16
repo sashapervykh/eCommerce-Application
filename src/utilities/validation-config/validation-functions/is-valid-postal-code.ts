@@ -1,14 +1,34 @@
 import { z } from 'zod';
 
-export function isValidPostalCode(value: string, context: z.RefinementCtx) {
-  const isUS = /^\d{5}$/.test(value);
-  const isCA = /^[a-z]\d[a-z][ -]?\d[a-z]\d$/i.test(value);
+export const isValidPostalCode = (data: { postalCode: string; country?: string }, context: z.RefinementCtx) => {
+  const { postalCode, country } = data;
 
-  if (!isUS && !isCA) {
+  if (!postalCode) {
+    return;
+  }
+
+  const isUS = /^\d{5}$/.test(postalCode);
+  const isCA = /^[a-z]\d[a-z][ -]?\d[a-z]\d$/i.test(postalCode);
+
+  if (country === undefined) {
     context.addIssue({
       code: z.ZodIssueCode.custom,
-      message: 'Postal code must be: 12345 (US) or A1A 1A1 (Canada)',
+      message: 'You should select your country first',
+      path: ['postalCode'],
     });
-    return false;
   }
-}
+
+  if (country === 'US' && !isUS) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Postal code must be in format: 12345',
+      path: ['postalCode'],
+    });
+  } else if (country === 'CA' && !isCA) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Postal code must be in format: A1A 1A1',
+      path: ['postalCode'],
+    });
+  }
+};
