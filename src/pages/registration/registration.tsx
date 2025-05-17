@@ -1,4 +1,4 @@
-import { Card, Text, TextInput, Select, PasswordInput } from '@gravity-ui/uikit';
+import { Card, Text, TextInput, Select, PasswordInput, Alert, Button } from '@gravity-ui/uikit';
 import { DatePicker } from '@gravity-ui/date-components';
 import styles from './style.module.css';
 import NavigationButton from '../../components/navigation-button/navigation-button';
@@ -8,18 +8,22 @@ import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { registrationSchema } from '../../utilities/validation-config/validation-rules';
 import { z } from 'zod';
-
-const onSubmit = (data: z.infer<typeof registrationSchema>) => {
-  console.log('Form submitted:', data);
-};
+import { api } from '../../api/api';
+import { isErrorResponse } from '../../utilities/return-checked-token-response';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 export default function RegistrationPage() {
+  const [successMessage, setSuccessMessage] = useState<string | undefined>();
+  const [serverError, setServerError] = useState<string | undefined>();
+
   const {
     register,
     handleSubmit,
     control,
     formState: { errors },
     trigger,
+    reset,
   } = useForm({
     mode: 'onChange',
     resolver: zodResolver(registrationSchema),
@@ -36,10 +40,39 @@ export default function RegistrationPage() {
     },
   });
 
+  const onSubmit = async (data: z.infer<typeof registrationSchema>) => {
+    try {
+      setServerError(undefined);
+      setSuccessMessage(undefined);
+
+      const response: unknown = await api.createCustomer({
+        ...data,
+        dateOfBirth: data.dateOfBirth.split('T')[0],
+        country: data.country ?? '',
+      });
+
+      if (isErrorResponse(response)) {
+        if (response.statusCode === 400 && response.errors.some((error) => error.code === 'DuplicateField')) {
+          setServerError('This email is already registered.');
+        } else {
+          setServerError(response.message || 'Error while registering. Try again.');
+        }
+        console.error('API error:', response);
+        return;
+      }
+
+      setSuccessMessage('Account successfully created! Now you can log in.');
+      reset();
+    } catch (error) {
+      console.error('Error while registering:', error);
+      setServerError('A server error has occurred. Please try again later.');
+    }
+  };
+
   return (
     <main className={styles.main}>
       <Card type="container" view="outlined" className={styles.container}>
-        <form className={styles.form} onSubmit={void handleSubmit(onSubmit)}>
+        <form className={styles.form} onSubmit={(error) => void handleSubmit(onSubmit)(error)}>
           <h1 className={styles.h1}>Create a personal account</h1>
           <fieldset className={styles.fieldset}>
             <legend>Personal information</legend>
@@ -180,7 +213,22 @@ export default function RegistrationPage() {
               />
             </FormLabel>
           </fieldset>
-          <NavigationButton route={Routes.main} text="Create" />
+          <Button type="submit" view="action" size="xl" width="max">
+            Create
+          </Button>
+          {successMessage && (
+            <Alert
+              theme="success"
+              title="Sucsess registration"
+              message=<>
+                {successMessage} <Link to={Routes.login}>Log in</Link>
+              </>
+              className={styles.alert}
+            />
+          )}
+          {serverError && (
+            <Alert theme="danger" title="Registration error" message={serverError} className={styles.alert} />
+          )}
           <div className={styles.wrapper}>
             <Text variant="subheader-1">Already have an account? Sign in here:</Text>
             <NavigationButton route={Routes.login} text="Sign in" />
