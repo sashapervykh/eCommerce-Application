@@ -98,8 +98,6 @@ export default function RegistrationPage() {
           setServerError(
             (errorMessages || (response as { message?: string }).message) ?? 'Error while registering. Try again.',
           );
-        } else {
-          setServerError((response as { message?: string }).message ?? 'Error while registering. Try again.');
         }
         console.error('API error:', response);
         return;
@@ -264,12 +262,6 @@ export default function RegistrationPage() {
           <Button type="submit" view="action" size="xl" width="max" disabled={isSubmitting}>
             Create
           </Button>
-          {/*           {successMessage && !serverError && (
-            <Alert theme="success" title="Success registration" message={successMessage} className={styles.alert} />
-          )}
-          {serverError && (
-            <Alert theme="danger" title="Registration error" message={serverError} className={styles.alert} />
-          )} */}
           <div className={styles.wrapper}>
             <Text variant="subheader-1">Already have an account? Sign in here:</Text>
             <NavigationButton route={Routes.login} text="Sign in" />
