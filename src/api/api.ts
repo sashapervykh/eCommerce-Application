@@ -6,7 +6,6 @@ class API {
   apiLink = `https://api.us-central1.gcp.commercetools.com/${projectKey}/customers`;
 
   async getAccessToken(data: { email: string; password: string }) {
-    console.log('getAccessToken: projectKey=', projectKey, 'clientId=', import.meta.env.VITE_CLIENT_ID);
     const response = await fetch(this.authLink, {
       method: 'POST',
       headers: {
@@ -26,7 +25,6 @@ class API {
   }
 
   async getClientCredentialsToken() {
-    console.log('getClientCredentialsToken: projectKey=', projectKey, 'clientId=', import.meta.env.VITE_CLIENT_ID);
     const response = await fetch(this.tokenLink, {
       method: 'POST',
       headers: {
@@ -41,8 +39,13 @@ class API {
 
     const result: unknown = await response.json();
 
-    if (typeof result === 'object' && result !== null && 'access_token' in result) {
-      return result.access_token as string;
+    if (
+      typeof result === 'object' &&
+      result !== null &&
+      'access_token' in result &&
+      typeof result.access_token === 'string'
+    ) {
+      return result.access_token;
     }
 
     throw new Error('Failed to obtain access token: ' + JSON.stringify(result));

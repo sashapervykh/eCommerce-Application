@@ -1,20 +1,46 @@
 import styles from './style.module.css';
 import FormLabel from '../../components/form-label/form-label';
 import NavigationButton from '../../components/navigation-button/navigation-button';
-import { Card, Text, TextInput, Select, PasswordInput, Alert, Button } from '@gravity-ui/uikit';
+import { Card, Text, TextInput, Select, PasswordInput, Button, useToaster } from '@gravity-ui/uikit';
 import { DatePicker } from '@gravity-ui/date-components';
 import { Routes } from '../../components/navigation-button/type';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { api } from '../../api/api';
 import { registrationSchema } from '../../utilities/validation-config/validation-rules';
 
+import { useNavigate } from 'react-router';
+
 export default function RegistrationPage() {
   const [successMessage, setSuccessMessage] = useState<string | undefined>();
   const [serverError, setServerError] = useState<string | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
+
+  const toaster = useToaster();
+
+  useEffect(() => {
+    if (successMessage && !serverError) {
+      toaster.add({
+        name: 'success-registration',
+        title: 'Success registration',
+        content: successMessage,
+        theme: 'success',
+        autoHiding: 6000,
+      });
+    }
+    if (serverError) {
+      toaster.add({
+        name: 'error-registration',
+        title: 'Registration error',
+        content: serverError,
+        theme: 'danger',
+        autoHiding: 6000,
+      });
+    }
+  }, [successMessage, serverError, toaster]);
 
   const {
     register,
@@ -79,8 +105,10 @@ export default function RegistrationPage() {
         return;
       }
 
-      setSuccessMessage('Account successfully created! Now you can sign in.');
+      setSuccessMessage('Account successfully created! Now you can log in.');
+
       reset();
+      void navigate(Routes.main);
     } catch (error) {
       console.error('Error while registering:', error);
       setServerError('A server error has occurred. Please try again later.');
@@ -236,12 +264,12 @@ export default function RegistrationPage() {
           <Button type="submit" view="action" size="xl" width="max" disabled={isSubmitting}>
             Create
           </Button>
-          {successMessage && !serverError && (
+          {/*           {successMessage && !serverError && (
             <Alert theme="success" title="Success registration" message={successMessage} className={styles.alert} />
           )}
           {serverError && (
             <Alert theme="danger" title="Registration error" message={serverError} className={styles.alert} />
-          )}
+          )} */}
           <div className={styles.wrapper}>
             <Text variant="subheader-1">Already have an account? Sign in here:</Text>
             <NavigationButton route={Routes.login} text="Sign in" />
