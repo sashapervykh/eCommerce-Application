@@ -16,7 +16,7 @@ import { CustomerContext } from '../../customer-context';
 const loginSchema = schema.pick({ email: true, password: true });
 
 export default function LoginPage() {
-  const { customer, setCustomer } = useContext(CustomerContext);
+  const { setCustomer } = useContext(CustomerContext);
   if (!setCustomer) throw new Error('Something goes wrong');
   const navigate: NavigateFunction = useNavigate();
   const {
@@ -46,25 +46,13 @@ export default function LoginPage() {
         }
       }
       if (isTokenResponse(response)) {
-        customerAPI.createAuthenticatedCustomer(response.token_type, response.access_token);
-        await customerAPI
-          .apiRoot()
-          .me()
-          .login()
-          .post({
-            body: {
-              email: data.email,
-              password: data.password,
-            },
-          })
-          .execute()
-          .then((response) => {
-            const array = response.body;
-            setCustomer(response.body.customer.firstName ?? '');
-            console.log(array, customer, response.body);
-          });
-        console.log(customer);
-
+        const customerData = await customerAPI.getLoggedInCustomerData({
+          email: data.email,
+          password: data.password,
+          access_token: response.access_token,
+          token_type: response.token_type,
+        });
+        setCustomer(customerData);
         await navigate('/');
       }
     } catch (error) {

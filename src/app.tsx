@@ -1,7 +1,7 @@
 import '@gravity-ui/uikit/styles/styles.css';
 import '@gravity-ui/uikit/styles/fonts.css';
 import { ThemeProvider } from '@gravity-ui/uikit';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import HomePage from './pages/main/main';
 import LoginPage from './pages/login/login';
 import RegistrationPage from './pages/registration/registration';
@@ -11,9 +11,11 @@ import NotFoundPage from './pages/404/not-found';
 import './style.css';
 import { CustomerContext } from './customer-context';
 import { useState } from 'react';
+import { CustomerSignInResult } from '@commercetools/platform-sdk';
 
 function App() {
-  const [customer, setCustomer] = useState('undefined');
+  // eslint-disable-next-line unicorn/no-useless-undefined
+  const [customer, setCustomer] = useState<CustomerSignInResult | undefined>(undefined);
   const value = { customer, setCustomer };
 
   return (
@@ -22,7 +24,7 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<LoginPage />} />
+            <Route path="/login" element={customer ? <Navigate to="/" /> : <LoginPage />} />
             <Route path="/registration" element={<RegistrationPage />} />
             <Route path="/catalog" element={<CatalogPage />} />
             <Route path="/about-us" element={<AboutPage />} />

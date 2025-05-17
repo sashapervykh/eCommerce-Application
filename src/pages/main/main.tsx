@@ -25,7 +25,7 @@ export default function HomePage() {
   return (
     <div className="page">
       <h1>Main page</h1>
-      <div>{customer.customer}</div>
+      <div>{customer.customer?.customer.firstName}</div>
       <Link to="/login">
         <Button view="action" size="l">
           To login
