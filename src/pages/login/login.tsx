@@ -9,30 +9,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { api } from '../../api/api';
 import { customerAPI } from '../../api/customer-api';
 import { schema } from '../../utilities/validation-config/validation-rules';
+import { isErrorResponse, isTokenResponse } from '../../utilities/return-checked-token-response';
+import { ChangeEvent } from 'react';
 const loginSchema = schema.pick({ email: true, password: true });
-
-const onSubmit = async (data: { email: string; password: string }) => {
-  try {
-    const response = await api.getAccessToken(data);
-    if (response.access_token) customerAPI.createAuthenticatedCustomer(response.token_type, response.access_token);
-    void customerAPI
-      .apiRoot()
-      .me()
-      .login()
-      .post({
-        body: {
-          email: data.email,
-          password: data.password,
-        },
-      })
-      .execute()
-      .then((response) => {
-        console.log(response.body);
-      });
-  } catch (error) {
-    console.error(error);
-  }
-};
 
 export default function LoginPage() {
   const {
@@ -40,10 +19,48 @@ export default function LoginPage() {
     handleSubmit,
     control,
     formState: { errors },
+    setError,
+    clearErrors,
   } = useForm({
     mode: 'onChange',
     resolver: zodResolver(loginSchema),
   });
+
+  const onSubmit = async (data: { email: string; password: string }) => {
+    try {
+      const response: unknown = await api.getAccessToken(data);
+      if (isErrorResponse(response)) {
+        console.log(response);
+        if (response.statusCode === 400) {
+          setError('root', {
+            type: 'ServerError',
+            message: 'Please check the email and password. The user with this data is not found.',
+          });
+        } else {
+          setError('root', { type: 'ServerError', message: response.error });
+        }
+      }
+      if (isTokenResponse(response)) {
+        customerAPI.createAuthenticatedCustomer(response.token_type, response.access_token);
+        void customerAPI
+          .apiRoot()
+          .me()
+          .login()
+          .post({
+            body: {
+              email: data.email,
+              password: data.password,
+            },
+          })
+          .execute()
+          .then((response) => {
+            console.log(response.body);
+          });
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <main className={styles.main}>
@@ -55,14 +72,24 @@ export default function LoginPage() {
           }}
         >
           <h1 className={styles.h1}>Log into your account</h1>
+          {errors.root && (
+            <Text variant="subheader-1" className={styles['server-error']} color="danger">
+              {errors.root.message}
+            </Text>
+          )}
           <FormLabel text="">
             <TextInput
-              {...register('email')}
+              {...register('email', {
+                onChange: (event: ChangeEvent) => {
+                  clearErrors('root');
+                  return event;
+                },
+              })}
               placeholder="Enter e-mail"
               className={styles.input}
               size="xl"
               errorMessage={errors.email?.message}
-              validationState={errors.email ? 'invalid' : undefined}
+              validationState={errors.email ? 'invalid' : errors.root ? 'invalid' : undefined}
             />
           </FormLabel>
           <FormLabel text="">
@@ -74,12 +101,15 @@ export default function LoginPage() {
                   controlRef={field.ref}
                   value={field.value || ''}
                   onBlur={field.onBlur}
-                  onChange={field.onChange}
+                  onChange={(event) => {
+                    field.onChange(event);
+                    clearErrors('root');
+                  }}
                   placeholder="Enter password"
                   className={styles.input}
                   size="xl"
                   errorMessage={fieldState.error?.message}
-                  validationState={fieldState.invalid ? 'invalid' : undefined}
+                  validationState={fieldState.invalid ? 'invalid' : errors.root ? 'invalid' : undefined}
                   autoComplete="true"
                 />
               )}
