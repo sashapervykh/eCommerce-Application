@@ -57,38 +57,40 @@ class API {
     firstName: string;
     lastName: string;
     dateOfBirth: string;
-    street: string;
-    city: string;
-    country: string;
-    postalCode: string;
+    addresses: {
+      streetName: string;
+      city: string;
+      country: string;
+      postalCode: string;
+    }[];
+    setAsDefault: boolean;
   }) {
     const token = await this.getClientCredentialsToken();
+
+    const requestBody = {
+      email: data.email,
+      password: data.password,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      dateOfBirth: data.dateOfBirth,
+      addresses: data.addresses,
+      shippingAddresses: [0],
+      billingAddresses: [0],
+      defaultShippingAddress: data.setAsDefault ? 0 : undefined,
+      //defaultBillingAddress: data.setAsDefault ? 0 : undefined,
+    };
+
     const response = await fetch(this.apiLink, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        email: data.email,
-        password: data.password,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        dateOfBirth: data.dateOfBirth,
-        addresses: [
-          {
-            streetName: data.street,
-            city: data.city,
-            postalCode: data.postalCode,
-            country: data.country,
-          },
-        ],
-        defaultBillingAddress: 0,
-        defaultShippingAddress: 0,
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     const result: unknown = await response.json();
+    console.log('API response:', result);
     return result;
   }
 }

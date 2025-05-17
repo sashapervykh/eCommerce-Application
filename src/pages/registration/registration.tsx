@@ -1,7 +1,7 @@
 import styles from './style.module.css';
 import FormLabel from '../../components/form-label/form-label';
 import NavigationButton from '../../components/navigation-button/navigation-button';
-import { Card, Text, TextInput, Select, PasswordInput, Button, useToaster } from '@gravity-ui/uikit';
+import { Card, Text, TextInput, Select, PasswordInput, Button, Checkbox, useToaster } from '@gravity-ui/uikit';
 import { DatePicker } from '@gravity-ui/date-components';
 import { Routes } from '../../components/navigation-button/type';
 import { useState, useEffect } from 'react';
@@ -10,7 +10,6 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { api } from '../../api/api';
 import { registrationSchema } from '../../utilities/validation-config/validation-rules';
-
 import { useNavigate } from 'react-router';
 
 export default function RegistrationPage() {
@@ -62,6 +61,7 @@ export default function RegistrationPage() {
       city: '',
       country: undefined,
       postalCode: '',
+      setAsDefault: false,
     },
   });
 
@@ -79,7 +79,15 @@ export default function RegistrationPage() {
       const response: unknown = await api.createCustomer({
         ...data,
         dateOfBirth: data.dateOfBirth.split('T')[0],
-        country: data.country ?? '',
+        addresses: [
+          {
+            streetName: data.street,
+            city: data.city,
+            country: data.country ?? '',
+            postalCode: data.postalCode,
+          },
+        ],
+        setAsDefault: data.setAsDefault ?? false,
       });
 
       if (
@@ -257,6 +265,9 @@ export default function RegistrationPage() {
                 errorMessage={errors.postalCode ? errors.postalCode.message : undefined}
                 validationState={errors.postalCode ? 'invalid' : undefined}
               />
+            </FormLabel>
+            <FormLabel text="Set as default shipping address">
+              <Checkbox {...register('setAsDefault')} size="l" className={styles.checkbox} />
             </FormLabel>
           </fieldset>
           <Button type="submit" view="action" size="xl" width="max" disabled={isSubmitting}>

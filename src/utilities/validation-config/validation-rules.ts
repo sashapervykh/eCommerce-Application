@@ -40,6 +40,7 @@ export const registrationSchema = z
     city: z.string().regex(/^[A-Za-zА-я]+$/),
     country: z.enum(['US', 'CA']).optional(),
     postalCode: z.string().min(1, 'Postal code is required'),
+    setAsDefault: z.boolean().optional(),
   })
   .superRefine((data, context) => {
     isValidPostalCode(data, context);
