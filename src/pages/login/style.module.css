@@ -14,3 +14,8 @@
   padding: 40px;
   margin: 20px auto;
 }
+
+.server-error {
+  display: flex;
+  text-align: center;
+}
