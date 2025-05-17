@@ -89,7 +89,7 @@ export default function LoginPage() {
               className={styles.input}
               size="xl"
               errorMessage={errors.email?.message}
-              validationState={errors.email ? 'invalid' : errors.root ? 'invalid' : undefined}
+              validationState={errors.email || errors.root ? 'invalid' : undefined}
             />
           </FormLabel>
           <FormLabel text="">
@@ -109,7 +109,7 @@ export default function LoginPage() {
                   className={styles.input}
                   size="xl"
                   errorMessage={fieldState.error?.message}
-                  validationState={fieldState.invalid ? 'invalid' : errors.root ? 'invalid' : undefined}
+                  validationState={fieldState.invalid || errors.root ? 'invalid' : undefined}
                   autoComplete="true"
                 />
               )}
