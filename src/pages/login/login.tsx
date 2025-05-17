@@ -10,11 +10,14 @@ import { api } from '../../api/api';
 import { customerAPI } from '../../api/customer-api';
 import { schema } from '../../utilities/validation-config/validation-rules';
 import { isErrorResponse, isTokenResponse } from '../../utilities/return-checked-token-response';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, useContext } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
+import { CustomerContext } from '../../customer-context';
 const loginSchema = schema.pick({ email: true, password: true });
 
 export default function LoginPage() {
+  const { customer, setCustomer } = useContext(CustomerContext);
+  if (!setCustomer) throw new Error('Something goes wrong');
   const navigate: NavigateFunction = useNavigate();
   const {
     register,
@@ -56,8 +59,12 @@ export default function LoginPage() {
           })
           .execute()
           .then((response) => {
-            console.log(response.body);
+            const array = response.body;
+            setCustomer(response.body.customer.firstName ?? '');
+            console.log(array, customer, response.body);
           });
+        console.log(customer);
+
         await navigate('/');
       }
     } catch (error) {
