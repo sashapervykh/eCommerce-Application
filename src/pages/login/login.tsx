@@ -11,9 +11,11 @@ import { customerAPI } from '../../api/customer-api';
 import { schema } from '../../utilities/validation-config/validation-rules';
 import { isErrorResponse, isTokenResponse } from '../../utilities/return-checked-token-response';
 import { ChangeEvent } from 'react';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
 const loginSchema = schema.pick({ email: true, password: true });
 
 export default function LoginPage() {
+  const navigate: NavigateFunction = useNavigate();
   const {
     register,
     handleSubmit,
@@ -42,7 +44,7 @@ export default function LoginPage() {
       }
       if (isTokenResponse(response)) {
         customerAPI.createAuthenticatedCustomer(response.token_type, response.access_token);
-        void customerAPI
+        await customerAPI
           .apiRoot()
           .me()
           .login()
@@ -56,6 +58,7 @@ export default function LoginPage() {
           .then((response) => {
             console.log(response.body);
           });
+        await navigate('/');
       }
     } catch (error) {
       console.error(error);
