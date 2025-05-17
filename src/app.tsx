@@ -1,6 +1,7 @@
 import '@gravity-ui/uikit/styles/styles.css';
 import '@gravity-ui/uikit/styles/fonts.css';
-import { ThemeProvider } from '@gravity-ui/uikit';
+
+import { ThemeProvider, Toaster, ToasterComponent, ToasterProvider } from '@gravity-ui/uikit';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import HomePage from './pages/main/main';
 import LoginPage from './pages/login/login';
@@ -19,8 +20,10 @@ function App() {
   const value = { customer, setCustomer };
 
   return (
+
     <CustomerContext.Provider value={value}>
-      <ThemeProvider theme="light">
+    <ThemeProvider theme="light">
+      <ToasterProvider toaster={new Toaster()}>
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -32,8 +35,11 @@ function App() {
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </BrowserRouter>
-      </ThemeProvider>
-    </CustomerContext.Provider>
+
+        <ToasterComponent />
+      </ToasterProvider>
+    </ThemeProvider>
+   </CustomerContext.Provider>
   );
 }
 
