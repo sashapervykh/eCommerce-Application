@@ -1,21 +1,20 @@
+import styles from './style.module.css';
+import FormLabel from '../../components/form-label/form-label';
+import NavigationButton from '../../components/navigation-button/navigation-button';
 import { Card, Text, TextInput, Select, PasswordInput, Alert, Button } from '@gravity-ui/uikit';
 import { DatePicker } from '@gravity-ui/date-components';
-import styles from './style.module.css';
-import NavigationButton from '../../components/navigation-button/navigation-button';
 import { Routes } from '../../components/navigation-button/type';
-import FormLabel from '../../components/form-label/form-label';
-import { Controller, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { registrationSchema } from '../../utilities/validation-config/validation-rules';
-import { z } from 'zod';
-import { api } from '../../api/api';
-import { isErrorResponse } from '../../utilities/return-checked-token-response';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Controller, useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { api } from '../../api/api';
+import { registrationSchema } from '../../utilities/validation-config/validation-rules';
 
 export default function RegistrationPage() {
   const [successMessage, setSuccessMessage] = useState<string | undefined>();
   const [serverError, setServerError] = useState<string | undefined>();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     register,
@@ -41,6 +40,12 @@ export default function RegistrationPage() {
   });
 
   const onSubmit = async (data: z.infer<typeof registrationSchema>) => {
+    if (isSubmitting) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
     try {
       setServerError(undefined);
       setSuccessMessage(undefined);
@@ -51,21 +56,36 @@ export default function RegistrationPage() {
         country: data.country ?? '',
       });
 
-      if (isErrorResponse(response)) {
-        if (response.statusCode === 400 && response.errors.some((error) => error.code === 'DuplicateField')) {
-          setServerError('This email is already registered.');
+      if (
+        response &&
+        typeof response === 'object' &&
+        'statusCode' in response &&
+        response.statusCode === 400 &&
+        'errors' in response &&
+        Array.isArray(response.errors)
+      ) {
+        if (response.errors.length > 0) {
+          const errorMessages = response.errors
+            .filter((error: { message?: string }) => error.message)
+            .map((error: { message: string }) => error.message)
+            .join(', ');
+          setServerError(
+            (errorMessages || (response as { message?: string }).message) ?? 'Error while registering. Try again.',
+          );
         } else {
-          setServerError(response.message || 'Error while registering. Try again.');
+          setServerError((response as { message?: string }).message ?? 'Error while registering. Try again.');
         }
         console.error('API error:', response);
         return;
       }
 
-      setSuccessMessage('Account successfully created! Now you can log in.');
+      setSuccessMessage('Account successfully created! Now you can sign in.');
       reset();
     } catch (error) {
       console.error('Error while registering:', error);
       setServerError('A server error has occurred. Please try again later.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -213,18 +233,11 @@ export default function RegistrationPage() {
               />
             </FormLabel>
           </fieldset>
-          <Button type="submit" view="action" size="xl" width="max">
+          <Button type="submit" view="action" size="xl" width="max" disabled={isSubmitting}>
             Create
           </Button>
-          {successMessage && (
-            <Alert
-              theme="success"
-              title="Sucsess registration"
-              message=<>
-                {successMessage} <Link to={Routes.login}>Log in</Link>
-              </>
-              className={styles.alert}
-            />
+          {successMessage && !serverError && (
+            <Alert theme="success" title="Success registration" message={successMessage} className={styles.alert} />
           )}
           {serverError && (
             <Alert theme="danger" title="Registration error" message={serverError} className={styles.alert} />
