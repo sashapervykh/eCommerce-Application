@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { createContext, useContext, useState } from 'react';
 import { Customer } from '@commercetools/platform-sdk';
 import { api } from '../../api/api';
 import { isErrorResponse, isTokenResponse } from '../../utilities/return-checked-token-response';
@@ -12,25 +12,19 @@ interface UserData {
   lastName?: string;
 }
 
-const mockUser: Customer = {
-  id: 'mock-user-id',
-  version: 1,
-  createdAt: new Date().toISOString(),
-  lastModifiedAt: new Date().toISOString(),
-  email: 'mock@example.com',
-  firstName: 'Mock',
-  lastName: 'User',
-  addresses: [],
-  isEmailVerified: false,
-  authenticationMode: 'Password',
-  stores: [],
-  customerNumber: 'mock-001',
-  shippingAddressIds: [],
-  billingAddressIds: [],
-  customerGroupAssignments: [],
-};
+interface AuthContextType {
+  userInfo: Customer | null;
+  isAuthenticated: boolean;
+  login: (email: string, password: string) => void;
+  register: (userData: UserData) => void;
+  logout: () => void;
+  serverError: string | null;
+  setServerError: React.Dispatch<React.SetStateAction<string | null>>;
+}
 
-export const useAuth = () => {
+const AuthContext = createContext<AuthContextType>({} as AuthContextType);
+
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [userInfo, setUserInfo] = useState<Customer | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -67,19 +61,8 @@ export const useAuth = () => {
     }
   };
 
-  const register = async (userData: UserData) => {
+  const register = (userData: UserData) => {
     console.log('Registration with:', userData);
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        setUserInfo({
-          ...mockUser,
-          email: userData.email,
-          firstName: userData.firstName,
-          lastName: userData.lastName,
-        });
-        resolve();
-      }, 500);
-    });
   };
 
   const logout = () => {
@@ -88,7 +71,7 @@ export const useAuth = () => {
     return Promise.resolve();
   };
 
-  return {
+  const authContextValue = {
     isAuthenticated: !!userInfo,
     userInfo,
     login,
@@ -97,4 +80,8 @@ export const useAuth = () => {
     serverError,
     setServerError,
   };
+
+  return <AuthContext.Provider value={authContextValue}> {children}</AuthContext.Provider>;
 };
+
+export const useAuth = () => useContext(AuthContext);

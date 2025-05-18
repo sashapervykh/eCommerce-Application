@@ -7,25 +7,28 @@ import { NotFoundPage } from './pages/404/not-found';
 import { AboutPage } from './pages/about-us/about-us';
 import { MainLayout } from './components/layout/layout';
 import { CatalogPage } from './pages/catalog/catalog';
-import { LoginPage } from './pages/login/login';
 import { RegistrationPage } from './pages/registration/registration';
+import { AuthProvider } from './components/hooks/useAuth';
+import { CommonRoutes } from './pages/login/auth-checker';
 
 export function App() {
   return (
     <ThemeProvider theme="light">
       <ToasterProvider toaster={new Toaster()}>
         <BrowserRouter>
-          <Routes>
-            <Route element={<MainLayout />}>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/catalog" element={<CatalogPage />} />
-              <Route path="/about-us" element={<AboutPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/registration" element={<RegistrationPage />} />
-              <Route path="/404" element={<NotFoundPage />} />
-              <Route path="*" element={<NotFoundPage />} />
-            </Route>
-          </Routes>
+          <AuthProvider>
+            <Routes>
+              <Route element={<MainLayout />}>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/catalog" element={<CatalogPage />} />
+                <Route path="/about-us" element={<AboutPage />} />
+                <Route path="/login" element={<CommonRoutes />} />
+                <Route path="/registration" element={<RegistrationPage />} />
+                <Route path="/404" element={<NotFoundPage />} />
+                <Route path="*" element={<NotFoundPage />} />
+              </Route>
+            </Routes>
+          </AuthProvider>
         </BrowserRouter>
         <ToasterComponent />
       </ToasterProvider>

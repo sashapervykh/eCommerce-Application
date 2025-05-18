@@ -14,7 +14,7 @@ import { useAuth } from '../../components/hooks/useAuth';
 const loginSchema = schema.pick({ email: true, password: true });
 
 export function LoginPage() {
-  const { serverError, login, setServerError } = useAuth();
+  const { serverError, login, setServerError, isAuthenticated } = useAuth();
   const {
     register,
     handleSubmit,
@@ -25,14 +25,15 @@ export function LoginPage() {
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = async (data: { email: string; password: string }) => {
+  const onSubmit = (data: { email: string; password: string }) => {
     try {
-      await login(data.email, data.password);
+      login(data.email, data.password);
     } catch (error) {
       console.error(error);
     }
   };
 
+  console.log(isAuthenticated);
   return (
     <PageWrapper title="Login">
       <Card type="container" view="outlined" className={styles.container}>
