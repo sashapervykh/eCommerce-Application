@@ -14,7 +14,7 @@ import { useAuth } from '../../components/hooks/useAuth';
 const loginSchema = schema.pick({ email: true, password: true });
 
 export function LoginPage() {
-  const { serverError, login, setServerError, isAuthenticated } = useAuth();
+  const { serverError, login, setServerError } = useAuth();
   const {
     register,
     handleSubmit,
@@ -33,7 +33,6 @@ export function LoginPage() {
     }
   };
 
-  console.log(isAuthenticated);
   return (
     <PageWrapper title="Login">
       <Card type="container" view="outlined" className={styles.container}>

@@ -8,9 +8,8 @@ import { useAuth } from '../../components/hooks/useAuth';
 const api = createApiBuilderFromCtpClient(ctpClient).withProjectKey({ projectKey });
 
 export function HomePage() {
-  const { userInfo, isAuthenticated } = useAuth();
+  const { userInfo } = useAuth();
   const [projectDetails, setProjectDetails] = useState<CustomerPagedQueryResponse | undefined>();
-  console.log(isAuthenticated);
 
   useEffect(() => {
     void api
