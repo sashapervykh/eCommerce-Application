@@ -58,12 +58,16 @@ class API {
     lastName: string;
     dateOfBirth: string;
     addresses: {
+      key: string;
       streetName: string;
       city: string;
       country: string;
       postalCode: string;
     }[];
-    setAsDefault: boolean;
+    shippingAddresses: number[];
+    billingAddresses: number[];
+    defaultBillingAddress?: number;
+    defaultShippingAddress?: number;
   }) {
     const token = await this.getClientCredentialsToken();
 
@@ -74,10 +78,10 @@ class API {
       lastName: data.lastName,
       dateOfBirth: data.dateOfBirth,
       addresses: data.addresses,
-      shippingAddresses: [0],
-      billingAddresses: [0],
-      defaultShippingAddress: data.setAsDefault ? 0 : undefined,
-      //defaultBillingAddress: data.setAsDefault ? 0 : undefined,
+      shippingAddresses: data.shippingAddresses,
+      billingAddresses: data.billingAddresses,
+      defaultShippingAddress: data.defaultShippingAddress,
+      defaultBillingAddress: data.defaultBillingAddress,
     };
 
     const response = await fetch(this.apiLink, {
@@ -90,7 +94,7 @@ class API {
     });
 
     const result: unknown = await response.json();
-    console.log('API response:', result);
+    console.log('API response → for CrossCheck Testing:', result);
     return result;
   }
 }
