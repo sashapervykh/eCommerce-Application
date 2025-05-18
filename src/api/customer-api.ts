@@ -20,6 +20,18 @@ class CustomerAPI {
       .withHttpMiddleware(this.httpMiddlewareOptions)
       .build();
   }
+
+  createCustomerWithRefreshToken(refresh_token: string) {
+    this.ctpClient = new ClientBuilder()
+      .withRefreshTokenFlow({
+        host: 'https://auth.us-central1.gcp.commercetools.com/',
+        projectKey: projectKey,
+        credentials: { clientId: import.meta.env.VITE_CLIENT_ID, clientSecret: import.meta.env.VITE_CLIENT_SECRET },
+        refreshToken: refresh_token,
+      })
+      .withHttpMiddleware(this.httpMiddlewareOptions)
+      .build();
+  }
 }
 
 export const customerAPI = new CustomerAPI();
