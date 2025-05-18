@@ -1,15 +1,22 @@
-import { Link } from 'react-router-dom';
+import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
 import { Button } from '@gravity-ui/uikit';
 
-export default function CatalogPage() {
+function CatalogContent() {
   return (
-    <div className="page">
-      <h1>Catalog page</h1>
-      <Link to="/">
-        <Button view="action" size="l">
-          To main
-        </Button>
-      </Link>
+    <div>
+      <h1>Catalog Content</h1>
+      {/* Catalog Content */}
     </div>
+  );
+}
+
+export function CatalogPage() {
+  return (
+    <PageWrapper title="Catalog">
+      <div>
+        <Button view="outlined">Moon</Button>
+      </div>
+      <CatalogContent />
+    </PageWrapper>
   );
 }

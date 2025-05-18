@@ -1,0 +1,26 @@
+.page-title {
+  line-height: 2rem;
+}
+
+.content-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 1rem;
+  text-align: center;
+}
+
+.data-preview {
+  margin-top: 1rem;
+  overflow: hidden; /* Скрываем содержимое, выходящее за границы */
+}
+
+.response-data {
+  background: #f5f5f5;
+  padding: 1rem;
+  border-radius: 4px;
+  text-align: left;
+  max-width: 100%;
+  overflow-x: auto; /* Добавляем горизонтальный скролл при необходимости */
+  white-space: pre-wrap; /* Сохраняем форматирование, но переносим текст */
+  word-wrap: break-word; /* Переносим длинные слова */
+}
