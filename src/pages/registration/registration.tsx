@@ -28,6 +28,7 @@ export default function RegistrationPage() {
     reset,
     watch,
     setValue,
+    clearErrors,
   } = useForm({
     mode: 'onChange',
     resolver: zodResolver(registrationSchema),
@@ -52,6 +53,13 @@ export default function RegistrationPage() {
   });
 
   const sameAddress = watch('sameAddress');
+
+  const syncShippingToBilling = (value: string, billingField: string) => {
+    if (sameAddress) {
+      setValue(billingField as keyof z.infer<typeof registrationSchema>, value);
+      clearErrors(billingField as keyof z.infer<typeof registrationSchema>);
+    }
+  };
 
   useEffect(() => {
     if (successMessage && !serverError) {
@@ -84,11 +92,13 @@ export default function RegistrationPage() {
         shippingPostalCode: 'billingPostalCode',
       };
 
+      clearErrors(['billingStreet', 'billingCity', 'billingCountry', 'billingPostalCode']);
+
       for (const [shippingField, billingField] of Object.entries(fieldMapping)) {
         setValue(billingField, watch(shippingField as keyof z.infer<typeof registrationSchema>));
       }
     }
-  }, [successMessage, serverError, toaster, sameAddress, watch, setValue]);
+  }, [successMessage, serverError, toaster, sameAddress, watch, setValue, clearErrors]);
 
   const onSubmit = async (data: z.infer<typeof registrationSchema>) => {
     if (isSubmitting) {
@@ -256,7 +266,11 @@ export default function RegistrationPage() {
             </FormLabel>
             <FormLabel text="Please enter your shipping street">
               <TextInput
-                {...register('shippingStreet')}
+                {...register('shippingStreet', {
+                  onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+                    syncShippingToBilling(event.target.value, 'billingStreet');
+                  },
+                })}
                 placeholder="Enter street"
                 className={styles.input}
                 size="xl"
@@ -266,7 +280,11 @@ export default function RegistrationPage() {
             </FormLabel>
             <FormLabel text="Please enter your shipping city">
               <TextInput
-                {...register('shippingCity')}
+                {...register('shippingCity', {
+                  onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+                    syncShippingToBilling(event.target.value, 'billingCity');
+                  },
+                })}
                 placeholder="Enter city"
                 className={styles.input}
                 size="xl"
@@ -287,6 +305,7 @@ export default function RegistrationPage() {
                     onUpdate={(selectedValues) => {
                       const selectedValue = selectedValues[0] ?? '';
                       field.onChange(selectedValue);
+                      syncShippingToBilling(selectedValue, 'billingCountry');
                       void trigger(['shippingPostalCode', 'shippingCountry']);
                     }}
                     errorMessage={fieldState.error?.message}
@@ -301,7 +320,8 @@ export default function RegistrationPage() {
             <FormLabel text="Please enter your shipping postal code">
               <TextInput
                 {...register('shippingPostalCode', {
-                  onChange: () => {
+                  onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+                    syncShippingToBilling(event.target.value, 'billingPostalCode');
                     void trigger(['shippingPostalCode', 'shippingCountry']);
                   },
                 })}
