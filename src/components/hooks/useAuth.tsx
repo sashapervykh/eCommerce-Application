@@ -81,7 +81,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     console.log('Logging out...');
     localStorage.removeItem('refresh_token');
     setUserInfo(null);
-    return Promise.resolve();
   };
 
   useEffect(() => {

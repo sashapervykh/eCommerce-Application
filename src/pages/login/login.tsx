@@ -10,11 +10,12 @@ import { ChangeEvent } from 'react';
 import styles from './style.module.css';
 import { Routes } from '../../components/navigation-button/type';
 import { useAuth } from '../../components/hooks/useAuth';
+import { Navigate } from 'react-router-dom';
 
 const loginSchema = schema.pick({ email: true, password: true });
 
 export function LoginPage() {
-  const { serverError, login, setServerError } = useAuth();
+  const { serverError, login, setServerError, isAuthenticated } = useAuth();
   const {
     register,
     handleSubmit,
@@ -32,6 +33,10 @@ export function LoginPage() {
       console.error(error);
     }
   };
+
+  if (isAuthenticated) {
+    return <Navigate to="/"></Navigate>;
+  }
 
   return (
     <PageWrapper title="Login">
