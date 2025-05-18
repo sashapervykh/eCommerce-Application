@@ -21,6 +21,7 @@ interface AuthContextType {
   logout: () => void;
   serverError: string | null;
   setServerError: React.Dispatch<React.SetStateAction<string | null>>;
+  isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -28,6 +29,7 @@ const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [userInfo, setUserInfo] = useState<Customer | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const navigate = useNavigate();
 
   const login = async (email: string, password: string) => {
@@ -70,6 +72,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUserInfo(customerData.body);
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -88,12 +92,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const refresh_token = localStorage.getItem('refresh_token');
       if (refresh_token) {
         try {
-          setUserInfo({} as Customer);
           await refresh(refresh_token);
         } catch {
           setUserInfo(null);
         }
       }
+      setIsLoading(false);
     };
     void refreshWithSavedToken();
   }, []);
@@ -107,6 +111,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     logout,
     serverError,
     setServerError,
+    isLoading,
   };
 
   return <AuthContext.Provider value={authContextValue}> {children}</AuthContext.Provider>;
