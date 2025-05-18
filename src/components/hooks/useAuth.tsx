@@ -53,7 +53,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           })
           .execute();
         setUserInfo(customerData.body.customer);
-        console.log(userInfo);
         await navigate('/');
       }
     } catch (error) {

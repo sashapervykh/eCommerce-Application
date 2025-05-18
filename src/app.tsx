@@ -9,7 +9,8 @@ import { MainLayout } from './components/layout/layout';
 import { CatalogPage } from './pages/catalog/catalog';
 import { RegistrationPage } from './pages/registration/registration';
 import { AuthProvider } from './components/hooks/useAuth';
-import { CommonRoutes } from './pages/login/auth-checker';
+import { CommonRoutes } from './components/auth-checker/auth-checker';
+import { LoginPage } from './pages/login/login';
 
 export function App() {
   return (
@@ -22,7 +23,7 @@ export function App() {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/catalog" element={<CatalogPage />} />
                 <Route path="/about-us" element={<AboutPage />} />
-                <Route path="/login" element={<CommonRoutes />} />
+                <Route path="/login" element={<CommonRoutes child={<LoginPage />}></CommonRoutes>} />
                 <Route path="/registration" element={<RegistrationPage />} />
                 <Route path="/404" element={<NotFoundPage />} />
                 <Route path="*" element={<NotFoundPage />} />
