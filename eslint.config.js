@@ -3,8 +3,8 @@ import globals from 'globals';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import tseslint from 'typescript-eslint';
-import eslintPluginUnicorn from 'eslint-plugin-unicorn';
-import eslintConfigPrettier from 'eslint-config-prettier/flat';
+import unicorn from 'eslint-plugin-unicorn';
+import eslintConfigPrettier from 'eslint-config-prettier';
 
 export default tseslint.config(
   { ignores: ['dist'] },
@@ -13,7 +13,6 @@ export default tseslint.config(
       js.configs.recommended,
       ...tseslint.configs.strictTypeChecked,
       ...tseslint.configs.stylisticTypeChecked,
-      eslintPluginUnicorn.configs.all,
       eslintConfigPrettier,
     ],
     files: ['**/*.{ts,tsx}'],
@@ -28,11 +27,56 @@ export default tseslint.config(
     plugins: {
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
+      unicorn,
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
-      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
-      'unicorn/better-regex': 'warn',
+      'react-refresh/only-export-components': [
+        'warn',
+        {
+          allowConstantExport: true,
+          allowExportNames: ['HeaderContext'],
+        },
+      ],
+      'unicorn/no-null': 'off',
+      'unicorn/no-keyword-prefix': 'off',
+      'unicorn/prevent-abbreviations': [
+        'error',
+        {
+          allowList: {
+            Props: true,
+            props: true,
+            className: true,
+          },
+          replacements: {
+            props: false,
+          },
+        },
+      ],
+      '@typescript-eslint/no-misused-promises': [
+        'error',
+        {
+          checksVoidReturn: false,
+        },
+      ],
+      '@typescript-eslint/no-unsafe-call': 'off',
+      '@typescript-eslint/no-confusing-void-expression': ['error', { ignoreArrowShorthand: true }],
+      '@typescript-eslint/no-floating-promises': [
+        'error',
+        {
+          ignoreVoid: true,
+          ignoreIIFE: true,
+        },
+      ],
+      '@typescript-eslint/no-unsafe-argument': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
     },
   },
 );

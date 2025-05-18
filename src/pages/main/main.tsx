@@ -1,14 +1,14 @@
-import { Link } from 'react-router-dom';
-import { Button } from '@gravity-ui/uikit';
-
 import { useEffect, useState } from 'react';
 import { createApiBuilderFromCtpClient, type CustomerPagedQueryResponse } from '@commercetools/platform-sdk';
 import { ctpClient, projectKey } from '../../commercetools-sdk';
+import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
+import styles from './style.module.css';
 
 const api = createApiBuilderFromCtpClient(ctpClient).withProjectKey({ projectKey });
 
-export default function HomePage() {
+export function HomePage() {
   const [projectDetails, setProjectDetails] = useState<CustomerPagedQueryResponse | undefined>();
+
   useEffect(() => {
     void api
       .customers()
@@ -20,14 +20,16 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="page">
-      <h1>Main page</h1>
-      <Link to="/login">
-        <Button view="action" size="l">
-          To login
-        </Button>
-      </Link>
-      <pre>{JSON.stringify(projectDetails, undefined, 2)}</pre>
-    </div>
+    <PageWrapper title="Space Real Estate">
+      <div className={styles['content-container']}>
+        <h1 className={styles['page-title']}>Welcome to Space Real Estate</h1>
+        {projectDetails && (
+          <div className={styles['data-preview']}>
+            <h2 className={styles['data-preview-title']}>API Response Preview:</h2>
+            <pre className={styles['response-data']}>{JSON.stringify(projectDetails, undefined, 2)}</pre>
+          </div>
+        )}
+      </div>
+    </PageWrapper>
   );
 }

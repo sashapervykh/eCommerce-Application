@@ -1,19 +1,21 @@
-import { Card, Text, Button } from '@gravity-ui/uikit';
+import { Card, Button, Text } from '@gravity-ui/uikit';
 import { TextInput, PasswordInput } from '@gravity-ui/uikit';
-import styles from './style.module.css';
-import NavigationButton from '../../components/navigation-button/navigation-button';
-import { Routes } from '../../components/navigation-button/type';
-import FormLabel from '../../components/form-label/form-label';
-import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import FormLabel from '../../components/form-label/form-label';
+import { NavigationButton } from '../../components/navigation-button/navigation-button';
+import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
+import { Controller, useForm } from 'react-hook-form';
 import { api } from '../../api/api';
 import { customerAPI } from '../../api/customer-api';
 import { schema } from '../../utilities/validation-config/validation-rules';
 import { isErrorResponse, isTokenResponse } from '../../utilities/return-checked-token-response';
 import { ChangeEvent } from 'react';
+import styles from './style.module.css';
+import { Routes } from '../../components/navigation-button/type';
+
 const loginSchema = schema.pick({ email: true, password: true });
 
-export default function LoginPage() {
+export function LoginPage() {
   const {
     register,
     handleSubmit,
@@ -63,12 +65,12 @@ export default function LoginPage() {
   };
 
   return (
-    <main className={styles.main}>
+    <PageWrapper title="Login">
       <Card type="container" view="outlined" className={styles.container}>
         <form
           className={styles.form}
-          onSubmit={(event) => {
-            void handleSubmit(onSubmit)(event);
+          onSubmit={() => {
+            void handleSubmit(onSubmit)();
           }}
         >
           <h1 className={styles.h1}>Log into your account</h1>
@@ -124,6 +126,6 @@ export default function LoginPage() {
           </div>
         </form>
       </Card>
-    </main>
+    </PageWrapper>
   );
 }
