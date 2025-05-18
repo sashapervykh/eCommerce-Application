@@ -1,3 +1,9 @@
+.nav {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
 .main {
   margin: auto;
   width: 80%;

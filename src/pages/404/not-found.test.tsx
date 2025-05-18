@@ -1,7 +1,7 @@
 import { expect, test, describe, vi, afterEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import NotFoundPage from './not-found';
+import { NotFoundPage } from './not-found';
 import { Routes } from '../../components/navigation-button/type';
 import '@testing-library/jest-dom';
 
