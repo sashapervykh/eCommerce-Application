@@ -3,10 +3,12 @@ import { createApiBuilderFromCtpClient, type CustomerPagedQueryResponse } from '
 import { ctpClient, projectKey } from '../../commercetools-sdk';
 import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
 import styles from './style.module.css';
+import { useAuth } from '../../components/hooks/useAuth';
 
 const api = createApiBuilderFromCtpClient(ctpClient).withProjectKey({ projectKey });
 
 export function HomePage() {
+  const { userInfo } = useAuth();
   const [projectDetails, setProjectDetails] = useState<CustomerPagedQueryResponse | undefined>();
 
   useEffect(() => {
@@ -22,7 +24,9 @@ export function HomePage() {
   return (
     <PageWrapper title="Space Real Estate">
       <div className={styles['content-container']}>
-        <h1 className={styles['page-title']}>Welcome to Space Real Estate</h1>
+        <h1 className={styles['page-title']}>
+          {userInfo?.firstName ? `Hello, ${userInfo.firstName}` : ''} Welcome to Space Real Estate
+        </h1>
         {projectDetails && (
           <div className={styles['data-preview']}>
             <h2 className={styles['data-preview-title']}>API Response Preview:</h2>

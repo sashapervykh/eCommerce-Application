@@ -5,24 +5,21 @@ import FormLabel from '../../components/form-label/form-label';
 import { NavigationButton } from '../../components/navigation-button/navigation-button';
 import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
 import { Controller, useForm } from 'react-hook-form';
-import { api } from '../../api/api';
-import { customerAPI } from '../../api/customer-api';
 import { schema } from '../../utilities/validation-config/validation-rules';
-import { isErrorResponse, isTokenResponse } from '../../utilities/return-checked-token-response';
 import { ChangeEvent } from 'react';
 import styles from './style.module.css';
 import { Routes } from '../../components/navigation-button/type';
+import { useAuth } from '../../components/hooks/useAuth';
 
 const loginSchema = schema.pick({ email: true, password: true });
 
 export function LoginPage() {
+  const { serverError, login, setServerError } = useAuth();
   const {
     register,
     handleSubmit,
     control,
     formState: { errors },
-    setError,
-    clearErrors,
   } = useForm({
     mode: 'onChange',
     resolver: zodResolver(loginSchema),
@@ -30,35 +27,7 @@ export function LoginPage() {
 
   const onSubmit = async (data: { email: string; password: string }) => {
     try {
-      const response: unknown = await api.getAccessToken(data);
-      if (isErrorResponse(response)) {
-        console.log(response);
-        if (response.statusCode === 400) {
-          setError('root', {
-            type: 'ServerError',
-            message: 'Please check the email and password. The user with this data is not found.',
-          });
-        } else {
-          setError('root', { type: 'ServerError', message: response.error });
-        }
-      }
-      if (isTokenResponse(response)) {
-        customerAPI.createAuthenticatedCustomer(response.token_type, response.access_token);
-        void customerAPI
-          .apiRoot()
-          .me()
-          .login()
-          .post({
-            body: {
-              email: data.email,
-              password: data.password,
-            },
-          })
-          .execute()
-          .then((response) => {
-            console.log(response.body);
-          });
-      }
+      await login(data.email, data.password);
     } catch (error) {
       console.error(error);
     }
@@ -69,21 +38,22 @@ export function LoginPage() {
       <Card type="container" view="outlined" className={styles.container}>
         <form
           className={styles.form}
-          onSubmit={() => {
+          onSubmit={(event) => {
+            event.preventDefault();
             void handleSubmit(onSubmit)();
           }}
         >
           <h1 className={styles.h1}>Log into your account</h1>
-          {errors.root && (
+          {serverError && (
             <Text variant="subheader-1" className={styles['server-error']} color="danger">
-              {errors.root.message}
+              {serverError}
             </Text>
           )}
           <FormLabel text="">
             <TextInput
               {...register('email', {
                 onChange: (event: ChangeEvent) => {
-                  clearErrors('root');
+                  setServerError(null);
                   return event;
                 },
               })}
@@ -91,7 +61,7 @@ export function LoginPage() {
               className={styles.input}
               size="xl"
               errorMessage={errors.email?.message}
-              validationState={errors.email ? 'invalid' : errors.root ? 'invalid' : undefined}
+              validationState={errors.email || serverError ? 'invalid' : undefined}
             />
           </FormLabel>
           <FormLabel text="">
@@ -105,13 +75,13 @@ export function LoginPage() {
                   onBlur={field.onBlur}
                   onChange={(event) => {
                     field.onChange(event);
-                    clearErrors('root');
+                    setServerError(null);
                   }}
                   placeholder="Enter password"
                   className={styles.input}
                   size="xl"
                   errorMessage={fieldState.error?.message}
-                  validationState={fieldState.invalid ? 'invalid' : errors.root ? 'invalid' : undefined}
+                  validationState={fieldState.invalid || serverError ? 'invalid' : undefined}
                   autoComplete="true"
                 />
               )}
