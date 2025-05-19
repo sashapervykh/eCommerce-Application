@@ -1,12 +1,12 @@
 import { Card } from '@gravity-ui/uikit';
 import styles from './style.module.css';
-import NavigationButton from '../../components/navigation-button/navigation-button';
+import { NavigationButton } from '../../components/navigation-button/navigation-button';
 import { Routes } from '../../components/navigation-button/type';
 import Lottie from 'lottie-react';
 import animationData from './animation.json';
 import { useLocation } from 'react-router';
 
-export default function NotFoundPage() {
+export function NotFoundPage() {
   const location = useLocation();
   return (
     <main className={styles.main}>

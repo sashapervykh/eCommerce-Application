@@ -2,7 +2,7 @@ import { Button } from '@gravity-ui/uikit';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import { NavButtonProperties } from './type';
 
-export default function NavigationButton(properties: NavButtonProperties) {
+export function NavigationButton(properties: NavButtonProperties) {
   const navigate: NavigateFunction = useNavigate();
 
   return (
