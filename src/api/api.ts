@@ -57,38 +57,31 @@ class API {
     firstName: string;
     lastName: string;
     dateOfBirth: string;
-    street: string;
-    city: string;
-    country: string;
-    postalCode: string;
+    addresses: {
+      key: string;
+      streetName: string;
+      city: string;
+      country: string;
+      postalCode: string;
+    }[];
+    shippingAddresses: number[];
+    billingAddresses: number[];
+    defaultBillingAddress?: number;
+    defaultShippingAddress?: number;
   }) {
     const token = await this.getClientCredentialsToken();
+
     const response = await fetch(this.apiLink, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        email: data.email,
-        password: data.password,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        dateOfBirth: data.dateOfBirth,
-        addresses: [
-          {
-            streetName: data.street,
-            city: data.city,
-            postalCode: data.postalCode,
-            country: data.country,
-          },
-        ],
-        defaultBillingAddress: 0,
-        defaultShippingAddress: 0,
-      }),
+      body: JSON.stringify(data),
     });
 
     const result: unknown = await response.json();
+    console.log('API response → for CrossCheck Testing:', result);
     return result;
   }
 }
