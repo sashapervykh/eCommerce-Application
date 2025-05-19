@@ -54,10 +54,10 @@ export default function RegistrationPage() {
 
   const sameAddress = watch('sameAddress');
 
-  const syncShippingToBilling = (value: string, billingField: string) => {
+  const syncShippingToBilling = (value: string, billingField: keyof z.infer<typeof registrationSchema>) => {
     if (sameAddress) {
-      setValue(billingField as keyof z.infer<typeof registrationSchema>, value);
-      clearErrors(billingField as keyof z.infer<typeof registrationSchema>);
+      setValue(billingField, value);
+      clearErrors(billingField);
     }
   };
 

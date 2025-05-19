@@ -71,26 +71,13 @@ class API {
   }) {
     const token = await this.getClientCredentialsToken();
 
-    const requestBody = {
-      email: data.email,
-      password: data.password,
-      firstName: data.firstName,
-      lastName: data.lastName,
-      dateOfBirth: data.dateOfBirth,
-      addresses: data.addresses,
-      shippingAddresses: data.shippingAddresses,
-      billingAddresses: data.billingAddresses,
-      defaultShippingAddress: data.defaultShippingAddress,
-      defaultBillingAddress: data.defaultBillingAddress,
-    };
-
     const response = await fetch(this.apiLink, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(requestBody),
+      body: JSON.stringify(data),
     });
 
     const result: unknown = await response.json();
