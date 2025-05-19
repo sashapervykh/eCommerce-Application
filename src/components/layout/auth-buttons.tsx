@@ -6,8 +6,8 @@ export const AuthButtons = () => {
   const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
 
-  const onLogout = async () => {
-    await logout();
+  const onLogout = () => {
+    logout();
     void navigate('/login');
   };
 
