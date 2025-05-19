@@ -8,7 +8,12 @@ const customErrorMap: z.ZodErrorMap = (issue, context) => {
     return { message: 'Email must be well formatted (i.e. include @ and domain and not contain whitespaces)' };
   }
 
-  if (issue.path.includes('firstName') || issue.path.includes('lastName') || issue.path.includes('city')) {
+  if (
+    issue.path.includes('firstName') ||
+    issue.path.includes('lastName') ||
+    issue.path.includes('billingCity') ||
+    issue.path.includes('shippingCity')
+  ) {
     if (issue.code === z.ZodIssueCode.too_small) {
       return { message: 'This field is required' };
     }
@@ -18,7 +23,7 @@ const customErrorMap: z.ZodErrorMap = (issue, context) => {
   }
 
   if (
-    issue.path.includes('country') &&
+    (issue.path.includes('billingCountry') || issue.path.includes('shippingCountry')) &&
     (issue.code === z.ZodIssueCode.invalid_enum_value || issue.code === z.ZodIssueCode.too_small)
   ) {
     return { message: 'Please select a valid country (United States or Canada)' };
@@ -36,13 +41,29 @@ export const registrationSchema = z
     firstName: z.string().regex(/^[A-Za-zА-я]+$/),
     lastName: z.string().regex(/^[A-Za-zА-я]+$/),
     dateOfBirth: z.string().min(1, 'Date is required').superRefine(isValidDOB),
-    street: z.string().min(1, 'Street is required'),
-    city: z.string().regex(/^[A-Za-zА-я]+$/),
-    country: z.enum(['US', 'CA']).optional(),
-    postalCode: z.string().min(1, 'Postal code is required'),
+    billingStreet: z.string().min(1, 'Street is required'),
+    billingCity: z.string().regex(/^[A-Za-zА-я]+$/),
+    billingCountry: z.enum(['US', 'CA']).optional(),
+    billingPostalCode: z.string().min(1, 'Postal code is required'),
+    shippingStreet: z.string().min(1, 'Street is required'),
+    shippingCity: z.string().regex(/^[A-Za-zА-я]+$/),
+    shippingCountry: z.enum(['US', 'CA']).optional(),
+    shippingPostalCode: z.string().min(1, 'Postal code is required'),
+    sameAddress: z.boolean().optional(),
+    setAsDefaultShipping: z.boolean().optional(),
+    setAsDefaultBilling: z.boolean().optional(),
   })
   .superRefine((data, context) => {
-    isValidPostalCode(data, context);
+    isValidPostalCode(
+      { country: data.billingCountry, postalCode: data.billingPostalCode },
+      context,
+      'billingPostalCode',
+    );
+    isValidPostalCode(
+      { country: data.shippingCountry, postalCode: data.shippingPostalCode },
+      context,
+      'shippingPostalCode',
+    );
   });
 
 export const schema = z.object({

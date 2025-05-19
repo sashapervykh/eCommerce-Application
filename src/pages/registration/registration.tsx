@@ -1,6 +1,8 @@
 import styles from './style.module.css';
 import FormLabel from '../../components/form-label/form-label';
-import { Card, Text, TextInput, Select, PasswordInput, Button, useToaster } from '@gravity-ui/uikit';
+import NavigationButton from '../../components/navigation-button/navigation-button';
+import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
+import { Card, Text, TextInput, Select, PasswordInput, Button, Checkbox, useToaster } from '@gravity-ui/uikit';
 import { DatePicker } from '@gravity-ui/date-components';
 import { Routes } from '../../components/navigation-button/type';
 import { useState, useEffect } from 'react';
@@ -9,18 +11,56 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { api } from '../../api/api';
 import { registrationSchema } from '../../utilities/validation-config/validation-rules';
-
 import { useNavigate } from 'react-router';
-import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
-import { NavigationButton } from '../../components/navigation-button/navigation-button';
 
-export function RegistrationPage() {
+export default function RegistrationPage() {
   const [successMessage, setSuccessMessage] = useState<string | undefined>();
   const [serverError, setServerError] = useState<string | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
-
   const toaster = useToaster();
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+    trigger,
+    reset,
+    watch,
+    setValue,
+    clearErrors,
+  } = useForm({
+    mode: 'onChange',
+    resolver: zodResolver(registrationSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+      firstName: '',
+      lastName: '',
+      dateOfBirth: '',
+      billingStreet: '',
+      billingCity: '',
+      billingCountry: undefined,
+      billingPostalCode: '',
+      shippingStreet: '',
+      shippingCity: '',
+      shippingCountry: undefined,
+      shippingPostalCode: '',
+      sameAddress: false,
+      setAsDefaultShipping: false,
+      setAsDefaultBilling: false,
+    },
+  });
+
+  const sameAddress = watch('sameAddress');
+
+  const syncShippingToBilling = (value: string, billingField: keyof z.infer<typeof registrationSchema>) => {
+    if (sameAddress) {
+      setValue(billingField, value);
+      clearErrors(billingField);
+    }
+  };
 
   useEffect(() => {
     if (successMessage && !serverError) {
@@ -32,6 +72,7 @@ export function RegistrationPage() {
         autoHiding: 6000,
       });
     }
+
     if (serverError) {
       toaster.add({
         name: 'error-registration',
@@ -41,30 +82,24 @@ export function RegistrationPage() {
         autoHiding: 6000,
       });
     }
-  }, [successMessage, serverError, toaster]);
 
-  const {
-    register,
-    handleSubmit,
-    control,
-    formState: { errors },
-    trigger,
-    reset,
-  } = useForm({
-    mode: 'onChange',
-    resolver: zodResolver(registrationSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-      firstName: '',
-      lastName: '',
-      dateOfBirth: '',
-      street: '',
-      city: '',
-      country: undefined,
-      postalCode: '',
-    },
-  });
+    if (sameAddress) {
+      const fieldMapping: Partial<
+        Record<keyof z.infer<typeof registrationSchema>, keyof z.infer<typeof registrationSchema>>
+      > = {
+        shippingStreet: 'billingStreet',
+        shippingCity: 'billingCity',
+        shippingCountry: 'billingCountry',
+        shippingPostalCode: 'billingPostalCode',
+      };
+
+      clearErrors(['billingStreet', 'billingCity', 'billingCountry', 'billingPostalCode']);
+
+      for (const [shippingField, billingField] of Object.entries(fieldMapping)) {
+        setValue(billingField, watch(shippingField as keyof z.infer<typeof registrationSchema>));
+      }
+    }
+  }, [successMessage, serverError, toaster, sameAddress, watch, setValue, clearErrors]);
 
   const onSubmit = async (data: z.infer<typeof registrationSchema>) => {
     if (isSubmitting) {
@@ -77,11 +112,36 @@ export function RegistrationPage() {
       setServerError(undefined);
       setSuccessMessage(undefined);
 
-      const response: unknown = await api.createCustomer({
+      const shippingAddress = {
+        key: 'shipping',
+        streetName: data.shippingStreet,
+        city: data.shippingCity,
+        country: data.shippingCountry ?? '',
+        postalCode: data.shippingPostalCode,
+      };
+
+      const requestBody = {
         ...data,
         dateOfBirth: data.dateOfBirth.split('T')[0],
-        country: data.country ?? '',
-      });
+        addresses: data.sameAddress
+          ? [shippingAddress]
+          : [
+              shippingAddress,
+              {
+                key: 'billing',
+                streetName: data.billingStreet,
+                city: data.billingCity,
+                country: data.billingCountry ?? '',
+                postalCode: data.billingPostalCode,
+              },
+            ],
+        billingAddresses: data.sameAddress ? [0] : [1],
+        shippingAddresses: [0],
+        defaultShippingAddress: data.setAsDefaultShipping ? 0 : undefined,
+        defaultBillingAddress: data.setAsDefaultBilling ? (data.sameAddress ? 0 : 1) : undefined,
+      };
+
+      const response: unknown = await api.createCustomer(requestBody);
 
       if (
         response &&
@@ -107,6 +167,7 @@ export function RegistrationPage() {
       setSuccessMessage('Account successfully created! Now you can log in.');
 
       reset();
+
       void navigate(Routes.main);
     } catch (error) {
       console.error('Error while registering:', error);
@@ -118,7 +179,7 @@ export function RegistrationPage() {
 
   return (
     <PageWrapper title="Space Real Estate">
-      <div className={styles.page}>
+      <div className={styles.page}>    
         <main className={styles.main}>
           <Card type="container" view="outlined" className={styles.container}>
             <form className={styles.form} onSubmit={(error) => void handleSubmit(onSubmit)(error)}>
@@ -202,30 +263,41 @@ export function RegistrationPage() {
                 </FormLabel>
               </fieldset>
               <fieldset className={styles.fieldset}>
-                <legend>Address information</legend>
-                <FormLabel text="Please enter your street">
+                <legend>Shipping Address</legend>
+                <FormLabel text="Set as default shipping address">
+                  <Checkbox {...register('setAsDefaultShipping')} size="l" className={styles.checkbox} />
+                </FormLabel>
+                <FormLabel text="Please enter your shipping street">
                   <TextInput
-                    {...register('street')}
+                    {...register('shippingStreet', {
+                      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+                        syncShippingToBilling(event.target.value, 'billingStreet');
+                      },
+                    })}
                     placeholder="Enter street"
                     className={styles.input}
                     size="xl"
-                    errorMessage={errors.street?.message}
-                    validationState={errors.street ? 'invalid' : undefined}
+                    errorMessage={errors.shippingStreet?.message}
+                    validationState={errors.shippingStreet ? 'invalid' : undefined}
                   />
                 </FormLabel>
-                <FormLabel text="Please enter your city">
+                <FormLabel text="Please enter your shipping city">
                   <TextInput
-                    {...register('city')}
+                    {...register('shippingCity', {
+                      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+                        syncShippingToBilling(event.target.value, 'billingCity');
+                      },
+                    })}
                     placeholder="Enter city"
                     className={styles.input}
                     size="xl"
-                    errorMessage={errors.city?.message}
-                    validationState={errors.city ? 'invalid' : undefined}
+                    errorMessage={errors.shippingCity?.message}
+                    validationState={errors.shippingCity ? 'invalid' : undefined}
                   />
                 </FormLabel>
-                <FormLabel text="Please select your country">
+                <FormLabel text="Please select your shipping country">
                   <Controller
-                    name="country"
+                    name="shippingCountry"
                     control={control}
                     render={({ field, fieldState }) => (
                       <Select
@@ -236,7 +308,8 @@ export function RegistrationPage() {
                         onUpdate={(selectedValues) => {
                           const selectedValue = selectedValues[0] ?? '';
                           field.onChange(selectedValue);
-                          void trigger(['postalCode', 'country']);
+                          syncShippingToBilling(selectedValue, 'billingCountry');
+                          void trigger(['shippingPostalCode', 'shippingCountry']);
                         }}
                         errorMessage={fieldState.error?.message}
                         validationState={fieldState.invalid ? 'invalid' : undefined}
@@ -247,18 +320,90 @@ export function RegistrationPage() {
                     )}
                   />
                 </FormLabel>
-                <FormLabel text="Please enter your postal code">
+                <FormLabel text="Please enter your shipping postal code">
                   <TextInput
-                    {...register('postalCode', {
-                      onChange: () => {
-                        void trigger(['postalCode', 'country']);
+                    {...register('shippingPostalCode', {
+                      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+                        syncShippingToBilling(event.target.value, 'billingPostalCode');
+                        void trigger(['shippingPostalCode', 'shippingCountry']);
                       },
                     })}
                     placeholder="Enter postal code"
                     className={styles.input}
                     size="xl"
-                    errorMessage={errors.postalCode ? errors.postalCode.message : undefined}
-                    validationState={errors.postalCode ? 'invalid' : undefined}
+                    errorMessage={errors.shippingPostalCode?.message}
+                    validationState={errors.shippingPostalCode ? 'invalid' : undefined}
+                  />
+                </FormLabel>
+                <FormLabel text="Use same address for billing">
+                  <Checkbox {...register('sameAddress')} size="l" className={styles.checkbox} />
+                </FormLabel>
+              </fieldset>
+              <fieldset className={styles.fieldset}>
+                <legend>Billing Address</legend>
+                <FormLabel text="Set as default billing address">
+                  <Checkbox {...register('setAsDefaultBilling')} size="l" className={styles.checkbox} />
+                </FormLabel>
+                <FormLabel text="Please enter your billing street">
+                  <TextInput
+                    {...register('billingStreet')}
+                    placeholder="Enter street"
+                    className={styles.input}
+                    size="xl"
+                    errorMessage={errors.billingStreet?.message}
+                    validationState={errors.billingStreet ? 'invalid' : undefined}
+                    disabled={sameAddress}
+                  />
+                </FormLabel>
+                <FormLabel text="Please enter your billing city">
+                  <TextInput
+                    {...register('billingCity')}
+                    placeholder="Enter city"
+                    className={styles.input}
+                    size="xl"
+                    errorMessage={errors.billingCity?.message}
+                    validationState={errors.billingCity ? 'invalid' : undefined}
+                    disabled={sameAddress}
+                  />
+                </FormLabel>
+                <FormLabel text="Please select your billing country">
+                  <Controller
+                    name="billingCountry"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                      <Select
+                        value={field.value ? [field.value] : []}
+                        placeholder="Select country"
+                        className={styles.input}
+                        size="xl"
+                        onUpdate={(selectedValues) => {
+                          const selectedValue = selectedValues[0] ?? '';
+                          field.onChange(selectedValue);
+                          void trigger(['billingPostalCode', 'billingCountry']);
+                        }}
+                        errorMessage={fieldState.error?.message}
+                        validationState={fieldState.invalid ? 'invalid' : undefined}
+                        disabled={sameAddress}
+                      >
+                        <Select.Option value="US">United States</Select.Option>
+                        <Select.Option value="CA">Canada</Select.Option>
+                      </Select>
+                    )}
+                  />
+                </FormLabel>
+                <FormLabel text="Please enter your billing postal code">
+                  <TextInput
+                    {...register('billingPostalCode', {
+                      onChange: () => {
+                        void trigger(['billingPostalCode', 'billingCountry']);
+                      },
+                    })}
+                    placeholder="Enter postal code"
+                    className={styles.input}
+                    size="xl"
+                    errorMessage={errors.billingPostalCode?.message}
+                    validationState={errors.billingPostalCode ? 'invalid' : undefined}
+                    disabled={sameAddress}
                   />
                 </FormLabel>
               </fieldset>
