@@ -1,7 +1,5 @@
 import styles from './style.module.css';
 import FormLabel from '../../components/form-label/form-label';
-import { NavigationButton } from '../../components/navigation-button/navigation-button';
-import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
 import { Card, Text, TextInput, Select, PasswordInput, Button, Checkbox, useToaster } from '@gravity-ui/uikit';
 import { DatePicker } from '@gravity-ui/date-components';
 import { Routes } from '../../components/navigation-button/type';
@@ -15,7 +13,6 @@ import { Navigate, useNavigate } from 'react-router';
 import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
 import { NavigationButton } from '../../components/navigation-button/navigation-button';
 import { useAuth } from '../../components/hooks/useAuth';
-
 
 export function RegistrationPage() {
   const { isAuthenticated } = useAuth();
