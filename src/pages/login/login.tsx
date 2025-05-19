@@ -1,4 +1,4 @@
-import { Card, Button, Text } from '@gravity-ui/uikit';
+import { Card, Button, Text, Alert } from '@gravity-ui/uikit';
 import { TextInput, PasswordInput } from '@gravity-ui/uikit';
 import { zodResolver } from '@hookform/resolvers/zod';
 import FormLabel from '../../components/form-label/form-label';
@@ -49,11 +49,7 @@ export function LoginPage() {
           }}
         >
           <h1 className={styles.h1}>Log into your account</h1>
-          {serverError && (
-            <Text variant="subheader-1" className={styles['server-error']} color="danger">
-              {serverError}
-            </Text>
-          )}
+
           <FormLabel text="">
             <TextInput
               {...register('email', {
@@ -92,6 +88,9 @@ export function LoginPage() {
               )}
             />
           </FormLabel>
+          {serverError && (
+            <Alert theme="danger" title="Authorization failed" message={serverError} className={styles.alert} />
+          )}
           <Button type="submit" view="action" size="xl" width="max">
             Sign in
           </Button>
