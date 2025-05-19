@@ -1,6 +1,6 @@
 import styles from './style.module.css';
 import FormLabel from '../../components/form-label/form-label';
-import NavigationButton from '../../components/navigation-button/navigation-button';
+import { NavigationButton } from '../../components/navigation-button/navigation-button';
 import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
 import { Card, Text, TextInput, Select, PasswordInput, Button, Checkbox, useToaster } from '@gravity-ui/uikit';
 import { DatePicker } from '@gravity-ui/date-components';
@@ -13,7 +13,7 @@ import { api } from '../../api/api';
 import { registrationSchema } from '../../utilities/validation-config/validation-rules';
 import { useNavigate } from 'react-router';
 
-export default function RegistrationPage() {
+export function RegistrationPage() {
   const [successMessage, setSuccessMessage] = useState<string | undefined>();
   const [serverError, setServerError] = useState<string | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -179,7 +179,7 @@ export default function RegistrationPage() {
 
   return (
     <PageWrapper title="Space Real Estate">
-      <div className={styles.page}>    
+      <div className={styles.page}>
         <main className={styles.main}>
           <Card type="container" view="outlined" className={styles.container}>
             <form className={styles.form} onSubmit={(error) => void handleSubmit(onSubmit)(error)}>
