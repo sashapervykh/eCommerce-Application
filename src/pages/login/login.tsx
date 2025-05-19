@@ -89,9 +89,14 @@ export function LoginPage() {
             />
           </FormLabel>
           {serverError && (
-            <Alert theme="danger" title="Authorization failed" message={serverError} className={styles.alert} />
+            <Alert
+              theme="danger"
+              title="Authorization failed"
+              message={serverError}
+              className={styles['element-with-margin']}
+            />
           )}
-          <Button type="submit" view="action" size="xl" width="max">
+          <Button className={styles['element-with-margin']} type="submit" view="action" size="xl" width="max">
             Sign in
           </Button>
           <div className={styles['signup-wrapper']}>
