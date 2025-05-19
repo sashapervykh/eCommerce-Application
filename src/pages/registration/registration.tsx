@@ -11,9 +11,14 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { api } from '../../api/api';
 import { registrationSchema } from '../../utilities/validation-config/validation-rules';
-import { useNavigate } from 'react-router';
+import { Navigate, useNavigate } from 'react-router';
+import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
+import { NavigationButton } from '../../components/navigation-button/navigation-button';
+import { useAuth } from '../../components/hooks/useAuth';
+
 
 export function RegistrationPage() {
+  const { isAuthenticated } = useAuth();
   const [successMessage, setSuccessMessage] = useState<string | undefined>();
   const [serverError, setServerError] = useState<string | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -100,6 +105,10 @@ export function RegistrationPage() {
       }
     }
   }, [successMessage, serverError, toaster, sameAddress, watch, setValue, clearErrors]);
+
+  if (isAuthenticated) {
+    return <Navigate to="/"></Navigate>;
+  }
 
   const onSubmit = async (data: z.infer<typeof registrationSchema>) => {
     if (isSubmitting) {

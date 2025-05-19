@@ -25,7 +25,7 @@ export function HomePage() {
     <PageWrapper title="Space Real Estate">
       <div className={styles['content-container']}>
         <h1 className={styles['page-title']}>
-          {userInfo?.firstName ? `Hello, ${userInfo.firstName}` : ''} Welcome to Space Real Estate
+          {userInfo?.firstName ? `Hello, ${userInfo.firstName}!` : ''} Welcome to Space Real Estate
         </h1>
         {projectDetails && (
           <div className={styles['data-preview']}>

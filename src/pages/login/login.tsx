@@ -1,4 +1,4 @@
-import { Card, Button, Text } from '@gravity-ui/uikit';
+import { Card, Button, Text, Alert } from '@gravity-ui/uikit';
 import { TextInput, PasswordInput } from '@gravity-ui/uikit';
 import { zodResolver } from '@hookform/resolvers/zod';
 import FormLabel from '../../components/form-label/form-label';
@@ -10,11 +10,12 @@ import { ChangeEvent } from 'react';
 import styles from './style.module.css';
 import { Routes } from '../../components/navigation-button/type';
 import { useAuth } from '../../components/hooks/useAuth';
+import { Navigate } from 'react-router-dom';
 
 const loginSchema = schema.pick({ email: true, password: true });
 
 export function LoginPage() {
-  const { serverError, login, setServerError } = useAuth();
+  const { serverError, login, setServerError, isAuthenticated } = useAuth();
   const {
     register,
     handleSubmit,
@@ -25,13 +26,17 @@ export function LoginPage() {
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = async (data: { email: string; password: string }) => {
+  const onSubmit = (data: { email: string; password: string }) => {
     try {
-      await login(data.email, data.password);
+      login(data.email, data.password);
     } catch (error) {
       console.error(error);
     }
   };
+
+  if (isAuthenticated) {
+    return <Navigate to="/"></Navigate>;
+  }
 
   return (
     <PageWrapper title="Login">
@@ -44,11 +49,7 @@ export function LoginPage() {
           }}
         >
           <h1 className={styles.h1}>Log into your account</h1>
-          {serverError && (
-            <Text variant="subheader-1" className={styles['server-error']} color="danger">
-              {serverError}
-            </Text>
-          )}
+
           <FormLabel text="">
             <TextInput
               {...register('email', {
@@ -87,6 +88,9 @@ export function LoginPage() {
               )}
             />
           </FormLabel>
+          {serverError && (
+            <Alert theme="danger" title="Authorization failed" message={serverError} className={styles.alert} />
+          )}
           <Button type="submit" view="action" size="xl" width="max">
             Sign in
           </Button>

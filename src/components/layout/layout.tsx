@@ -1,8 +1,9 @@
 import { Outlet } from 'react-router-dom';
-import { Button } from '@gravity-ui/uikit';
+import { Button, Loader } from '@gravity-ui/uikit';
 import { useNavigate } from 'react-router-dom';
 import styles from './layout.module.css';
 import { AuthButtons } from './auth-buttons';
+import { useAuth } from '../hooks/useAuth';
 
 const navLinks = [
   { text: 'Home', route: '/' },
@@ -13,7 +14,13 @@ const navLinks = [
 export function MainLayout() {
   const navigate = useNavigate();
 
-  return (
+  const { isLoading } = useAuth();
+
+  return isLoading ? (
+    <div>
+      <Loader size="l" className={styles.loader} />
+    </div>
+  ) : (
     <div className={styles['app-container']}>
       <header className={styles.header}>
         <div className={styles.container}>
