@@ -1,0 +1,48 @@
+import { createApiBuilderFromCtpClient } from '@commercetools/platform-sdk';
+import { projectKey } from '../commercetools-sdk';
+import { Client, ClientBuilder, HttpMiddlewareOptions } from '@commercetools/ts-client';
+
+class CustomerAPI {
+  ctpClient: Client | undefined;
+  httpMiddlewareOptions: HttpMiddlewareOptions = {
+    host: 'https://api.us-central1.gcp.commercetools.com',
+    httpClient: fetch,
+  };
+
+  apiRoot() {
+    const apiRoot = createApiBuilderFromCtpClient(this.ctpClient).withProjectKey({ projectKey });
+    return apiRoot;
+  }
+
+  createAnonymCustomer() {
+    this.ctpClient = new ClientBuilder()
+      .withAnonymousSessionFlow({
+        host: 'https://auth.us-central1.gcp.commercetools.com/',
+        projectKey: projectKey,
+        credentials: { clientId: import.meta.env.VITE_CLIENT_ID, clientSecret: import.meta.env.VITE_CLIENT_SECRET },
+      })
+      .withHttpMiddleware(this.httpMiddlewareOptions)
+      .build();
+  }
+
+  createAuthenticatedCustomer(token_type: string, access_token: string) {
+    this.ctpClient = new ClientBuilder()
+      .withExistingTokenFlow(`${token_type} ${access_token}`, { force: true })
+      .withHttpMiddleware(this.httpMiddlewareOptions)
+      .build();
+  }
+
+  createCustomerWithRefreshToken(refresh_token: string) {
+    this.ctpClient = new ClientBuilder()
+      .withRefreshTokenFlow({
+        host: 'https://auth.us-central1.gcp.commercetools.com/',
+        projectKey: projectKey,
+        credentials: { clientId: import.meta.env.VITE_CLIENT_ID, clientSecret: import.meta.env.VITE_CLIENT_SECRET },
+        refreshToken: refresh_token,
+      })
+      .withHttpMiddleware(this.httpMiddlewareOptions)
+      .build();
+  }
+}
+
+export const customerAPI = new CustomerAPI();
