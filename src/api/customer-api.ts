@@ -14,6 +14,17 @@ class CustomerAPI {
     return apiRoot;
   }
 
+  createAnonymCustomer() {
+    this.ctpClient = new ClientBuilder()
+      .withAnonymousSessionFlow({
+        host: 'https://auth.us-central1.gcp.commercetools.com/',
+        projectKey: projectKey,
+        credentials: { clientId: import.meta.env.VITE_CLIENT_ID, clientSecret: import.meta.env.VITE_CLIENT_SECRET },
+      })
+      .withHttpMiddleware(this.httpMiddlewareOptions)
+      .build();
+  }
+
   createAuthenticatedCustomer(token_type: string, access_token: string) {
     this.ctpClient = new ClientBuilder()
       .withExistingTokenFlow(`${token_type} ${access_token}`, { force: true })

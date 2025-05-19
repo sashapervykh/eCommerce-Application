@@ -82,7 +82,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const logout = () => {
-    console.log('Logging out...');
+    customerAPI.createAnonymCustomer();
     localStorage.removeItem('refresh_token');
     setUserInfo(null);
   };
