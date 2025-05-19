@@ -15,7 +15,7 @@ import { NavigationButton } from '../../components/navigation-button/navigation-
 import { useAuth } from '../../components/hooks/useAuth';
 
 export function RegistrationPage() {
-  const { isAuthenticated } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const [successMessage, setSuccessMessage] = useState<string | undefined>();
   const [serverError, setServerError] = useState<string | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -170,7 +170,9 @@ export function RegistrationPage() {
         return;
       }
 
-      setSuccessMessage('Account successfully created! Now you can log in.');
+      login(data.email, data.password);
+
+      setSuccessMessage('Account successfully created! You have successfully logged in.');
 
       reset();
 
