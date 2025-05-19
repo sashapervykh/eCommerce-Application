@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const login = async (email: string, password: string) => {
     try {
       const response: unknown = await api.getAccessToken({ email, password });
-      console.log(response);
+
       if (isErrorResponse(response)) {
         if (response.statusCode === 400) {
           setServerError('Please check the email and password. The user with this data is not found.');
