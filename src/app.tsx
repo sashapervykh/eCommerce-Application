@@ -10,6 +10,7 @@ import { CatalogPage } from './pages/catalog/catalog';
 import { RegistrationPage } from './pages/registration/registration';
 import { AuthProvider } from './components/hooks/useAuth';
 import { LoginPage } from './pages/login/login';
+import { UserPage } from './pages/user/user';
 
 export function App() {
   return (
@@ -26,6 +27,7 @@ export function App() {
                 <Route path="/registration" element={<RegistrationPage />} />
                 <Route path="/404" element={<NotFoundPage />} />
                 <Route path="*" element={<NotFoundPage />} />
+                <Route path="/user" element={<UserPage />} />
               </Route>
             </Routes>
           </AuthProvider>
