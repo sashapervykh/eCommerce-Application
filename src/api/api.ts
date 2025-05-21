@@ -1,5 +1,10 @@
 import { projectKey } from '../commercetools-sdk';
 
+interface CustomerResponse {
+  id: string;
+  version: number;
+}
+
 class API {
   authLink = `https://auth.us-central1.gcp.commercetools.com/oauth/${projectKey}/customers/token`;
   tokenLink = `https://auth.us-central1.gcp.commercetools.com/oauth/token`;
@@ -83,6 +88,79 @@ class API {
     const result: unknown = await response.json();
     console.log('API response → for CrossCheck Testing:', result);
     return result;
+  }
+
+  async updateCustomer(
+    customerId: string,
+    version: number,
+    data: {
+      firstName?: string;
+      lastName?: string;
+      dateOfBirth?: string;
+      addresses?: {
+        action: 'addAddress' | 'changeAddress' | 'removeAddress';
+        addressId?: string;
+        address?: {
+          key: string;
+          streetName: string;
+          city: string;
+          country: string;
+          postalCode: string;
+        };
+      }[];
+      defaultShippingAddress?: number;
+      defaultBillingAddress?: number;
+    },
+  ): Promise<CustomerResponse> {
+    const token = await this.getClientCredentialsToken();
+    const actions = [];
+
+    if (data.firstName) actions.push({ action: 'setFirstName', firstName: data.firstName });
+    if (data.lastName) actions.push({ action: 'setLastName', lastName: data.lastName });
+    if (data.dateOfBirth) actions.push({ action: 'setDateOfBirth', dateOfBirth: data.dateOfBirth });
+
+    if (data.addresses) {
+      data.addresses.forEach((address) => {
+        if (address.action === 'addAddress' && address.address) {
+          actions.push({
+            action: 'addAddress',
+            address: address.address,
+          });
+        }
+      });
+    }
+
+    if (data.defaultShippingAddress !== undefined) {
+      actions.push({
+        action: 'setDefaultShippingAddress',
+        addressId: data.defaultShippingAddress.toString(),
+      });
+    }
+
+    if (data.defaultBillingAddress !== undefined) {
+      actions.push({
+        action: 'setDefaultBillingAddress',
+        addressId: data.defaultBillingAddress.toString(),
+      });
+    }
+
+    const response = await fetch(`${this.apiLink}/${customerId}`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        version,
+        actions,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to update customer: ${response.statusText}`);
+    }
+
+    return (await response.json()) as CustomerResponse;
   }
 }
 
