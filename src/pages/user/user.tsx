@@ -11,6 +11,7 @@ import { registrationSchema } from '../../utilities/validation-config/validation
 import { api } from '../../api/api';
 import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
+import { useEffect } from 'react';
 
 interface ProfileFormData {
   firstName: string;
@@ -36,6 +37,7 @@ interface UserContentProps {
 }
 
 function UserContent({ userInfo, isEditMode, toggleEditMode }: UserContentProps) {
+  const { refreshUser } = useAuth();
   const toaster = useToaster();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -91,6 +93,30 @@ function UserContent({ userInfo, isEditMode, toggleEditMode }: UserContentProps)
   });
 
   const sameAddress = watch('sameAddress');
+  useEffect(() => {
+    reset({
+      firstName: userInfo.firstName ?? '',
+      lastName: userInfo.lastName ?? '',
+      dateOfBirth: userInfo.dateOfBirth ?? '',
+      shippingStreet: userInfo.addresses[0]?.streetName ?? '',
+      shippingCity: userInfo.addresses[0]?.city ?? '',
+      shippingCountry:
+        userInfo.addresses[0]?.country === 'US' || userInfo.addresses[0]?.country === 'CA'
+          ? userInfo.addresses[0].country
+          : 'US',
+      shippingPostalCode: userInfo.addresses[0]?.postalCode ?? '',
+      billingStreet: userInfo.addresses[1]?.streetName ?? '',
+      billingCity: userInfo.addresses[1]?.city ?? '',
+      billingCountry:
+        userInfo.addresses[1]?.country === 'US' || userInfo.addresses[1]?.country === 'CA'
+          ? userInfo.addresses[1]?.country
+          : 'US',
+      billingPostalCode: userInfo.addresses[1]?.postalCode ?? '',
+      sameAddress: false,
+      setAsDefaultShipping: userInfo.defaultShippingAddressId === userInfo.shippingAddressIds?.[0],
+      setAsDefaultBilling: userInfo.defaultBillingAddressId === userInfo.billingAddressIds?.[0],
+    });
+  }, [userInfo, reset, isEditMode]);
 
   const onSubmit: SubmitHandler<ProfileFormData> = async (data) => {
     if (isSubmitting) return;
@@ -131,6 +157,7 @@ function UserContent({ userInfo, isEditMode, toggleEditMode }: UserContentProps)
       };
 
       await api.updateCustomer(userInfo.id, userInfo.version, updateData);
+      await refreshUser();
 
       toaster.add({
         name: 'profile-update-success',

@@ -22,6 +22,7 @@ interface AuthContextType {
   serverError: string | null;
   setServerError: React.Dispatch<React.SetStateAction<string | null>>;
   isLoading: boolean;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -31,6 +32,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [serverError, setServerError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const navigate = useNavigate();
+  const refreshUser = async () => {
+    try {
+      const customerData = await customerAPI.apiRoot().me().get().execute();
+      setUserInfo(customerData.body);
+    } catch (error) {
+      console.error('Failed to refresh user data:', error);
+    }
+  };
 
   const login = async (email: string, password: string) => {
     try {
@@ -112,6 +121,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     serverError,
     setServerError,
     isLoading,
+    refreshUser,
   };
 
   return <AuthContext.Provider value={authContextValue}> {children}</AuthContext.Provider>;
