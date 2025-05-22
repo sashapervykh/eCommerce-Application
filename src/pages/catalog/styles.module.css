@@ -1,0 +1,13 @@
+.wrapper {
+  margin-bottom: 20px;
+}
+
+.image-wrapper {
+  display: flex;
+}
+
+.image {
+  display: block;
+  width: 100px;
+  height: 100px;
+}
