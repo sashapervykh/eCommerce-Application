@@ -25,7 +25,6 @@ function CatalogContent() {
     }
     if (!result) {
       void getProducts();
-      console.log(result);
     }
   }, [result]);
 
@@ -33,7 +32,7 @@ function CatalogContent() {
     <div>
       <h1>Catalog Content</h1>
       {result?.map((product) => (
-        <div className={styles.wrapper}>
+        <div key={product.name['en-US']} className={styles.wrapper}>
           <div className={styles['image-wrapper']}>
             <div>
               <img className={styles.image} src={product.images ? product.images[0].url : ''} alt="" />
