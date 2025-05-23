@@ -22,7 +22,7 @@ export function ProductCard({ productInfo }: { productInfo: ProductInfo }) {
         <Text variant="body-2" className={styles.text}>
           <b>Price:</b> ${productInfo.price}{' '}
         </Text>
-        <Text variant="body-2" className={(styles.text, styles.description)} ellipsis={true} ellipsisLines={4}>
+        <Text variant="body-2" className={(styles.text, styles.description)} ellipsis={true} ellipsisLines={5}>
           <b>Description:</b> {productInfo.description}
         </Text>
       </div>
