@@ -2,7 +2,7 @@ import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
 import { useAuth } from '../../components/hooks/useAuth';
 import { Navigate } from 'react-router-dom';
 import { Customer } from '@commercetools/platform-sdk';
-import { Card, Button, Text, useToaster } from '@gravity-ui/uikit';
+import { Card, Button, Text, useToaster, PasswordInput } from '@gravity-ui/uikit';
 import { useState } from 'react';
 import styles from './style.module.css';
 import { TextInput, Select, Checkbox } from '@gravity-ui/uikit';
@@ -14,6 +14,7 @@ import { z } from 'zod';
 import { useEffect } from 'react';
 
 interface ProfileFormData {
+  email: string;
   firstName: string;
   lastName: string;
   dateOfBirth: string;
@@ -40,6 +41,9 @@ function UserContent({ userInfo, isEditMode, toggleEditMode }: UserContentProps)
   const { refreshUser } = useAuth();
   const toaster = useToaster();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   const {
     register,
@@ -52,6 +56,7 @@ function UserContent({ userInfo, isEditMode, toggleEditMode }: UserContentProps)
   } = useForm<ProfileFormData>({
     resolver: zodResolver(
       registrationSchema._def.schema.pick({
+        email: true,
         firstName: true,
         lastName: true,
         dateOfBirth: true,
@@ -69,6 +74,7 @@ function UserContent({ userInfo, isEditMode, toggleEditMode }: UserContentProps)
       }) as z.ZodType<ProfileFormData>,
     ),
     defaultValues: {
+      email: userInfo.email,
       firstName: userInfo.firstName ?? '',
       lastName: userInfo.lastName ?? '',
       dateOfBirth: userInfo.dateOfBirth ?? '',
@@ -242,6 +248,43 @@ function UserContent({ userInfo, isEditMode, toggleEditMode }: UserContentProps)
     );
   }
 
+  const handlePasswordChange = async () => {
+    if (newPassword !== confirmPassword) {
+      toaster.add({
+        name: 'password-mismatch',
+        title: 'Error',
+        content: 'New passwords do not match',
+        theme: 'danger',
+      });
+      return;
+    }
+
+    try {
+      await api.changePassword({
+        id: userInfo.id,
+        version: userInfo.version,
+        currentPassword,
+        newPassword,
+      });
+      toaster.add({
+        name: 'password-success',
+        title: 'Success',
+        content: 'Password updated successfully',
+        theme: 'success',
+      });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Error:', error.message);
+      }
+      toaster.add({
+        name: 'password-error',
+        title: 'Error',
+        content: 'Failed to change password',
+        theme: 'danger',
+      });
+    }
+  };
+
   return (
     <Card className={styles.profileCard}>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -260,6 +303,13 @@ function UserContent({ userInfo, isEditMode, toggleEditMode }: UserContentProps)
         <div className={styles.profileSection}>
           <h2>Personal Information</h2>
           <div className={styles.formRow}>
+            <TextInput
+              {...register('email')}
+              label="Email"
+              size="l"
+              errorMessage={errors.email?.message}
+              validationState={errors.email ? 'invalid' : undefined}
+            />
             <TextInput
               {...register('firstName')}
               label="First Name"
@@ -399,6 +449,54 @@ function UserContent({ userInfo, isEditMode, toggleEditMode }: UserContentProps)
             errorMessage={errors.billingPostalCode?.message}
             validationState={errors.billingPostalCode ? 'invalid' : undefined}
           />
+        </div>
+        <div className={styles.profileSection}>
+          <h2>Change Password</h2>
+          <PasswordInput
+            value={currentPassword}
+            onChange={(event) => setCurrentPassword(event.target.value)}
+            label="Current Password"
+            size="l"
+          />
+          <PasswordInput
+            value={newPassword}
+            onChange={(event) => setNewPassword(event.target.value)}
+            label="New Password"
+            size="l"
+          />
+          <PasswordInput
+            value={confirmPassword}
+            onChange={(event) => setConfirmPassword(event.target.value)}
+            label="Confirm New Password"
+            size="l"
+          />
+          <Button onClick={handlePasswordChange} view="action">
+            Change Password
+          </Button>
+        </div>
+        <div className={styles.profileSection}>
+          <h2>Change Password</h2>
+          <PasswordInput
+            value={currentPassword}
+            onChange={(event) => setCurrentPassword(event.target.value)}
+            label="Current Password"
+            size="l"
+          />
+          <PasswordInput
+            value={newPassword}
+            onChange={(event) => setNewPassword(event.target.value)}
+            label="New Password"
+            size="l"
+          />
+          <PasswordInput
+            value={confirmPassword}
+            onChange={(event) => setConfirmPassword(event.target.value)}
+            label="Confirm New Password"
+            size="l"
+          />
+          <Button onClick={handlePasswordChange} view="action">
+            Change Password
+          </Button>
         </div>
       </form>
     </Card>

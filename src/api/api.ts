@@ -162,6 +162,29 @@ class API {
 
     return (await response.json()) as CustomerResponse;
   }
+
+  async changePassword(data: {
+    id: string;
+    version: number;
+    currentPassword: string;
+    newPassword: string;
+  }): Promise<CustomerResponse> {
+    const token = await this.getClientCredentialsToken();
+    const response = await fetch(`${this.apiLink}/password`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Password change failed: ${response.statusText}`);
+    }
+
+    return (await response.json()) as CustomerResponse;
+  }
 }
 
 export const api = new API();
