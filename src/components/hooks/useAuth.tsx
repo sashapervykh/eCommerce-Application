@@ -96,6 +96,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         } catch {
           setUserInfo(null);
         }
+      } else {
+        customerAPI.createAnonymCustomer();
       }
       setIsLoading(false);
     };
