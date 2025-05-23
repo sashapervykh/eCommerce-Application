@@ -5,5 +5,6 @@ export interface ProductInfo {
   name: string;
   description: string;
   price: string;
+  fullPrice?: string;
   images?: Image[];
 }

@@ -21,6 +21,7 @@ export function ProductCard({ productInfo }: { productInfo: ProductInfo }) {
         </Text>
         <Text variant="body-2" className={styles.text}>
           <b>Price:</b> ${productInfo.price}{' '}
+          {productInfo.fullPrice ? <span className={styles['full-price']}>${productInfo.fullPrice}</span> : ''}
         </Text>
         <Text variant="body-2" className={(styles.text, styles.description)} ellipsis={true} ellipsisLines={5}>
           <b>Description:</b> {productInfo.description}

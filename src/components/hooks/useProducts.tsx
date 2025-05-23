@@ -20,13 +20,24 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     try {
       const response = await customerAPI.apiRoot().products().get().execute();
       const productsInfo = response.body.results.map((productInfo) => {
+        const discountedPrice = productInfo.masterData.current.masterVariant.prices?.[0]?.discounted?.value.centAmount;
+        const price = productInfo.masterData.current.masterVariant.prices?.[0].value.centAmount;
+        let currentPrice: string;
+        let fullPrice: string | undefined;
+
+        if (discountedPrice) {
+          currentPrice = (discountedPrice / 100).toLocaleString('en-US');
+          fullPrice = price ? (price / 100).toLocaleString('en-US') : 'Not provided';
+        } else {
+          currentPrice = price ? (price / 100).toLocaleString('en-US') : 'Not provided';
+        }
+
         return {
           id: productInfo.id,
           name: productInfo.masterData.current.name['en-US'],
           description: productInfo.masterData.current.description?.['en-US'] ?? 'Not provided',
-          price: productInfo.masterData.current.masterVariant.prices
-            ? (productInfo.masterData.current.masterVariant.prices[0].value.centAmount / 100).toLocaleString('en-US')
-            : 'Not defined',
+          price: currentPrice,
+          fullPrice: fullPrice,
           images: productInfo.masterData.current.masterVariant.images,
         };
       });
