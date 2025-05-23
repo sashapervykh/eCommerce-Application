@@ -1,16 +1,23 @@
 import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
-import { Button } from '@gravity-ui/uikit';
+import { Spin } from '@gravity-ui/uikit';
 import styles from './styles.module.css';
 import { useProducts } from '../../components/hooks/useProducts';
 
 function CatalogContent() {
-  const { productsInfo, getProducts } = useProducts();
+  const { productsInfo, getProducts, isLoading, error } = useProducts();
 
   getProducts();
 
+  if (isLoading) {
+    return <Spin></Spin>;
+  }
+
+  if (error) {
+    return <div>{'Something goes wrong. Refresh the page to try again'}</div>;
+  }
+
   return (
     <div>
-      <h1>Catalog Content</h1>
       {productsInfo?.map((product) => (
         <div key={product.id} className={styles.wrapper}>
           <div className={styles['image-wrapper']}>
@@ -34,9 +41,7 @@ function CatalogContent() {
 export function CatalogPage() {
   return (
     <PageWrapper title="Catalog">
-      <div>
-        <Button view="outlined">Moon</Button>
-      </div>
+      <h1>Our products</h1>
       <CatalogContent />
     </PageWrapper>
   );

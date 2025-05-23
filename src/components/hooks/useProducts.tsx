@@ -12,13 +12,17 @@ interface ProductInfo {
 
 interface ProductsContextType {
   productsInfo: ProductInfo[] | null;
+  isLoading: boolean;
   getProducts: () => void;
+  error: boolean;
 }
 
 const ProductsContext = createContext<ProductsContextType>({} as ProductsContextType);
 
 export const ProductsProvider = ({ children }: { children: React.ReactNode }) => {
   const [productsInfo, setProductsInfo] = useState<ProductInfo[] | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<boolean>(false);
 
   const getProducts = async () => {
     try {
@@ -35,14 +39,18 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
         };
       });
       setProductsInfo(productsInfo);
+      setIsLoading(false);
     } catch (error) {
       console.error(error);
+      setError(true);
     }
   };
 
   const ProductsContextValue = {
     productsInfo,
+    isLoading,
     getProducts,
+    error,
   };
 
   return <ProductsContext.Provider value={ProductsContextValue}> {children}</ProductsContext.Provider>;
