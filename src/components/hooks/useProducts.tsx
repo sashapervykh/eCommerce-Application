@@ -1,14 +1,6 @@
 import { createContext, useContext, useState } from 'react';
 import { customerAPI } from '../../api/customer-api';
-import { Image } from '@commercetools/platform-sdk';
-
-interface ProductInfo {
-  id: string;
-  name: string;
-  description: string;
-  price: string;
-  images?: Image[];
-}
+import { ProductInfo } from '../../pages/catalog/components/catalog-content/product/types';
 
 interface ProductsContextType {
   productsInfo: ProductInfo[] | null;
