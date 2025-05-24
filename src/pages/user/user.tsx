@@ -155,10 +155,36 @@ function UserContent({ userInfo, isEditMode, toggleEditMode }: UserContentProps)
       };
 
       const updateData = {
+        email: data.email,
         firstName: data.firstName,
         lastName: data.lastName,
         dateOfBirth: data.dateOfBirth,
-        addresses: data.sameAddress ? [shippingAddress] : [shippingAddress, billingAddress],
+        addresses: data.sameAddress
+          ? [
+              {
+                action: 'changeAddress' as const,
+                addressId: userInfo.shippingAddressIds?.[0],
+                address: {
+                  key: 'shipping',
+                  streetName: data.shippingStreet,
+                  city: data.shippingCity,
+                  country: data.shippingCountry ?? 'US',
+                  postalCode: data.shippingPostalCode,
+                },
+              },
+              {
+                action: 'changeAddress' as const,
+                addressId: userInfo.billingAddressIds?.[0],
+                address: {
+                  key: 'billing',
+                  streetName: data.shippingStreet,
+                  city: data.shippingCity,
+                  country: data.shippingCountry ?? 'US',
+                  postalCode: data.shippingPostalCode,
+                },
+              },
+            ]
+          : [shippingAddress, billingAddress],
         defaultShippingAddress: data.setAsDefaultShipping ? 0 : undefined,
         defaultBillingAddress: data.setAsDefaultBilling ? (data.sameAddress ? 0 : 1) : undefined,
       };
@@ -267,6 +293,7 @@ function UserContent({ userInfo, isEditMode, toggleEditMode }: UserContentProps)
         currentPassword,
         newPassword,
       });
+      await refreshUser();
       toaster.add({
         name: 'password-success',
         title: 'Success',
@@ -450,30 +477,6 @@ function UserContent({ userInfo, isEditMode, toggleEditMode }: UserContentProps)
             errorMessage={errors.billingPostalCode?.message}
             validationState={errors.billingPostalCode ? 'invalid' : undefined}
           />
-        </div>
-        <div className={styles.profileSection}>
-          <h2>Change Password</h2>
-          <PasswordInput
-            value={currentPassword}
-            onChange={(event) => setCurrentPassword(event.target.value)}
-            label="Current Password"
-            size="l"
-          />
-          <PasswordInput
-            value={newPassword}
-            onChange={(event) => setNewPassword(event.target.value)}
-            label="New Password"
-            size="l"
-          />
-          <PasswordInput
-            value={confirmPassword}
-            onChange={(event) => setConfirmPassword(event.target.value)}
-            label="Confirm New Password"
-            size="l"
-          />
-          <Button onClick={handlePasswordChange} view="action">
-            Change Password
-          </Button>
         </div>
         <div className={styles.profileSection}>
           <h2>Change Password</h2>

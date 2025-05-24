@@ -94,6 +94,7 @@ class API {
     customerId: string,
     version: number,
     data: {
+      email?: string;
       firstName?: string;
       lastName?: string;
       dateOfBirth?: string;
@@ -114,7 +115,12 @@ class API {
   ): Promise<CustomerResponse> {
     const token = await this.getClientCredentialsToken();
     const actions = [];
-
+    if (data.email) {
+      actions.push({
+        action: 'changeEmail',
+        email: data.email,
+      });
+    }
     if (data.firstName) actions.push({ action: 'setFirstName', firstName: data.firstName });
     if (data.lastName) actions.push({ action: 'setLastName', lastName: data.lastName });
     if (data.dateOfBirth) actions.push({ action: 'setDateOfBirth', dateOfBirth: data.dateOfBirth });
