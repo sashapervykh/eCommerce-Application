@@ -1,11 +1,14 @@
 import { Spin } from '@gravity-ui/uikit';
 import { useProducts } from '../../../../components/hooks/useProducts';
 import { ProductsList } from './product/products';
+import { useEffect } from 'react';
 
 export function CatalogContent() {
   const { productsInfo, getProducts, isLoading, error } = useProducts();
 
-  getProducts();
+  useEffect(() => {
+    getProducts();
+  }, []);
 
   if (isLoading) {
     return <Spin></Spin>;
