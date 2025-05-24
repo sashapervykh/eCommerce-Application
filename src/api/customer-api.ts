@@ -42,7 +42,6 @@ class CustomerAPI {
       })
       .withHttpMiddleware(this.httpMiddlewareOptions)
       .build();
-    console.log('with refresh token');
   }
 }
 
