@@ -101,6 +101,7 @@ function UserContent({ userInfo, isEditMode, toggleEditMode }: UserContentProps)
   const sameAddress = watch('sameAddress');
   useEffect(() => {
     reset({
+      email: userInfo.email,
       firstName: userInfo.firstName ?? '',
       lastName: userInfo.lastName ?? '',
       dateOfBirth: userInfo.dateOfBirth ?? '',
