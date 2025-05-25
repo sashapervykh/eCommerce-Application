@@ -18,7 +18,6 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
 
   const getProducts = async () => {
     try {
-      console.log('request');
       const response = await customerAPI.apiRoot().products().get().execute();
       const productsInfo = response.body.results.map((productInfo) => {
         const discountedPrice = productInfo.masterData.current.masterVariant.prices?.[0]?.discounted?.value.centAmount;
