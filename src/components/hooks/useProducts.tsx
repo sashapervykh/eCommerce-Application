@@ -6,6 +6,7 @@ interface ProductsContextType {
   productsInfo: ProductInfo[] | null;
   isLoading: boolean;
   getProducts: () => void;
+  getSortedProducts: (value: string) => void;
   error: boolean;
 }
 
@@ -49,10 +50,50 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     }
   };
 
+  const getSortedProducts = async (value: string) => {
+    try {
+      const response = await customerAPI
+        .apiRoot()
+        .productProjections()
+        .search()
+        .get({ queryArgs: { sort: [value] } })
+        .execute();
+      const productsInfo = response.body.results.map((productInfo) => {
+        const discountedPrice = productInfo.masterVariant.prices?.[0]?.discounted?.value.centAmount;
+        const price = productInfo.masterVariant.prices?.[0].value.centAmount;
+        let currentPrice: string;
+        let fullPrice: string | undefined;
+
+        if (discountedPrice) {
+          currentPrice = (discountedPrice / 100).toLocaleString('en-US');
+          fullPrice = price ? (price / 100).toLocaleString('en-US') : 'Not provided';
+        } else {
+          currentPrice = price ? (price / 100).toLocaleString('en-US') : 'Not provided';
+        }
+
+        return {
+          id: productInfo.id,
+          name: productInfo.name['en-US'],
+          description: productInfo.description?.['en-US'] ?? 'Not provided',
+          price: currentPrice,
+          fullPrice: fullPrice,
+          images: productInfo.masterVariant.images,
+        };
+      });
+      console.log(productsInfo);
+      setProductsInfo(productsInfo);
+      setIsLoading(false);
+    } catch (error) {
+      console.error(error);
+      setError(true);
+    }
+  };
+
   const ProductsContextValue = {
     productsInfo,
     isLoading,
     getProducts,
+    getSortedProducts,
     error,
   };
 
