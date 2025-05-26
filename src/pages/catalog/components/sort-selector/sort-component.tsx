@@ -4,8 +4,9 @@ import style from './style.module.css';
 import { useProducts } from '../../../../components/hooks/useProducts';
 
 export function SortComponent() {
-  const { getProducts, getSortedProducts } = useProducts();
+  const { getProducts, getSpecificProducts } = useProducts();
   const [parameter, setParameter] = useState<string>('');
+
   return (
     <Select
       className={style['sort-component']}
@@ -16,7 +17,7 @@ export function SortComponent() {
           getProducts();
           setParameter('');
         } else {
-          getSortedProducts(value[0]);
+          getSpecificProducts({ sort: value[0] });
           setParameter(value[0]);
         }
       }}

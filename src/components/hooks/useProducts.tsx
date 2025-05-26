@@ -7,7 +7,7 @@ interface ProductsContextType {
   productsInfo: ProductInfo[] | null;
   isLoading: boolean;
   getProducts: () => void;
-  getSortedProducts: (value: string) => void;
+  getSpecificProducts: ({ sort, search }: { sort?: string; search?: string }) => void;
   error: boolean;
 }
 
@@ -17,6 +17,8 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
   const [productsInfo, setProductsInfo] = useState<ProductInfo[] | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
+  const [searchCriteria, setSearchCriteria] = useState<string | undefined>(undefined);
+  const [sortCriteria, setSortCriteria] = useState<string | undefined>(undefined);
 
   const getProducts = async () => {
     try {
@@ -51,16 +53,29 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     }
   };
 
-  const getSortedProducts = async (value: string) => {
+  const getSpecificProducts = async ({ sort, search }: { sort?: string; search?: string }) => {
     try {
       const response = await customerAPI
         .apiRoot()
         .productProjections()
         .search()
-        .get({ queryArgs: { sort: [value] } })
+        .get({
+          queryArgs: {
+            'text.en-US': search ?? searchCriteria,
+            sort: sort ?? sortCriteria,
+            fuzzy: true,
+          },
+        })
         .execute();
       const productsInfo = returnProductsData(response.body.results);
       console.log(productsInfo);
+      if (search) {
+        setSearchCriteria(search);
+      }
+      if (sort) {
+        setSortCriteria(sort);
+      }
+
       setProductsInfo(productsInfo);
       setIsLoading(false);
     } catch (error) {
@@ -73,7 +88,7 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     productsInfo,
     isLoading,
     getProducts,
-    getSortedProducts,
+    getSpecificProducts,
     error,
   };
 
