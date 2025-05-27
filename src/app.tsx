@@ -11,6 +11,7 @@ import { RegistrationPage } from './pages/registration/registration';
 import { AuthProvider } from './components/hooks/useAuth';
 import { LoginPage } from './pages/login/login';
 import { ProductsProvider } from './components/hooks/useProducts';
+import { ProductPage } from './pages/product-page/product-page';
 
 export function App() {
   return (
@@ -23,6 +24,7 @@ export function App() {
                 <Route element={<MainLayout />}>
                   <Route path="/" element={<HomePage />} />
                   <Route path="/catalog" element={<CatalogPage />} />
+                  <Route path="/catalog/:productId" element={<ProductPage />} />
                   <Route path="/about-us" element={<AboutPage />} />
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/registration" element={<RegistrationPage />} />

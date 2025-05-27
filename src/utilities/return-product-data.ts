@@ -16,6 +16,7 @@ export function returnProductsData(responseBody: ProductProjection[]) {
 
     return {
       id: productInfo.id,
+      key: productInfo.key ?? productInfo.name['en-US'].split(' ').join(''),
       name: productInfo.name['en-US'],
       description: productInfo.description?.['en-US'] ?? 'Not provided',
       price: currentPrice,

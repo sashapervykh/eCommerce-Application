@@ -1,10 +1,18 @@
 import { ProductInfo } from './types';
 import styles from './styles.module.css';
 import { Card, Text } from '@gravity-ui/uikit';
+import { useNavigate } from 'react-router-dom';
 
 export function ProductCard({ productInfo }: { productInfo: ProductInfo }) {
+  const navigate = useNavigate();
   return (
-    <Card type="selection" view="raised" key={productInfo.id} className={styles.wrapper}>
+    <Card
+      type="selection"
+      view="raised"
+      key={productInfo.id}
+      className={styles.wrapper}
+      onClick={() => navigate(`./${productInfo.key}`)}
+    >
       <div className={styles['image-wrapper']}>
         {productInfo.images?.map((image, index) => {
           return (

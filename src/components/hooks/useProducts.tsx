@@ -34,8 +34,10 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
           currentPrice = price ? (price / 100).toLocaleString('en-US') : 'Not provided';
         }
 
+        console.log(productInfo.key);
         return {
           id: productInfo.id,
+          key: productInfo.key ?? productInfo.masterData.current.name['en-US'].split(' ').join(''),
           name: productInfo.masterData.current.name['en-US'],
           description: productInfo.masterData.current.description?.['en-US'] ?? 'Not provided',
           price: currentPrice,
