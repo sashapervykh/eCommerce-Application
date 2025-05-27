@@ -89,6 +89,7 @@
 
 .address-info {
   flex-grow: 1;
+  margin-bottom: 1rem;
 }
 
 .section-header {
@@ -127,6 +128,55 @@
 
 .checkbox {
   margin: 16px 0;
+}
+
+.address-card {
+  margin-top: 2rem;
+  padding: 1.5rem;
+}
+
+.address-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.address-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.address-item {
+  border: 1px solid var(--g-color-line-generic);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.address-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.address-defaults {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.address-form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
 }
 
 @media (width <= 600px) {

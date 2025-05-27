@@ -15,29 +15,28 @@ export function AddressEditForm({
     <div className={styles['form-row']}>
       <TextInput
         label="Street"
-        value={address.streetName ?? ''}
+        value={address.streetName}
         onChange={(event) => onChange('streetName', event.target.value)}
         size="l"
         disabled={disabled}
       />
       <TextInput
         label="City"
-        value={address.city ?? ''}
+        value={address.city}
         onChange={(event) => onChange('city', event.target.value)}
         size="l"
         disabled={disabled}
       />
       <TextInput
         label="Country"
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        value={address.country ?? ''}
+        value={address.country}
         onChange={(event) => onChange('country', event.target.value)}
         size="l"
         disabled={disabled}
       />
       <TextInput
         label="Postal Code"
-        value={address.postalCode ?? ''}
+        value={address.postalCode}
         onChange={(event) => onChange('postalCode', event.target.value)}
         size="l"
         disabled={disabled}

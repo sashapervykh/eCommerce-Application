@@ -1,63 +1,130 @@
 import { Customer } from '@commercetools/platform-sdk';
-import { Card, Button, Checkbox } from '@gravity-ui/uikit';
+import { Card, Button, useToaster } from '@gravity-ui/uikit';
 import { useState } from 'react';
 import styles from './style.module.css';
 import { ProfileView } from './ProfileView';
 import { ProfileEditForm } from './ProfileEditForm';
 import { PasswordChangeForm } from './PasswordChangeForm';
-import { AddressEditForm } from './AddressEditForm';
+import { AddressList } from './AddressList';
+import { api } from '../../api/api';
+import { useAuth } from '../../components/hooks/useAuth';
+import type { Address } from '@commercetools/platform-sdk';
 
 export function UserContent({ userInfo }: { userInfo: Customer }) {
+  const { refreshUser } = useAuth();
+  const toaster = useToaster();
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
-  const [isEditingAddresses, setIsEditingAddresses] = useState(false);
-  const [sameAddress, setSameAddress] = useState(false);
-  const [editData, setEditData] = useState({
-    shipping: {
-      streetName: '',
-      city: '',
-      country: '',
-      postalCode: '',
-    },
-    billing: {
-      streetName: '',
-      city: '',
-      country: '',
-      postalCode: '',
-    },
-  });
 
-  const shippingAddress = userInfo.addresses.find((addr) => addr.id === userInfo.shippingAddressIds?.[0]);
-  const billingAddress = userInfo.addresses.find((addr) => addr.id === userInfo.billingAddressIds?.[0]);
-
-  const handleAddressChange = (type: 'shipping' | 'billing', field: string, value: string) => {
-    setEditData((previous) => {
-      const newData = {
-        ...previous,
-        [type]: {
-          ...previous[type],
-          [field]: value,
-        },
-      };
-
-      if (sameAddress && type === 'shipping') {
-        return {
-          ...newData,
-          billing: {
-            ...newData.billing,
-            [field]: value,
-          },
-        };
-      }
-
-      return newData;
-    });
+  const handleAddressAdded = async (address: Partial<Address>): Promise<void> => {
+    try {
+      await api.addAddress(userInfo.id, userInfo.version, {
+        key: `address-${Date.now().toString()}`,
+        streetName: address.streetName ?? '',
+        city: address.city ?? '',
+        country: address.country ?? 'US',
+        postalCode: address.postalCode ?? '',
+      });
+      await refreshUser();
+      toaster.add({
+        name: 'address-added',
+        title: 'Success',
+        content: 'Address added successfully',
+        theme: 'success',
+      });
+    } catch (error) {
+      toaster.add({
+        name: 'address-error',
+        title: 'Error',
+        content: 'Failed to add address',
+        theme: 'danger',
+      });
+      throw error;
+    }
   };
 
-  const handleSaveAddresses = () => {
-    // Здесь должна быть логика сохранения адресов
-    console.log('Saving addresses:', editData);
-    setIsEditingAddresses(false);
+  const handleAddressUpdated = async (addressId: string, address: Partial<Address>): Promise<void> => {
+    try {
+      await api.updateAddress(userInfo.id, userInfo.version, addressId, address);
+      await refreshUser();
+      toaster.add({
+        name: 'address-updated',
+        title: 'Success',
+        content: 'Address updated successfully',
+        theme: 'success',
+      });
+    } catch (error) {
+      toaster.add({
+        name: 'address-error',
+        title: 'Error',
+        content: 'Failed to update address',
+        theme: 'danger',
+      });
+      throw error;
+    }
+  };
+
+  const handleAddressRemoved = async (addressId: string): Promise<void> => {
+    try {
+      await api.removeAddress(userInfo.id, userInfo.version, addressId);
+      await refreshUser();
+      toaster.add({
+        name: 'address-removed',
+        title: 'Success',
+        content: 'Address removed successfully',
+        theme: 'success',
+      });
+    } catch (error) {
+      toaster.add({
+        name: 'address-error',
+        title: 'Error',
+        content: 'Failed to remove address',
+        theme: 'danger',
+      });
+      throw error;
+    }
+  };
+
+  const handleSetDefaultShipping = async (addressId: string): Promise<void> => {
+    try {
+      await api.setDefaultShippingAddress(userInfo.id, userInfo.version, addressId);
+      await refreshUser();
+      toaster.add({
+        name: 'default-shipping-set',
+        title: 'Success',
+        content: 'Default shipping address set',
+        theme: 'success',
+      });
+    } catch (error) {
+      toaster.add({
+        name: 'address-error',
+        title: 'Error',
+        content: 'Failed to set default shipping address',
+        theme: 'danger',
+      });
+      throw error;
+    }
+  };
+
+  const handleSetDefaultBilling = async (addressId: string): Promise<void> => {
+    try {
+      await api.setDefaultBillingAddress(userInfo.id, userInfo.version, addressId);
+      await refreshUser();
+      toaster.add({
+        name: 'default-billing-set',
+        title: 'Success',
+        content: 'Default billing address set',
+        theme: 'success',
+      });
+    } catch (error) {
+      toaster.add({
+        name: 'address-error',
+        title: 'Error',
+        content: 'Failed to set default billing address',
+        theme: 'danger',
+      });
+      throw error;
+    }
   };
 
   return (
@@ -95,114 +162,14 @@ export function UserContent({ userInfo }: { userInfo: Customer }) {
       )}
 
       <div className={styles['profile-section']}>
-        <div className={styles['section-header']}>
-          <h2>Addresses</h2>
-          {!isEditingAddresses && (
-            <Button
-              view="normal"
-              size="m"
-              onClick={() => {
-                setIsEditingAddresses(true);
-                setEditData({
-                  shipping: {
-                    streetName: shippingAddress?.streetName ?? '',
-                    city: shippingAddress?.city ?? '',
-                    country: shippingAddress?.country ?? '',
-                    postalCode: shippingAddress?.postalCode ?? '',
-                  },
-                  billing: {
-                    streetName: billingAddress?.streetName ?? '',
-                    city: billingAddress?.city ?? '',
-                    country: billingAddress?.country ?? '',
-                    postalCode: billingAddress?.postalCode ?? '',
-                  },
-                });
-              }}
-            >
-              Edit
-            </Button>
-          )}
-        </div>
-
-        {isEditingAddresses ? (
-          <div>
-            <div className={styles['address-section']}>
-              <h3>Shipping Address</h3>
-              <AddressEditForm
-                address={editData.shipping}
-                onChange={(field, value) => handleAddressChange('shipping', field, value)}
-              />
-            </div>
-
-            <Checkbox checked={sameAddress} onChange={() => setSameAddress(!sameAddress)} className={styles.checkbox}>
-              Use same address for billing
-            </Checkbox>
-
-            <div className={styles['address-section']}>
-              <h3>Billing Address</h3>
-              <AddressEditForm
-                address={editData.billing}
-                onChange={(field, value) => handleAddressChange('billing', field, value)}
-                disabled={sameAddress}
-              />
-            </div>
-
-            <div className={styles['button-group']}>
-              <Button view="normal" onClick={() => setIsEditingAddresses(false)} className={styles['margin-right']}>
-                Cancel
-              </Button>
-              <Button view="action" onClick={handleSaveAddresses}>
-                Save Changes
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <div className={styles['address-sections']}>
-            <div className={styles['address-section']}>
-              <h3>Shipping Address</h3>
-              {shippingAddress ? (
-                <div className={styles['address-info']}>
-                  <p>
-                    <strong>Street:</strong> {shippingAddress.streetName}
-                  </p>
-                  <p>
-                    <strong>City:</strong> {shippingAddress.city}
-                  </p>
-                  <p>
-                    <strong>Country:</strong> {shippingAddress.country}
-                  </p>
-                  <p>
-                    <strong>Postal Code:</strong> {shippingAddress.postalCode}
-                  </p>
-                </div>
-              ) : (
-                <p>No shipping address specified</p>
-              )}
-            </div>
-
-            <div className={styles['address-section']}>
-              <h3>Billing Address</h3>
-              {billingAddress ? (
-                <div className={styles['address-info']}>
-                  <p>
-                    <strong>Street:</strong> {billingAddress.streetName}
-                  </p>
-                  <p>
-                    <strong>City:</strong> {billingAddress.city}
-                  </p>
-                  <p>
-                    <strong>Country:</strong> {billingAddress.country}
-                  </p>
-                  <p>
-                    <strong>Postal Code:</strong> {billingAddress.postalCode}
-                  </p>
-                </div>
-              ) : (
-                <p>No billing address specified</p>
-              )}
-            </div>
-          </div>
-        )}
+        <AddressList
+          customer={userInfo}
+          onAddressAdded={handleAddressAdded}
+          onAddressUpdated={handleAddressUpdated}
+          onAddressRemoved={handleAddressRemoved}
+          onSetDefaultShipping={handleSetDefaultShipping}
+          onSetDefaultBilling={handleSetDefaultBilling}
+        />
       </div>
     </Card>
   );

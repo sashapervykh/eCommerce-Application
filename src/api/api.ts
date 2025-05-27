@@ -191,6 +191,162 @@ class API {
 
     return (await response.json()) as CustomerResponse;
   }
+
+  async addAddress(
+    customerId: string,
+    version: number,
+    address: {
+      key: string;
+      streetName: string;
+      city: string;
+      country: string;
+      postalCode: string;
+    },
+  ): Promise<CustomerResponse> {
+    const token = await this.getClientCredentialsToken();
+
+    const response = await fetch(`${this.apiLink}/${customerId}`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        version,
+        actions: [
+          {
+            action: 'addAddress',
+            address,
+          },
+        ],
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to add address: ${response.statusText}`);
+    }
+
+    return (await response.json()) as CustomerResponse;
+  }
+
+  async updateAddress(
+    customerId: string,
+    version: number,
+    addressId: string,
+    address: Partial<{
+      streetName: string;
+      city: string;
+      country: string;
+      postalCode: string;
+    }>,
+  ): Promise<CustomerResponse> {
+    const token = await this.getClientCredentialsToken();
+
+    const response = await fetch(`${this.apiLink}/${customerId}`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        version,
+        actions: [
+          {
+            action: 'changeAddress',
+            addressId,
+            address,
+          },
+        ],
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to update address: ${response.statusText}`);
+    }
+
+    return (await response.json()) as CustomerResponse;
+  }
+
+  async removeAddress(customerId: string, version: number, addressId: string): Promise<CustomerResponse> {
+    const token = await this.getClientCredentialsToken();
+
+    const response = await fetch(`${this.apiLink}/${customerId}`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        version,
+        actions: [
+          {
+            action: 'removeAddress',
+            addressId,
+          },
+        ],
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to remove address: ${response.statusText}`);
+    }
+
+    return (await response.json()) as CustomerResponse;
+  }
+
+  async setDefaultShippingAddress(customerId: string, version: number, addressId: string): Promise<CustomerResponse> {
+    const token = await this.getClientCredentialsToken();
+
+    const response = await fetch(`${this.apiLink}/${customerId}`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        version,
+        actions: [
+          {
+            action: 'setDefaultShippingAddress',
+            addressId,
+          },
+        ],
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to set default shipping address: ${response.statusText}`);
+    }
+
+    return (await response.json()) as CustomerResponse;
+  }
+
+  async setDefaultBillingAddress(customerId: string, version: number, addressId: string): Promise<CustomerResponse> {
+    const token = await this.getClientCredentialsToken();
+
+    const response = await fetch(`${this.apiLink}/${customerId}`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        version,
+        actions: [
+          {
+            action: 'setDefaultBillingAddress',
+            addressId,
+          },
+        ],
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to set default billing address: ${response.statusText}`);
+    }
+
+    return (await response.json()) as CustomerResponse;
+  }
 }
 
 export const api = new API();
