@@ -1,6 +1,6 @@
 import { PasswordInput, Button } from '@gravity-ui/uikit';
 import { useState } from 'react';
-import styles from '../style.module.css';
+import styles from './style.module.css';
 import { usePasswordChange } from './usePasswordChange';
 
 export function PasswordChangeForm({

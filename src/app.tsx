@@ -10,7 +10,7 @@ import { CatalogPage } from './pages/catalog/catalog';
 import { RegistrationPage } from './pages/registration/registration';
 import { AuthProvider } from './components/hooks/useAuth';
 import { LoginPage } from './pages/login/login';
-import { UserPage } from './pages/user/user';
+import { UserPage } from './pages/user/UserPage';
 
 export function App() {
   return (

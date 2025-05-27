@@ -1,7 +1,7 @@
 import { Button, TextInput } from '@gravity-ui/uikit';
 import { useForm } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
-import styles from '../style.module.css';
+import styles from './style.module.css';
 import { Customer } from '@commercetools/platform-sdk';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { registrationSchema } from '../../utilities/validation-config/validation-rules';

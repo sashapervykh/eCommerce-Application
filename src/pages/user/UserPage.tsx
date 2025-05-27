@@ -2,7 +2,7 @@ import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
 import { useAuth } from '../../components/hooks/useAuth';
 import { Navigate } from 'react-router-dom';
 import styles from './style.module.css';
-import { ProfileTabs } from './ProfileTabs';
+import { UserContent } from './UserContent';
 
 export function UserPage() {
   const { isAuthenticated, userInfo } = useAuth();
@@ -18,7 +18,7 @@ export function UserPage() {
   return (
     <PageWrapper title="User Profile">
       <div className={styles.page}>
-        <ProfileTabs userInfo={userInfo} />
+        <UserContent userInfo={userInfo} />
       </div>
     </PageWrapper>
   );
