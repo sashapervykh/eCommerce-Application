@@ -7,20 +7,22 @@
 
 .wrapper {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   margin-bottom: 20px;
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
   width: 260px;
 }
 
 .image-wrapper {
   display: flex;
-  overflow-x: hidden;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
   width: inherit;
   height: 260px;
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
 }
 
 .image {
@@ -46,4 +48,19 @@
 .full-price {
   text-decoration: line-through;
   color: rgb(168 174 179);
+}
+
+.wrapper:hover {
+  margin: -10px;
+  background-color: var(--g-color-base-brand);
+  width: 280px;
+}
+
+.wrapper:hover .image {
+  width: 280px;
+  height: 280px;
+}
+
+.wrapper:hover .image-wrapper {
+  height: 280px;
 }
