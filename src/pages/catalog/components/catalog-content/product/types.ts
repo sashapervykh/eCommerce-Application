@@ -9,4 +9,5 @@ export interface ProductInfo {
   fullPrice?: string;
   images?: Image[];
   attributes?: Attribute[];
+  published: boolean | undefined;
 }

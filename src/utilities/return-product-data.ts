@@ -22,6 +22,7 @@ export function returnProductsData(responseBody: ProductProjection[]) {
       price: currentPrice,
       fullPrice: fullPrice,
       images: productInfo.masterVariant.images,
+      published: productInfo.published,
     };
   });
 }

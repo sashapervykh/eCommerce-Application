@@ -47,7 +47,7 @@ export function ProductPage() {
     );
   }
 
-  if (error || !productDetails) {
+  if (error || !productDetails?.published) {
     return <NotFoundPage />;
   }
 

@@ -46,6 +46,7 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
           price: currentPrice,
           fullPrice: fullPrice,
           images: productInfo.masterData.current.masterVariant.images,
+          published: productInfo.masterData.published,
         };
       });
       setProductsInfo(productsInfo);
@@ -103,6 +104,7 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
         fullPrice: fullPrice,
         images: productInfo.masterData.current.masterVariant.images,
         attributes: productInfo.masterData.current.masterVariant.attributes ?? [],
+        published: productInfo.masterData.published,
       };
 
       setProductDetails(productDetails);
