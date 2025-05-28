@@ -41,9 +41,10 @@ export function AddressForm({ address, onSave, onCancel }: AddressFormProps) {
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
     trigger,
   } = useForm<AddressFormValues>({
+    mode: 'onChange',
     resolver: zodResolver(addressSchema),
     defaultValues: {
       streetName: address?.streetName ?? '',
@@ -82,6 +83,9 @@ export function AddressForm({ address, onSave, onCancel }: AddressFormProps) {
             size="l"
             errorMessage={errors.streetName?.message}
             validationState={errors.streetName ? 'invalid' : undefined}
+            onBlur={async () => {
+              await trigger('streetName');
+            }}
           />
         )}
       />
@@ -95,6 +99,9 @@ export function AddressForm({ address, onSave, onCancel }: AddressFormProps) {
             size="l"
             errorMessage={errors.city?.message}
             validationState={errors.city ? 'invalid' : undefined}
+            onBlur={async () => {
+              await trigger('city');
+            }}
           />
         )}
       />
@@ -107,7 +114,7 @@ export function AddressForm({ address, onSave, onCancel }: AddressFormProps) {
             value={[field.value]}
             onUpdate={(value) => {
               field.onChange(value[0]);
-              void trigger('postalCode');
+              void trigger(['postalCode', 'country']);
             }}
             size="l"
             errorMessage={errors.country?.message}
@@ -128,7 +135,9 @@ export function AddressForm({ address, onSave, onCancel }: AddressFormProps) {
             size="l"
             errorMessage={errors.postalCode?.message}
             validationState={errors.postalCode ? 'invalid' : undefined}
-            onBlur={() => trigger('postalCode')}
+            onBlur={async () => {
+              await trigger('postalCode');
+            }}
           />
         )}
       />
@@ -146,7 +155,7 @@ export function AddressForm({ address, onSave, onCancel }: AddressFormProps) {
             }
           }}
           loading={isSubmitting}
-          disabled={isSubmitting}
+          disabled={isSubmitting || !isValid}
         >
           Save
         </Button>

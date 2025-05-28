@@ -15,7 +15,9 @@ export function ProfileEditForm({ userInfo, onCancel }: { userInfo: Customer; on
     control,
     formState: { errors },
     handleSubmit,
+    trigger,
   } = useForm({
+    mode: 'onChange',
     resolver: zodResolver(
       registrationSchema._def.schema.pick({
         email: true,
@@ -47,21 +49,33 @@ export function ProfileEditForm({ userInfo, onCancel }: { userInfo: Customer; on
         <h2>Edit Personal Information</h2>
         <div className={styles['form-row']}>
           <TextInput
-            {...register('email')}
+            {...register('email', {
+              onChange: async () => {
+                await trigger('email');
+              },
+            })}
             label="Email"
             size="l"
             errorMessage={errors.email?.message}
             validationState={errors.email ? 'invalid' : undefined}
           />
           <TextInput
-            {...register('firstName')}
+            {...register('firstName', {
+              onChange: async () => {
+                await trigger('firstName');
+              },
+            })}
             label="First Name"
             size="l"
             errorMessage={errors.firstName?.message}
             validationState={errors.firstName ? 'invalid' : undefined}
           />
           <TextInput
-            {...register('lastName')}
+            {...register('lastName', {
+              onChange: async () => {
+                await trigger('lastName');
+              },
+            })}
             label="Last Name"
             size="l"
             errorMessage={errors.lastName?.message}
@@ -79,6 +93,9 @@ export function ProfileEditForm({ userInfo, onCancel }: { userInfo: Customer; on
               size="l"
               errorMessage={errors.dateOfBirth?.message}
               validationState={errors.dateOfBirth ? 'invalid' : undefined}
+              onBlur={async () => {
+                await trigger('dateOfBirth');
+              }}
             />
           )}
         />
