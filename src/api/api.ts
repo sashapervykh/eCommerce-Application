@@ -1,15 +1,21 @@
-import { projectKey } from '../commercetools-sdk';
+import { projectKey, ctpClient } from '../commercetools-sdk';
+import { createApiBuilderFromCtpClient } from '@commercetools/platform-sdk';
 
 interface CustomerResponse {
   id: string;
   version: number;
 }
 
+const apiRoot = createApiBuilderFromCtpClient(ctpClient).withProjectKey({
+  projectKey,
+});
+
 class API {
   authLink = `https://auth.us-central1.gcp.commercetools.com/oauth/${projectKey}/customers/token`;
   tokenLink = `https://auth.us-central1.gcp.commercetools.com/oauth/token`;
   apiLink = `https://api.us-central1.gcp.commercetools.com/${projectKey}/customers`;
 
+  // Оставляем без изменений методы для регистрации
   async getAccessToken(data: { email: string; password: string }) {
     const response = await fetch(this.authLink, {
       method: 'POST',
@@ -90,6 +96,7 @@ class API {
     return result;
   }
 
+  // Новые методы с использованием SDK
   async updateCustomer(
     customerId: string,
     version: number,
@@ -113,17 +120,16 @@ class API {
       defaultBillingAddress?: number;
     },
   ): Promise<CustomerResponse> {
-    const token = await this.getClientCredentialsToken();
     const actions = [];
     if (data.email) {
       actions.push({
-        action: 'changeEmail',
+        action: 'changeEmail' as const,
         email: data.email,
       });
     }
-    if (data.firstName) actions.push({ action: 'setFirstName', firstName: data.firstName });
-    if (data.lastName) actions.push({ action: 'setLastName', lastName: data.lastName });
-    if (data.dateOfBirth) actions.push({ action: 'setDateOfBirth', dateOfBirth: data.dateOfBirth });
+    if (data.firstName) actions.push({ action: 'setFirstName' as const, firstName: data.firstName });
+    if (data.lastName) actions.push({ action: 'setLastName' as const, lastName: data.lastName });
+    if (data.dateOfBirth) actions.push({ action: 'setDateOfBirth' as const, dateOfBirth: data.dateOfBirth });
 
     if (data.addresses) {
       data.addresses.forEach((address) => {
@@ -138,35 +144,29 @@ class API {
 
     if (data.defaultShippingAddress !== undefined) {
       actions.push({
-        action: 'setDefaultShippingAddress',
+        action: 'setDefaultShippingAddress' as const,
         addressId: data.defaultShippingAddress.toString(),
       });
     }
 
     if (data.defaultBillingAddress !== undefined) {
       actions.push({
-        action: 'setDefaultBillingAddress',
+        action: 'setDefaultBillingAddress' as const,
         addressId: data.defaultBillingAddress.toString(),
       });
     }
 
-    const response = await fetch(`${this.apiLink}/${customerId}`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        version,
-        actions,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to update customer: ${response.statusText}`);
-    }
-
-    return (await response.json()) as CustomerResponse;
+    return apiRoot
+      .customers()
+      .withId({ ID: customerId })
+      .post({
+        body: {
+          version,
+          actions,
+        },
+      })
+      .execute()
+      .then((response) => response.body);
   }
 
   async changePassword(data: {
@@ -175,21 +175,14 @@ class API {
     currentPassword: string;
     newPassword: string;
   }): Promise<CustomerResponse> {
-    const token = await this.getClientCredentialsToken();
-    const response = await fetch(`${this.apiLink}/password`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Password change failed: ${response.statusText}`);
-    }
-
-    return (await response.json()) as CustomerResponse;
+    return apiRoot
+      .customers()
+      .password()
+      .post({
+        body: data,
+      })
+      .execute()
+      .then((response) => response.body);
   }
 
   async addAddress(
@@ -203,149 +196,109 @@ class API {
       postalCode: string;
     },
   ): Promise<CustomerResponse> {
-    const token = await this.getClientCredentialsToken();
-
-    const response = await fetch(`${this.apiLink}/${customerId}`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        version,
-        actions: [
-          {
-            action: 'addAddress',
-            address,
-          },
-        ],
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to add address: ${response.statusText}`);
-    }
-
-    return (await response.json()) as CustomerResponse;
+    return apiRoot
+      .customers()
+      .withId({ ID: customerId })
+      .post({
+        body: {
+          version,
+          actions: [
+            {
+              action: 'addAddress' as const,
+              address,
+            },
+          ],
+        },
+      })
+      .execute()
+      .then((response) => response.body);
   }
 
   async updateAddress(
     customerId: string,
     version: number,
     addressId: string,
-    address: Partial<{
-      streetName: string;
-      city: string;
+    address: {
+      streetName?: string;
+      city?: string;
       country: string;
-      postalCode: string;
-    }>,
+      postalCode?: string;
+    },
   ): Promise<CustomerResponse> {
-    const token = await this.getClientCredentialsToken();
-
-    const response = await fetch(`${this.apiLink}/${customerId}`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        version,
-        actions: [
-          {
-            action: 'changeAddress',
-            addressId,
-            address,
-          },
-        ],
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to update address: ${response.statusText}`);
-    }
-
-    return (await response.json()) as CustomerResponse;
+    return apiRoot
+      .customers()
+      .withId({ ID: customerId })
+      .post({
+        body: {
+          version,
+          actions: [
+            {
+              action: 'changeAddress',
+              addressId,
+              address,
+            },
+          ],
+        },
+      })
+      .execute()
+      .then((response) => response.body);
   }
 
   async removeAddress(customerId: string, version: number, addressId: string): Promise<CustomerResponse> {
-    const token = await this.getClientCredentialsToken();
-
-    const response = await fetch(`${this.apiLink}/${customerId}`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        version,
-        actions: [
-          {
-            action: 'removeAddress',
-            addressId,
-          },
-        ],
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to remove address: ${response.statusText}`);
-    }
-
-    return (await response.json()) as CustomerResponse;
+    return apiRoot
+      .customers()
+      .withId({ ID: customerId })
+      .post({
+        body: {
+          version,
+          actions: [
+            {
+              action: 'removeAddress',
+              addressId,
+            },
+          ],
+        },
+      })
+      .execute()
+      .then((response) => response.body);
   }
 
   async setDefaultShippingAddress(customerId: string, version: number, addressId: string): Promise<CustomerResponse> {
-    const token = await this.getClientCredentialsToken();
-
-    const response = await fetch(`${this.apiLink}/${customerId}`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        version,
-        actions: [
-          {
-            action: 'setDefaultShippingAddress',
-            addressId,
-          },
-        ],
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to set default shipping address: ${response.statusText}`);
-    }
-
-    return (await response.json()) as CustomerResponse;
+    return apiRoot
+      .customers()
+      .withId({ ID: customerId })
+      .post({
+        body: {
+          version,
+          actions: [
+            {
+              action: 'setDefaultShippingAddress',
+              addressId,
+            },
+          ],
+        },
+      })
+      .execute()
+      .then((response) => response.body);
   }
 
   async setDefaultBillingAddress(customerId: string, version: number, addressId: string): Promise<CustomerResponse> {
-    const token = await this.getClientCredentialsToken();
-
-    const response = await fetch(`${this.apiLink}/${customerId}`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        version,
-        actions: [
-          {
-            action: 'setDefaultBillingAddress',
-            addressId,
-          },
-        ],
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to set default billing address: ${response.statusText}`);
-    }
-
-    return (await response.json()) as CustomerResponse;
+    return apiRoot
+      .customers()
+      .withId({ ID: customerId })
+      .post({
+        body: {
+          version,
+          actions: [
+            {
+              action: 'setDefaultBillingAddress',
+              addressId,
+            },
+          ],
+        },
+      })
+      .execute()
+      .then((response) => response.body);
   }
 }
 

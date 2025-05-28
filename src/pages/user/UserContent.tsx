@@ -45,7 +45,12 @@ export function UserContent({ userInfo }: { userInfo: Customer }) {
 
   const handleAddressUpdated = async (addressId: string, address: Partial<Address>): Promise<void> => {
     try {
-      await api.updateAddress(userInfo.id, userInfo.version, addressId, address);
+      await api.updateAddress(userInfo.id, userInfo.version, addressId, {
+        streetName: address.streetName,
+        city: address.city,
+        country: address.country ?? 'US',
+        postalCode: address.postalCode,
+      });
       await refreshUser();
       toaster.add({
         name: 'address-updated',

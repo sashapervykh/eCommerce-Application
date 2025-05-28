@@ -7,13 +7,8 @@ import { UserContent } from './UserContent';
 export function UserPage() {
   const { isAuthenticated, userInfo } = useAuth();
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" />;
-  }
-
-  if (!userInfo) {
-    return <div>Loading user data...</div>;
-  }
+  if (!isAuthenticated) return <Navigate to="/login" />;
+  if (!userInfo) return <div className={styles.loading}>Loading user data...</div>;
 
   return (
     <PageWrapper title="User Profile">
