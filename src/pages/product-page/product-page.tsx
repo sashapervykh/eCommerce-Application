@@ -9,11 +9,35 @@ export function ProductPage() {
   const { productId } = useParams();
   const { productDetails, getProductDetails, isLoading, error } = useProducts();
 
+  interface AttributeValueObject {
+    key: string;
+    label: string;
+  }
+
+  type AttributeValue = AttributeValueObject | AttributeValueObject[] | string | number;
+
   useEffect(() => {
     if (productId) {
       getProductDetails(productId);
     }
   }, [productId, getProductDetails]);
+
+  const getLabel = (item: AttributeValue | AttributeValueObject): string => {
+    if (typeof item === 'object') {
+      if ('label' in item) {
+        return item.label;
+      }
+      return JSON.stringify(item);
+    }
+    return String(item);
+  };
+
+  const formatAttributeValue = (value: AttributeValue): string => {
+    if (Array.isArray(value)) {
+      return value.map(getLabel).join(', ');
+    }
+    return getLabel(value);
+  };
 
   if (isLoading) {
     return (
@@ -56,6 +80,18 @@ export function ProductPage() {
             <Text variant="body-2" className={styles.description}>
               <b>Description:</b> {productDetails.description}
             </Text>
+            {productDetails.attributes && productDetails.attributes.length > 0 && (
+              <Text variant="body-2" className={styles.attributes}>
+                <h2>Property Features</h2>
+                <ul>
+                  {productDetails.attributes.map((attribute, index) => (
+                    <li key={index}>
+                      {attribute.name}: {formatAttributeValue(attribute.value)}
+                    </li>
+                  ))}
+                </ul>
+              </Text>
+            )}
           </div>
         </div>
         <Button view="action" size="l" href="/catalog" className={styles['back-button']}>

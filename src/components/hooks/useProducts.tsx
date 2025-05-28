@@ -102,6 +102,7 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
         price: currentPrice,
         fullPrice: fullPrice,
         images: productInfo.masterData.current.masterVariant.images,
+        attributes: productInfo.masterData.current.masterVariant.attributes ?? [],
       };
 
       setProductDetails(productDetails);
