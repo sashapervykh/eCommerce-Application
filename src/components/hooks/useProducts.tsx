@@ -15,6 +15,13 @@ interface ProductsContextType {
 
 const ProductsContext = createContext<ProductsContextType>({} as ProductsContextType);
 
+const formatPrice = (price: number | undefined): string => {
+  if (price === undefined) {
+    return '0.00';
+  }
+  return (price / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+};
+
 export const ProductsProvider = ({ children }: { children: React.ReactNode }) => {
   const [productsInfo, setProductsInfo] = useState<ProductInfo[] | null>(null);
   const [productDetails, setProductDetails] = useState<ProductInfo | null>(null);
@@ -31,10 +38,10 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
         let fullPrice: string | undefined;
 
         if (discountedPrice) {
-          currentPrice = (discountedPrice / 100).toLocaleString('en-US');
-          fullPrice = price ? (price / 100).toLocaleString('en-US') : 'Not provided';
+          currentPrice = formatPrice(discountedPrice);
+          fullPrice = price ? formatPrice(price) : undefined;
         } else {
-          currentPrice = price ? (price / 100).toLocaleString('en-US') : 'Not provided';
+          currentPrice = formatPrice(price);
         }
 
         console.log(productInfo.key);
@@ -89,10 +96,10 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
       let fullPrice: string | undefined;
 
       if (discountedPrice) {
-        currentPrice = (discountedPrice / 100).toLocaleString('en-US');
-        fullPrice = price ? (price / 100).toLocaleString('en-US') : 'Not provided';
+        currentPrice = formatPrice(discountedPrice);
+        fullPrice = price ? formatPrice(price) : undefined;
       } else {
-        currentPrice = price ? (price / 100).toLocaleString('en-US') : 'Not provided';
+        currentPrice = formatPrice(price);
       }
 
       const productDetails: ProductInfo = {

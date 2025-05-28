@@ -37,6 +37,7 @@
 
 .price {
   font-size: 15px;
+  color: #008000;
 }
 
 .text-wrapper {
@@ -49,7 +50,7 @@
 
 .full-price {
   text-decoration: line-through;
-  color: rgb(168 174 179);
+  color: #a8aeb3;
 }
 
 .description {
