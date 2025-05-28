@@ -1,13 +1,15 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useCallback } from 'react';
 import { customerAPI } from '../../api/customer-api';
 import { ProductInfo } from '../../pages/catalog/components/catalog-content/product/types';
 import { returnProductsData } from '../../utilities/return-product-data';
 
 interface ProductsContextType {
   productsInfo: ProductInfo[] | null;
+  productDetails: ProductInfo | null;
   isLoading: boolean;
   getProducts: () => void;
   getSortedProducts: (value: string) => void;
+  getProductDetails: (value: string) => void;
   error: boolean;
 }
 
@@ -15,6 +17,7 @@ const ProductsContext = createContext<ProductsContextType>({} as ProductsContext
 
 export const ProductsProvider = ({ children }: { children: React.ReactNode }) => {
   const [productsInfo, setProductsInfo] = useState<ProductInfo[] | null>(null);
+  const [productDetails, setProductDetails] = useState<ProductInfo | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
 
@@ -71,11 +74,52 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     }
   };
 
+  const getProductDetails = useCallback(async (key: string) => {
+    try {
+      setIsLoading(true);
+      setProductDetails(null);
+      setError(false);
+      const response = await customerAPI.apiRoot().products().withKey({ key }).get().execute();
+      console.log('Product details response:', response.body);
+      const productInfo = response.body;
+      const discountedPrice = productInfo.masterData.current.masterVariant.prices?.[0]?.discounted?.value.centAmount;
+      const price = productInfo.masterData.current.masterVariant.prices?.[0].value.centAmount;
+      let currentPrice: string;
+      let fullPrice: string | undefined;
+
+      if (discountedPrice) {
+        currentPrice = (discountedPrice / 100).toLocaleString('en-US');
+        fullPrice = price ? (price / 100).toLocaleString('en-US') : 'Not provided';
+      } else {
+        currentPrice = price ? (price / 100).toLocaleString('en-US') : 'Not provided';
+      }
+
+      const productDetails: ProductInfo = {
+        id: productInfo.id,
+        key: productInfo.key ?? productInfo.masterData.current.name['en-US'].split(' ').join(''),
+        name: productInfo.masterData.current.name['en-US'],
+        description: productInfo.masterData.current.description?.['en-US'] ?? 'Not provided',
+        price: currentPrice,
+        fullPrice: fullPrice,
+        images: productInfo.masterData.current.masterVariant.images,
+      };
+
+      setProductDetails(productDetails);
+      setIsLoading(false);
+    } catch (error) {
+      console.error(error);
+      setError(true);
+      setIsLoading(false);
+    }
+  }, []);
+
   const ProductsContextValue = {
     productsInfo,
+    productDetails,
     isLoading,
     getProducts,
     getSortedProducts,
+    getProductDetails,
     error,
   };
 
