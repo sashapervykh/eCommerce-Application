@@ -19,6 +19,7 @@ export function AddressEditForm({
         onChange={(event) => onChange('streetName', event.target.value)}
         size="l"
         disabled={disabled}
+        className={styles.input}
       />
       <TextInput
         label="City"
@@ -26,6 +27,7 @@ export function AddressEditForm({
         onChange={(event) => onChange('city', event.target.value)}
         size="l"
         disabled={disabled}
+        className={styles.input}
       />
       <TextInput
         label="Country"
@@ -33,6 +35,7 @@ export function AddressEditForm({
         onChange={(event) => onChange('country', event.target.value)}
         size="l"
         disabled={disabled}
+        className={styles.input}
       />
       <TextInput
         label="Postal Code"
@@ -40,6 +43,7 @@ export function AddressEditForm({
         onChange={(event) => onChange('postalCode', event.target.value)}
         size="l"
         disabled={disabled}
+        className={styles.input}
       />
     </div>
   );

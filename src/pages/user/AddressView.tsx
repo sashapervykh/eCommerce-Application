@@ -22,31 +22,35 @@ export function AddressView({
 
   if (isEditing) {
     return (
-      <div>
+      <div className={styles['address-edit-container']}>
         <div className={styles['form-row']}>
           <TextInput
             label="Street"
             value={editData.streetName ?? ''}
             onChange={(event) => handleChange('streetName', event.target.value)}
             size="l"
+            className={styles.input}
           />
           <TextInput
             label="City"
             value={editData.city ?? ''}
             onChange={(event) => handleChange('city', event.target.value)}
             size="l"
+            className={styles.input}
           />
           <TextInput
             label="Country"
             value={editData.country ?? ''}
             onChange={(event) => handleChange('country', event.target.value)}
             size="l"
+            className={styles.input}
           />
           <TextInput
             label="Postal Code"
             value={editData.postalCode ?? ''}
             onChange={(event) => handleChange('postalCode', event.target.value)}
             size="l"
+            className={styles.input}
           />
         </div>
         <div className={styles['button-group']}>
