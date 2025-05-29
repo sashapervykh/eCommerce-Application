@@ -2,7 +2,7 @@ import { Button } from '@gravity-ui/uikit';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
-export const AuthButtons = () => {
+export const AuthButtons = ({ mobile = false }: { mobile?: boolean }) => {
   const { isAuthenticated, logout, userInfo } = useAuth();
   const navigate = useNavigate();
 
@@ -11,13 +11,16 @@ export const AuthButtons = () => {
     void navigate('/login');
   };
 
+  const buttonSize = mobile ? 'm' : 'l';
+  const buttonWidth = mobile ? 'max' : undefined;
+
   if (isAuthenticated) {
     return (
       <>
-        <Button view="action" onClick={() => navigate('/user')}>
+        <Button view="action" onClick={() => navigate('/user')} size={buttonSize} width={buttonWidth}>
           {userInfo?.firstName ?? 'User'}
         </Button>
-        <Button view="action" onClick={onLogout}>
+        <Button view="outlined" onClick={onLogout} size={buttonSize} width={buttonWidth}>
           Log Out
         </Button>
       </>
@@ -26,10 +29,10 @@ export const AuthButtons = () => {
 
   return (
     <>
-      <Button view="action" onClick={() => navigate('/login')}>
+      <Button view="action" onClick={() => navigate('/login')} size={buttonSize} width={buttonWidth}>
         Sign In
       </Button>
-      <Button view="action" onClick={() => navigate('/registration')}>
+      <Button view="outlined" onClick={() => navigate('/registration')} size={buttonSize} width={buttonWidth}>
         Sign Up
       </Button>
     </>
