@@ -13,6 +13,7 @@ export function usePasswordChange(userInfo: { id: string; version: number; email
   const handlePasswordChange = async (currentPassword: string, newPassword: string) => {
     setIsSubmitting(true);
     try {
+      // 1. Получаем свежий токен
       const tokenResponse = await api.getAccessToken({
         email: userInfo.email,
         password: currentPassword,
@@ -22,18 +23,22 @@ export function usePasswordChange(userInfo: { id: string; version: number; email
         throw new Error('Invalid email or password');
       }
 
+      // 2. Обновляем клиент с новыми credentials
       customerAPI.createAuthenticatedCustomer(tokenResponse.token_type, tokenResponse.access_token);
 
+      // 3. Получаем актуальные данные пользователя (включая version)
       const customerData = await customerAPI.apiRoot().me().get().execute();
-      const currentVersion = customerData.body.version;
+      const currentVersion = customerData.body.version; // Используем свежую версию
 
+      // 4. Меняем пароль
       await api.changePassword({
         id: userInfo.id,
-        version: currentVersion,
+        version: currentVersion, // Важно: используем currentVersion, а не userInfo.version
         currentPassword,
         newPassword,
       });
 
+      // 5. Обновляем данные пользователя
       await refreshUser();
 
       toaster.add({

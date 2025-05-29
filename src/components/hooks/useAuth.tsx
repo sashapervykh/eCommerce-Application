@@ -37,6 +37,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const customerData = await customerAPI.apiRoot().me().get().execute();
       setUserInfo(customerData.body);
     } catch (error) {
+      // if (error.statusCode === 401) {
+      //   logout();
+      // }
       console.error('Failed to refresh user data:', error);
     }
   };

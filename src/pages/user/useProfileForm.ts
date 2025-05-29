@@ -3,6 +3,7 @@ import { useToaster } from '@gravity-ui/uikit';
 import { Customer } from '@commercetools/platform-sdk';
 import { api } from '../../api/api';
 import { useAuth } from '../../components/hooks/useAuth';
+import { customerAPI } from '../../api/customer-api';
 
 export function useProfileForm(userInfo: Customer) {
   const { refreshUser } = useAuth();
@@ -12,7 +13,9 @@ export function useProfileForm(userInfo: Customer) {
   const handleSubmit = async (data: { email: string; firstName: string; lastName: string; dateOfBirth: string }) => {
     setIsSubmitting(true);
     try {
-      await api.updateCustomer(userInfo.id, userInfo.version, {
+      const customerData = await customerAPI.apiRoot().me().get().execute();
+      const currentVersion = customerData.body.version;
+      await api.updateCustomer(userInfo.id, currentVersion, {
         email: data.email,
         firstName: data.firstName,
         lastName: data.lastName,

@@ -9,6 +9,7 @@ import { AddressList } from './AddressList';
 import { api } from '../../api/api';
 import { useAuth } from '../../components/hooks/useAuth';
 import type { Address } from '@commercetools/platform-sdk';
+import { customerAPI } from '../../api/customer-api';
 
 export function UserContent({ userInfo }: { userInfo: Customer }) {
   const { refreshUser } = useAuth();
@@ -18,7 +19,10 @@ export function UserContent({ userInfo }: { userInfo: Customer }) {
 
   const handleAddressAdded = async (address: Partial<Address>): Promise<void> => {
     try {
-      await api.addAddress(userInfo.id, userInfo.version, {
+      const customerData = await customerAPI.apiRoot().me().get().execute();
+      const currentVersion = customerData.body.version;
+
+      await api.addAddress(userInfo.id, currentVersion, {
         key: `address-${Date.now().toString()}`,
         streetName: address.streetName ?? '',
         city: address.city ?? '',
