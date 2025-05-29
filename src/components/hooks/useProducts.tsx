@@ -31,7 +31,6 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
   const [searchedValue, setSearchedValue] = useState<string | undefined>(undefined);
   const [sortingCriteria, setSortingCriteria] = useState<string | undefined>(undefined);
 
-
   const clearCriteria = async (criteria?: 'searchedValue' | 'sortingCriteria') => {
     switch (criteria) {
       case 'searchedValue': {
@@ -42,11 +41,13 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
         setSortingCriteria(undefined);
         break;
       }
-      default: {
-        setSortingCriteria(undefined);
-        setSearchedValue(undefined);
-      }
-    await getProductsByCriteria();
+      default:
+        {
+          setSortingCriteria(undefined);
+          setSearchedValue(undefined);
+        }
+        await getProductsByCriteria();
+    }
   };
 
   const getProductsByCriteria = async (criteria?: { searchedValue?: string; sortingCriteria?: string }) => {
