@@ -1,19 +1,22 @@
 import { useParams } from 'react-router-dom';
 import { useProducts } from '../../components/hooks/useProducts';
 import { Card, Text, Spin, Button } from '@gravity-ui/uikit';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { NotFoundPage } from '../404/not-found';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
-import { ChevronLeft, ChevronRight } from '@gravity-ui/icons';
+import { ChevronLeft, ChevronRight, Xmark } from '@gravity-ui/icons';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import styles from './styles.module.css';
+import modalStyles from './modal.module.css';
 
 export function ProductPage() {
   const { productId } = useParams();
   const { productDetails, getProductDetails, isLoading, error } = useProducts();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [initialSlide, setInitialSlide] = useState(0);
 
   interface AttributeValueObject {
     key: string;
@@ -21,6 +24,16 @@ export function ProductPage() {
   }
 
   type AttributeValue = AttributeValueObject | AttributeValueObject[] | string | number;
+
+  useEffect(() => {
+    if (isModalOpen) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = originalOverflow || '';
+      };
+    }
+  }, [isModalOpen]);
 
   useEffect(() => {
     if (productId) {
@@ -43,6 +56,21 @@ export function ProductPage() {
       return value.map(getLabel).join(', ');
     }
     return getLabel(value);
+  };
+
+  const handleImageClick = (index: number) => {
+    setInitialSlide(index);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleSlideClick = (event: React.MouseEvent) => {
+    if ((event.target as HTMLElement).tagName !== 'IMG') {
+      closeModal();
+    }
   };
 
   if (isLoading) {
@@ -88,6 +116,8 @@ export function ProductPage() {
                     <img
                       src={image.url}
                       alt={image.label ?? `${productDetails.name} image`}
+                      onClick={() => handleImageClick(index)}
+                      style={{ cursor: 'pointer' }}
                       className={styles['product-image']}
                     />
                   </SwiperSlide>
@@ -95,10 +125,10 @@ export function ProductPage() {
                 {hasMultipleImages && (
                   <>
                     <div className={styles['swiper-button-prev']}>
-                      <ChevronLeft width={20} height={20} color="#fff" />
+                      <ChevronLeft width={20} height={20} color="#000" />
                     </div>
                     <div className={styles['swiper-button-next']}>
-                      <ChevronRight width={20} height={20} color="#fff" />
+                      <ChevronRight width={20} height={20} color="#000" />
                     </div>
                   </>
                 )}
@@ -135,6 +165,52 @@ export function ProductPage() {
           Back to Catalog
         </Button>
       </Card>
+      {isModalOpen && hasImages && (
+        <div className={modalStyles['modal-overlay']} onClick={closeModal}>
+          <div className={modalStyles['modal-content']} onClick={(event) => event.stopPropagation()}>
+            <div className={modalStyles['close-button']} onClick={closeModal}>
+              <Xmark width={20} height={20} color="#000" />
+            </div>
+            <Swiper
+              modules={[Navigation, Pagination]}
+              navigation={
+                hasMultipleImages
+                  ? {
+                      prevEl: `.${modalStyles['modal-swiper-button-prev']}`,
+                      nextEl: `.${modalStyles['modal-swiper-button-next']}`,
+                    }
+                  : false
+              }
+              pagination={hasMultipleImages ? { clickable: true } : false}
+              spaceBetween={10}
+              slidesPerView={1}
+              loop={hasMultipleImages}
+              initialSlide={initialSlide}
+              className={`${modalStyles['modal-swiper-container']} modal-swiper`}
+            >
+              {productDetails.images?.map((image, index) => (
+                <SwiperSlide key={index} onClick={handleSlideClick}>
+                  <img
+                    src={image.url}
+                    alt={image.label ?? `${productDetails.name} image`}
+                    className={modalStyles['modal-image']}
+                  />
+                </SwiperSlide>
+              ))}
+              {hasMultipleImages && (
+                <>
+                  <div className={modalStyles['modal-swiper-button-prev']}>
+                    <ChevronLeft width={20} height={20} color="#000" />
+                  </div>
+                  <div className={modalStyles['modal-swiper-button-next']}>
+                    <ChevronRight width={20} height={20} color="#000" />
+                  </div>
+                </>
+              )}
+            </Swiper>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
