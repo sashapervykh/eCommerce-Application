@@ -15,7 +15,7 @@ interface UserData {
 interface AuthContextType {
   userInfo: Customer | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => void;
+  login: (email: string, password: string, preventRedirect?: boolean) => Promise<void>;
   refresh: (refresh_token: string) => void;
   register: (userData: UserData) => void;
   logout: () => void;
@@ -36,15 +36,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const customerData = await customerAPI.apiRoot().me().get().execute();
       setUserInfo(customerData.body);
-    } catch (error) {
-      // if (error.statusCode === 401) {
-      //   logout();
-      // }
+    } catch (error: unknown) {
+      if (error instanceof Error && 'statusCode' in error && error.statusCode === 401) {
+        const refresh_token = localStorage.getItem('refresh_token');
+        if (refresh_token) {
+          try {
+            await refresh(refresh_token);
+            return;
+          } catch (refreshError) {
+            console.error('Refresh token failed:', refreshError);
+          }
+        }
+        logout();
+      }
       console.error('Failed to refresh user data:', error);
     }
   };
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string, preventRedirect = false): Promise<void> => {
     try {
       const response: unknown = await api.getAccessToken({ email, password });
 
@@ -54,7 +63,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         } else {
           setServerError(response.error);
         }
+        return;
       }
+
       if (isTokenResponse(response)) {
         customerAPI.createAuthenticatedCustomer(response.token_type, response.access_token);
         const customerData = await customerAPI
@@ -70,10 +81,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           .execute();
         setUserInfo(customerData.body.customer);
         localStorage.setItem('refresh_token', response.refresh_token);
-        await navigate('/');
+
+        if (!preventRedirect) {
+          await navigate('/');
+        }
       }
     } catch (error) {
       console.error(error);
+      throw error;
     }
   };
 

@@ -49,7 +49,9 @@ export function UserContent({ userInfo }: { userInfo: Customer }) {
 
   const handleAddressUpdated = async (addressId: string, address: Partial<Address>): Promise<void> => {
     try {
-      const currentVersion = userInfo.version;
+      const customerData = await customerAPI.apiRoot().me().get().execute();
+      const currentVersion = customerData.body.version;
+
       await api.updateAddress(userInfo.id, currentVersion, addressId, {
         streetName: address.streetName,
         city: address.city,

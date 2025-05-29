@@ -15,7 +15,6 @@ class API {
   tokenLink = `https://auth.us-central1.gcp.commercetools.com/oauth/token`;
   apiLink = `https://api.us-central1.gcp.commercetools.com/${projectKey}/customers`;
 
-  // Оставляем без изменений методы для регистрации
   async getAccessToken(data: { email: string; password: string }) {
     const response = await fetch(this.authLink, {
       method: 'POST',
@@ -96,7 +95,6 @@ class API {
     return result;
   }
 
-  // Новые методы с использованием SDK
   async updateCustomer(
     customerId: string,
     version: number,
