@@ -12,34 +12,19 @@ import 'swiper/css/pagination';
 import styles from './styles.module.css';
 import modalStyles from './modal.module.css';
 
+interface AttributeValueObject {
+  key: string;
+  label: string;
+}
+
+type AttributeValue = AttributeValueObject | AttributeValueObject[] | string | number;
+
 export function ProductPage() {
   const { productId } = useParams();
   const { productDetails, getProductDetails, isLoading, error } = useProducts();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const [initialSlide, setInitialSlide] = useState(0);
-
-  interface AttributeValueObject {
-    key: string;
-    label: string;
-  }
-
-  type AttributeValue = AttributeValueObject | AttributeValueObject[] | string | number;
-
-  useEffect(() => {
-    if (isModalOpen) {
-      const originalOverflow = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
-      return () => {
-        document.body.style.overflow = originalOverflow || '';
-      };
-    }
-  }, [isModalOpen]);
-
-  useEffect(() => {
-    if (productId) {
-      getProductDetails(productId);
-    }
-  }, [productId, getProductDetails]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const getLabel = (item: AttributeValue | AttributeValueObject): string => {
     if (typeof item === 'object') {
@@ -58,6 +43,12 @@ export function ProductPage() {
     return getLabel(value);
   };
 
+  const handleSlideClick = (event: React.MouseEvent) => {
+    if ((event.target as HTMLElement).tagName !== 'IMG') {
+      closeModal();
+    }
+  };
+
   const handleImageClick = (index: number) => {
     setInitialSlide(index);
     setIsModalOpen(true);
@@ -67,11 +58,21 @@ export function ProductPage() {
     setIsModalOpen(false);
   };
 
-  const handleSlideClick = (event: React.MouseEvent) => {
-    if ((event.target as HTMLElement).tagName !== 'IMG') {
-      closeModal();
+  useEffect(() => {
+    if (isModalOpen) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = originalOverflow || '';
+      };
     }
-  };
+  }, [isModalOpen]);
+
+  useEffect(() => {
+    if (productId) {
+      getProductDetails(productId);
+    }
+  }, [productId, getProductDetails]);
 
   if (isLoading) {
     return (
