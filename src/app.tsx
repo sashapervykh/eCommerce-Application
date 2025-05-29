@@ -12,6 +12,7 @@ import { AuthProvider } from './components/hooks/useAuth';
 import { LoginPage } from './pages/login/login';
 import { ProductsProvider } from './components/hooks/useProducts';
 import { ProductPage } from './pages/product-page/product-page';
+import { UserPage } from './pages/user/UserPage';
 
 export function App() {
   return (
@@ -30,6 +31,7 @@ export function App() {
                   <Route path="/registration" element={<RegistrationPage />} />
                   <Route path="/404" element={<NotFoundPage />} />
                   <Route path="*" element={<NotFoundPage />} />
+                  <Route path="/user" element={<UserPage />} />
                 </Route>
               </Routes>
             </ProductsProvider>
