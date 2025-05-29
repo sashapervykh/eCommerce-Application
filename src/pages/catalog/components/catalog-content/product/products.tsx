@@ -11,9 +11,11 @@ export function ProductsList({ productsInfo }: { productsInfo: ProductInfo[] }) 
     >{`It seems that we don't have similar products. Try another options...`}</Text>
   ) : (
     <div className={styles['product-list']}>
-      {productsInfo.map((product) => (
-        <ProductCard key={product.name} productInfo={product} />
-      ))}
+      {productsInfo
+        .filter((product) => product.published)
+        .map((product) => (
+          <ProductCard key={product.name} productInfo={product} />
+        ))}
     </div>
   );
 }

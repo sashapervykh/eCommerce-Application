@@ -1,4 +1,4 @@
-import { Image } from '@commercetools/platform-sdk';
+import { Attribute, Image } from '@commercetools/platform-sdk';
 
 export interface ProductInfo {
   id: string;
@@ -8,4 +8,6 @@ export interface ProductInfo {
   price: string;
   fullPrice?: string;
   images?: Image[];
+  attributes?: Attribute[];
+  published: boolean | undefined;
 }

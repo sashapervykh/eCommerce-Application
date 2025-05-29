@@ -4,3 +4,6 @@ interface ImportMetaEnv {
   VITE_CLIENT_ID: string;
   VITE_CLIENT_SECRET: string;
 }
+declare module 'swiper/*' {
+  export default unknown;
+}

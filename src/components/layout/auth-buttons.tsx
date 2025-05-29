@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
 export const AuthButtons = () => {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout, userInfo } = useAuth();
   const navigate = useNavigate();
 
   const onLogout = () => {
@@ -13,9 +13,14 @@ export const AuthButtons = () => {
 
   if (isAuthenticated) {
     return (
-      <Button view="action" onClick={onLogout}>
-        Log Out
-      </Button>
+      <>
+        <Button view="action" onClick={() => navigate('/user')}>
+          {userInfo?.firstName ?? 'User'}
+        </Button>
+        <Button view="action" onClick={onLogout}>
+          Log Out
+        </Button>
+      </>
     );
   }
 

@@ -5,6 +5,7 @@ export enum Routes {
   catalog = '/catalog',
   about = '/about-us',
   error = '/404',
+  user = '/user',
 }
 
 export interface NavButtonProperties {
