@@ -1,21 +1,12 @@
 import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
-import { Button } from '@gravity-ui/uikit';
-
-function CatalogContent() {
-  return (
-    <div>
-      <h1>Catalog Content</h1>
-      {/* Catalog Content */}
-    </div>
-  );
-}
+import { CatalogContent } from './components/catalog-content/catalog-component';
+import { SortComponent } from './components/sort-selector/sort-component';
 
 export function CatalogPage() {
   return (
     <PageWrapper title="Catalog">
-      <div>
-        <Button view="outlined">Moon</Button>
-      </div>
+      <h1>Our products</h1>
+      <SortComponent />
       <CatalogContent />
     </PageWrapper>
   );
