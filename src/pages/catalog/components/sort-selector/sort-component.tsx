@@ -4,7 +4,7 @@ import style from './style.module.css';
 import { useProducts } from '../../../../components/hooks/useProducts';
 
 export function SortComponent() {
-  const { getProducts, getSortedProducts } = useProducts();
+  const { getProductsByCriteria } = useProducts();
   const [parameter, setParameter] = useState<string>('');
   return (
     <Select
@@ -13,10 +13,10 @@ export function SortComponent() {
       label="Sort by"
       onUpdate={(value) => {
         if (value[0] === 'None') {
-          getProducts();
           setParameter('');
+          getProductsByCriteria({ sortingCriteria: '' });
         } else {
-          getSortedProducts(value[0]);
+          getProductsByCriteria({ sortingCriteria: value[0] });
           setParameter(value[0]);
         }
       }}

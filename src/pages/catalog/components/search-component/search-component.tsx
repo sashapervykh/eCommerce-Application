@@ -8,10 +8,10 @@ import { useProducts } from '../../../../components/hooks/useProducts';
 
 export function SearchComponent() {
   const { register, handleSubmit, setValue } = useForm<{ search: string }>();
-  const { searchedValue, setSearchedValue, getSpecificProducts } = useProducts();
+  const { searchedValue, getProductsByCriteria } = useProducts();
 
   const onSubmit = (data: { search: string }) => {
-    getSpecificProducts({ searchedValue: data.search });
+    getProductsByCriteria({ searchedValue: data.search });
   };
 
   return (
@@ -34,8 +34,7 @@ export function SearchComponent() {
                   icon={Xmark}
                   onClick={() => {
                     setValue('search', '');
-                    setSearchedValue(undefined);
-                    getSpecificProducts({});
+                    getProductsByCriteria({ searchedValue: '' });
                   }}
                 />,
                 <SearchInputButton key="search" icon={Magnifier} type="submit" />,
