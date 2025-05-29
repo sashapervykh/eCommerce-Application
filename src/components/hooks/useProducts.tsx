@@ -38,8 +38,6 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     }
 
     await getProductsByCriteria();
-    console.log(searchedValue);
-    console.log(sortingCriteria);
   };
 
   const getProductsByCriteria = async (criteria?: { searchedValue?: string; sortingCriteria?: string }) => {

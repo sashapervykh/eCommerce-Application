@@ -4,9 +4,10 @@ import { ProductsList } from './product/products';
 import { useEffect } from 'react';
 
 export function CatalogContent() {
-  const { productsInfo, getProductsByCriteria, isLoading, error } = useProducts();
+  const { productsInfo, getProductsByCriteria, isLoading, error, clearCriteria } = useProducts();
 
   useEffect(() => {
+    clearCriteria();
     getProductsByCriteria();
   }, []);
 
