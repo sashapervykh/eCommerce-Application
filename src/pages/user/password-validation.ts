@@ -5,7 +5,7 @@ import { isValidPassword } from '../../utilities/validation-config/validation-fu
 
 export const passwordChangeSchema = z
   .object({
-    currentPassword: z.string().min(1, ' '), // Пустое сообщение для текущего пароля
+    currentPassword: z.string().min(1, ' '),
     newPassword: z
       .string()
       .min(1, 'New password is required')

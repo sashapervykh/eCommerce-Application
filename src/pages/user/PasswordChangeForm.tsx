@@ -21,11 +21,14 @@ export function PasswordChangeForm({
     handleSubmit,
     formState: { errors, isValid },
     trigger,
+    reset,
   } = usePasswordValidation();
 
   const onSubmit = async (data: { currentPassword: string; newPassword: string }) => {
     const success = await handlePasswordChange(data.currentPassword, data.newPassword);
-    if (success) onCancel();
+    if (success) {
+      reset();
+    }
   };
 
   return (

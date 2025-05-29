@@ -3,44 +3,38 @@ import { useToaster } from '@gravity-ui/uikit';
 import { api } from '../../api/api';
 import { customerAPI } from '../../api/customer-api';
 import { isTokenResponse } from '../../utilities/return-checked-token-response';
+import { useAuth } from '../../components/hooks/useAuth';
 
 export function usePasswordChange(userInfo: { id: string; version: number; email: string }) {
+  const { refreshUser } = useAuth();
   const toaster = useToaster();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handlePasswordChange = async (currentPassword: string, newPassword: string) => {
     setIsSubmitting(true);
     try {
-      // 1. Получаем токен с текущим паролем
       const tokenResponse = await api.getAccessToken({
         email: userInfo.email,
         password: currentPassword,
       });
 
-      if (!isTokenResponse(tokenResponse)) throw new Error('Invalid token response');
+      if (!isTokenResponse(tokenResponse)) {
+        throw new Error('Invalid email or password');
+      }
 
-      // 2. Обновляем клиент с новыми учетными данными
       customerAPI.createAuthenticatedCustomer(tokenResponse.token_type, tokenResponse.access_token);
 
-      // 3. Меняем пароль
+      const customerData = await customerAPI.apiRoot().me().get().execute();
+      const currentVersion = customerData.body.version;
+
       await api.changePassword({
         id: userInfo.id,
-        version: userInfo.version,
+        version: currentVersion,
         currentPassword,
         newPassword,
       });
 
-      // 4. Получаем новый токен с новым паролем
-      const newTokenResponse = await api.getAccessToken({
-        email: userInfo.email,
-        password: newPassword,
-      });
-
-      if (!isTokenResponse(newTokenResponse)) throw new Error('Invalid token response after password change');
-
-      // 5. Обновляем клиент и сохраняем refresh token
-      customerAPI.createAuthenticatedCustomer(newTokenResponse.token_type, newTokenResponse.access_token);
-      localStorage.setItem('refresh_token', newTokenResponse.refresh_token);
+      await refreshUser();
 
       toaster.add({
         name: 'password-success',
@@ -49,12 +43,14 @@ export function usePasswordChange(userInfo: { id: string; version: number; email
         theme: 'success',
       });
       return true;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Password change error:', error);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to change password. Please check your current password.';
       toaster.add({
         name: 'password-error',
         title: 'Error',
-        content: 'Failed to change password. Please check your current password.',
+        content: errorMessage,
         theme: 'danger',
       });
       return false;
