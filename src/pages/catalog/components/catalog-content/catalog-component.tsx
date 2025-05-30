@@ -3,7 +3,7 @@ import { useProducts } from '../../../../components/hooks/useProducts';
 import { ProductsList } from './product/products';
 import { useEffect } from 'react';
 import styles from './style.module.css';
-import { FiltersControls } from './filters-content/filters-conrols';
+import { FiltersControls } from './filters-content/filters-controls';
 
 export function CatalogContent() {
   const { productsInfo, getProductsByCriteria, isLoading, error, clearCriteria, isFiltersOpen } = useProducts();

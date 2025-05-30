@@ -7,7 +7,7 @@ interface ProductsContextType {
   productsInfo: ProductInfo[] | null;
   productDetails: ProductInfo | null;
   isLoading: boolean;
-  getProductsByCriteria: (criteria?: { searchedValue?: string; sortingCriteria?: string }) => void;
+  getProductsByCriteria: (criteria?: { searchedValue?: string; sortingCriteria?: string; filters?: string[] }) => void;
   getProductDetails: (value: string) => void;
   error: boolean;
   searchedValue: string | undefined;
@@ -37,7 +37,7 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
   const [filters, setFilters] = useState<string | undefined>(undefined);
   const [isFiltersOpen, setIsFiltersOpen] = useState<boolean>(false);
 
-  const clearCriteria = async (criteria?: 'searchedValue' | 'sortingCriteria') => {
+  const clearCriteria = (criteria?: 'searchedValue' | 'sortingCriteria') => {
     switch (criteria) {
       case 'searchedValue': {
         setSearchedValue(undefined);
@@ -47,16 +47,19 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
         setSortingCriteria(undefined);
         break;
       }
-      default:
-        {
-          setSortingCriteria(undefined);
-          setSearchedValue(undefined);
-        }
-        await getProductsByCriteria();
+      default: {
+        setSortingCriteria(undefined);
+        setSearchedValue(undefined);
+      }
+      // await getProductsByCriteria();
     }
   };
 
-  const getProductsByCriteria = async (criteria?: { searchedValue?: string; sortingCriteria?: string }) => {
+  const getProductsByCriteria = async (criteria?: {
+    searchedValue?: string;
+    sortingCriteria?: string;
+    filters?: string[];
+  }) => {
     try {
       let sort: string | undefined;
       if (criteria?.sortingCriteria === '') {
@@ -64,6 +67,7 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
       } else {
         sort = criteria?.sortingCriteria ?? sortingCriteria;
       }
+      console.log(criteria?.filters);
       const response = await customerAPI
         .apiRoot()
         .productProjections()
@@ -73,9 +77,11 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
             'text.en-US': criteria?.searchedValue ?? searchedValue,
             fuzzy: true,
             sort: sort,
+            filter: criteria?.filters,
           },
         })
         .execute();
+
       const productsInfo = returnProductsData(response.body.results);
 
       setProductsInfo(productsInfo);
