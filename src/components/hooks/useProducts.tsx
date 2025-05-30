@@ -7,10 +7,11 @@ interface ProductsContextType {
   productsInfo: ProductInfo[] | null;
   productDetails: ProductInfo | null;
   isLoading: boolean;
-  getProducts: () => void;
-  getSortedProducts: (value: string) => void;
+  getProductsByCriteria: (criteria?: { searchedValue?: string; sortingCriteria?: string }) => void;
   getProductDetails: (value: string) => void;
   error: boolean;
+  searchedValue: string | undefined;
+  clearCriteria: (criteria?: 'searchedValue' | 'sortingCriteria') => void;
 }
 
 const ProductsContext = createContext<ProductsContextType>({} as ProductsContextType);
@@ -27,54 +28,53 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
   const [productDetails, setProductDetails] = useState<ProductInfo | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
+  const [searchedValue, setSearchedValue] = useState<string | undefined>(undefined);
+  const [sortingCriteria, setSortingCriteria] = useState<string | undefined>(undefined);
 
-  const getProducts = async () => {
-    try {
-      const response = await customerAPI.apiRoot().products().get().execute();
-      const productsInfo = response.body.results.map((productInfo) => {
-        const discountedPrice = productInfo.masterData.current.masterVariant.prices?.[0]?.discounted?.value.centAmount;
-        const price = productInfo.masterData.current.masterVariant.prices?.[0].value.centAmount;
-        let currentPrice: string;
-        let fullPrice: string | undefined;
-
-        if (discountedPrice) {
-          currentPrice = formatPrice(discountedPrice);
-          fullPrice = price ? formatPrice(price) : undefined;
-        } else {
-          currentPrice = formatPrice(price);
+  const clearCriteria = async (criteria?: 'searchedValue' | 'sortingCriteria') => {
+    switch (criteria) {
+      case 'searchedValue': {
+        setSearchedValue(undefined);
+        break;
+      }
+      case 'sortingCriteria': {
+        setSortingCriteria(undefined);
+        break;
+      }
+      default:
+        {
+          setSortingCriteria(undefined);
+          setSearchedValue(undefined);
         }
-
-        console.log(productInfo.key);
-        return {
-          id: productInfo.id,
-          key: productInfo.key ?? productInfo.masterData.current.name['en-US'].split(' ').join(''),
-          name: productInfo.masterData.current.name['en-US'],
-          description: productInfo.masterData.current.description?.['en-US'] ?? 'Not provided',
-          price: currentPrice,
-          fullPrice: fullPrice,
-          images: productInfo.masterData.current.masterVariant.images,
-          published: productInfo.masterData.published,
-        };
-      });
-      setProductsInfo(productsInfo);
-      setIsLoading(false);
-    } catch (error) {
-      console.error(error);
-      setError(true);
+        await getProductsByCriteria();
     }
   };
 
-  const getSortedProducts = async (value: string) => {
+  const getProductsByCriteria = async (criteria?: { searchedValue?: string; sortingCriteria?: string }) => {
     try {
+      let sort: string | undefined;
+      if (criteria?.sortingCriteria === '') {
+        sort = undefined;
+      } else {
+        sort = criteria?.sortingCriteria ?? sortingCriteria;
+      }
       const response = await customerAPI
         .apiRoot()
         .productProjections()
         .search()
-        .get({ queryArgs: { sort: [value] } })
+        .get({
+          queryArgs: {
+            'text.en-US': criteria?.searchedValue ?? searchedValue,
+            fuzzy: true,
+            sort: sort,
+          },
+        })
         .execute();
       const productsInfo = returnProductsData(response.body.results);
-      console.log(productsInfo);
+
       setProductsInfo(productsInfo);
+      if (criteria?.searchedValue !== undefined) setSearchedValue(criteria.searchedValue);
+      if (criteria?.sortingCriteria) setSortingCriteria(criteria.sortingCriteria);
       setIsLoading(false);
     } catch (error) {
       console.error(error);
@@ -127,10 +127,11 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     productsInfo,
     productDetails,
     isLoading,
-    getProducts,
-    getSortedProducts,
+    getProductsByCriteria,
     getProductDetails,
     error,
+    searchedValue,
+    clearCriteria,
   };
 
   return <ProductsContext.Provider value={ProductsContextValue}> {children}</ProductsContext.Provider>;

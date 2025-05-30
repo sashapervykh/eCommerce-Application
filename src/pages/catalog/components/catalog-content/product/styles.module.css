@@ -50,6 +50,12 @@
   color: rgb(168 174 179);
 }
 
+.message {
+  display: flex;
+  width: inherit;
+  margin: 0 auto;
+}
+
 .wrapper:hover {
   margin: -10px;
   background-color: var(--g-color-base-brand);
