@@ -12,6 +12,10 @@ interface ProductsContextType {
   error: boolean;
   searchedValue: string | undefined;
   clearCriteria: (criteria?: 'searchedValue' | 'sortingCriteria') => void;
+  isFiltersOpen: boolean;
+  setIsFiltersOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  filters: string | undefined;
+  setFilters: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
 const ProductsContext = createContext<ProductsContextType>({} as ProductsContextType);
@@ -30,6 +34,8 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
   const [error, setError] = useState<boolean>(false);
   const [searchedValue, setSearchedValue] = useState<string | undefined>(undefined);
   const [sortingCriteria, setSortingCriteria] = useState<string | undefined>(undefined);
+  const [filters, setFilters] = useState<string | undefined>(undefined);
+  const [isFiltersOpen, setIsFiltersOpen] = useState<boolean>(false);
 
   const clearCriteria = async (criteria?: 'searchedValue' | 'sortingCriteria') => {
     switch (criteria) {
@@ -132,6 +138,10 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     error,
     searchedValue,
     clearCriteria,
+    isFiltersOpen,
+    setIsFiltersOpen,
+    filters,
+    setFilters,
   };
 
   return <ProductsContext.Provider value={ProductsContextValue}> {children}</ProductsContext.Provider>;

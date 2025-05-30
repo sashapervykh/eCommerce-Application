@@ -1,0 +1,24 @@
+.filters-wrapper {
+  min-width: 200px;
+  margin-right: 15px;
+}
+
+.filter-group {
+  padding: 5px;
+}
+
+.slider {
+  margin-bottom: 10px;
+}
+
+.slider-label {
+  display: grid;
+  grid-template-columns: 1fr 4fr;
+  margin-bottom: 5px;
+  vertical-align: middle;
+}
+
+.label-text {
+  display: flex;
+  margin: auto auto auto 0;
+}

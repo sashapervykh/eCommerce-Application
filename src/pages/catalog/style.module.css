@@ -1,4 +1,10 @@
 .list-controls {
-  display: grid;
-  grid-template-columns: 3fr 1fr;
+  display: flex;
+  justify-content: space-between;
+}
+
+.filters-button {
+  font-weight: bold;
+  max-width: fit-content;
+  margin-right: 15px;
 }
