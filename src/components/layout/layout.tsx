@@ -80,7 +80,12 @@ export function MainLayout() {
           <nav className={styles['nav-links']}>
             {navLinks.map((link) =>
               link.text === 'Catalog' ? (
-                <CatalogMenuButton key={link.text} items={catalogMenuItems} catalogRoute={link.route} />
+                <CatalogMenuButton
+                  key={link.text}
+                  items={catalogMenuItems}
+                  catalogRoute={link.route}
+                  setIsMenuOpen={setIsMenuOpen}
+                />
               ) : (
                 <Button key={link.text} view="action" onClick={() => void navigate(link.route)}>
                   {link.text}
@@ -96,7 +101,12 @@ export function MainLayout() {
         <div className={`${styles['mobile-menu']} ${isMenuOpen ? styles.open : ''}`}>
           {navLinks.map((link) =>
             link.text === 'Catalog' ? (
-              <CatalogMenuButton key={link.text} items={catalogMenuItems} catalogRoute={link.route} />
+              <CatalogMenuButton
+                key={link.text}
+                items={catalogMenuItems}
+                catalogRoute={link.route}
+                setIsMenuOpen={setIsMenuOpen}
+              />
             ) : (
               <Button
                 key={link.text}

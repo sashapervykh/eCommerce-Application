@@ -10,7 +10,15 @@ interface MenuItem {
   items?: MenuItem[];
 }
 
-export function CatalogMenuButton({ items, catalogRoute }: { items: MenuItem[]; catalogRoute: string }) {
+export function CatalogMenuButton({
+  items,
+  catalogRoute,
+  setIsMenuOpen,
+}: {
+  items: MenuItem[];
+  catalogRoute: string;
+  setIsMenuOpen: (value: boolean) => void;
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const buttonReference = useRef<HTMLButtonElement>(null);
   const menuReference = useRef<HTMLDivElement>(null);
@@ -24,6 +32,7 @@ export function CatalogMenuButton({ items, catalogRoute }: { items: MenuItem[]; 
     event.preventDefault();
     void navigate(catalogRoute);
     setIsOpen(false);
+    setIsMenuOpen(false);
   };
 
   return (
@@ -33,9 +42,6 @@ export function CatalogMenuButton({ items, catalogRoute }: { items: MenuItem[]; 
         onClick={handleClick}
         ref={buttonReference}
         aria-expanded={isOpen}
-        aria-controls="catalog-menu"
-        aria-label="Catalog menu, press Enter to open or click to go to catalog"
-        tabIndex={0}
         className={styles['nav-button']}
       >
         Catalog
@@ -50,6 +56,7 @@ export function CatalogMenuButton({ items, catalogRoute }: { items: MenuItem[]; 
                   onClick={() => {
                     item.action();
                     setIsOpen(false);
+                    setIsMenuOpen(false);
                   }}
                   className={styles['menu-item-button']}
                 >
@@ -63,6 +70,7 @@ export function CatalogMenuButton({ items, catalogRoute }: { items: MenuItem[]; 
                           onClick={() => {
                             subItem.action();
                             setIsOpen(false);
+                            setIsMenuOpen(false);
                           }}
                           className={styles['menu-item-button']}
                         >
