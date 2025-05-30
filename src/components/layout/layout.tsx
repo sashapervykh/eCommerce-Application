@@ -5,7 +5,10 @@ import { Xmark } from '@gravity-ui/icons';
 import { useNavigate } from 'react-router-dom';
 import styles from './layout.module.css';
 import { AuthButtons } from './auth-buttons';
+import { CatalogMenuButton } from '../navigation-button/catalog-button';
 import { useAuth } from '../hooks/useAuth';
+import { useCategories } from '../hooks/useCategories';
+import { catalogItems } from '../../utilities/return-catalog-items';
 
 const navLinks = [
   { text: 'Home', route: '/' },
@@ -18,7 +21,9 @@ export function MainLayout() {
   console.log('Xmark icon:', Xmark);
   const navigate = useNavigate();
   const { isLoading } = useAuth();
+  const { categories, isLoading: categoriesLoading, error: categoriesError } = useCategories();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const catalogMenuItems = catalogItems(categories, navigate);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -36,12 +41,16 @@ export function MainLayout() {
     return () => document.removeEventListener('click', handleClickOutside);
   }, [isMenuOpen]);
 
-  if (isLoading) {
+  if (isLoading || categoriesLoading) {
     return (
       <div>
         <Loader size="l" className={styles.loader} />
       </div>
     );
+  }
+
+  if (categoriesError) {
+    return <div className={styles.error}>Error loading categories: {categoriesError}</div>;
   }
 
   return (
@@ -69,32 +78,39 @@ export function MainLayout() {
           </button>
 
           <nav className={styles['nav-links']}>
-            {navLinks.map((link) => (
-              <Button key={link.text} view="action" onClick={() => void navigate(link.route)}>
-                {link.text}
-              </Button>
-            ))}
+            {navLinks.map((link) =>
+              link.text === 'Catalog' ? (
+                <CatalogMenuButton key={link.text} items={catalogMenuItems} catalogRoute={link.route} />
+              ) : (
+                <Button key={link.text} view="action" onClick={() => void navigate(link.route)}>
+                  {link.text}
+                </Button>
+              ),
+            )}
           </nav>
-
           <div className={styles.user}>
             <AuthButtons />
           </div>
         </div>
 
         <div className={`${styles['mobile-menu']} ${isMenuOpen ? styles.open : ''}`}>
-          {navLinks.map((link) => (
-            <Button
-              key={link.text}
-              view="action"
-              onClick={() => {
-                void navigate(link.route);
-                setIsMenuOpen(false);
-              }}
-              width="max"
-            >
-              {link.text}
-            </Button>
-          ))}
+          {navLinks.map((link) =>
+            link.text === 'Catalog' ? (
+              <CatalogMenuButton key={link.text} items={catalogMenuItems} catalogRoute={link.route} />
+            ) : (
+              <Button
+                key={link.text}
+                view="action"
+                onClick={() => {
+                  void navigate(link.route);
+                  setIsMenuOpen(false);
+                }}
+                width="max"
+              >
+                {link.text}
+              </Button>
+            ),
+          )}
           <div className={styles['mobile-auth-buttons']}>
             <AuthButtons />
           </div>

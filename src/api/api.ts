@@ -298,6 +298,11 @@ class API {
       .execute()
       .then((response) => response.body);
   }
+
+  async getCategories() {
+    const response = await apiRoot.categories().get().execute();
+    return response.body.results;
+  }
 }
 
 export const api = new API();
