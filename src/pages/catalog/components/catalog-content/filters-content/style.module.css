@@ -22,3 +22,21 @@
   display: flex;
   margin: auto auto auto 0;
 }
+
+.developers {
+  display: grid;
+  margin-top: 10px;
+  grid-gap: 5px;
+}
+
+.floors {
+  display: grid;
+  margin: 10px auto 10px 0;
+  grid-gap: 5px;
+  grid-template-columns: repeat(3, auto);
+}
+
+.filters-buttons {
+  display: flex;
+  justify-content: space-around;
+}
