@@ -1,4 +1,5 @@
-import { useState, useRef } from 'react';
+import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Button } from '@gravity-ui/uikit';
 import { ChevronDownWide } from '@gravity-ui/icons';
 import { useNavigate } from 'react-router-dom';
@@ -19,44 +20,64 @@ export function CatalogMenuButton({
   catalogRoute: string;
   setIsMenuOpen: (value: boolean) => void;
 }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const buttonReference = useRef<HTMLButtonElement>(null);
-  const menuReference = useRef<HTMLDivElement>(null);
+  const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
+  const location = useLocation();
   const navigate = useNavigate();
+  const isMobile = () => window.matchMedia('(max-width: 767px)').matches;
 
   const openMenu = () => {
-    setIsOpen(true);
+    setIsSubmenuOpen(!isSubmenuOpen);
   };
 
-  const handleClick = (event: React.MouseEvent) => {
+  const handleTextClick = (event: React.MouseEvent) => {
     event.preventDefault();
     void navigate(catalogRoute);
-    setIsOpen(false);
-    setIsMenuOpen(false);
   };
+
+  const handleIconClick = (event: React.MouseEvent) => {
+    event.preventDefault();
+    setIsSubmenuOpen(!isSubmenuOpen);
+  };
+
+  useEffect(() => {
+    setIsMenuOpen(false);
+    setIsSubmenuOpen(false);
+
+    const handleResize = () => {
+      if (window.innerWidth > 767) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [location.pathname, setIsMenuOpen]);
 
   return (
     <div className={styles['catalog-menu-container']} onMouseEnter={openMenu}>
-      <Button
-        view="action"
-        onClick={handleClick}
-        ref={buttonReference}
-        aria-expanded={isOpen}
-        className={styles['nav-button']}
-      >
-        Catalog
-        <ChevronDownWide className={styles['chevron-icon']} />
-      </Button>
-      {isOpen && (
-        <div id="catalog-menu" ref={menuReference} className={styles['catalog-menu']}>
+      {isMobile() ? (
+        <div className={styles['button-group']}>
+          <Button view="action" onClick={handleTextClick} className={styles['nav-button']}>
+            Catalog
+          </Button>
+          <Button view="action" onClick={handleIconClick} className={styles['icon-button']}>
+            <ChevronDownWide className={styles['chevron-icon']} />
+          </Button>
+        </div>
+      ) : (
+        <Button view="action" onClick={handleTextClick} className={styles['nav-button']}>
+          Catalog
+          <ChevronDownWide className={styles['chevron-icon']} />
+        </Button>
+      )}
+      {isSubmenuOpen && (
+        <div className={styles['catalog-menu']}>
           <ul className={styles['menu-list']}>
             {items.map((item, index) => (
               <li key={index} className={styles['menu-item']}>
                 <button
                   onClick={() => {
                     item.action();
-                    setIsOpen(false);
-                    setIsMenuOpen(false);
                   }}
                   className={styles['menu-item-button']}
                 >
@@ -69,8 +90,6 @@ export function CatalogMenuButton({
                         <button
                           onClick={() => {
                             subItem.action();
-                            setIsOpen(false);
-                            setIsMenuOpen(false);
                           }}
                           className={styles['menu-item-button']}
                         >
