@@ -2,20 +2,68 @@ import { createContext, useContext, useState, useCallback } from 'react';
 import { customerAPI } from '../../api/customer-api';
 import { ProductInfo } from '../../pages/catalog/components/catalog-content/product/types';
 import { returnProductsData } from '../../utilities/return-product-data';
+import { INITIAL_CRITERIA } from '../../constants/constants';
+
+interface CriteriaData {
+  sort: string | undefined;
+  search: string | undefined;
+  filters: {
+    price: number[];
+    area: number[];
+    floors: Record<string, boolean>;
+    developers: Record<string, boolean>;
+  };
+}
 
 interface ProductsContextType {
   productsInfo: ProductInfo[] | null;
   productDetails: ProductInfo | null;
   isLoading: boolean;
-  getProductsByCriteria: (criteria?: { searchedValue?: string; sortingCriteria?: string; filters?: string[] }) => void;
+  getProductsByCriteria: (criteria: CriteriaData) => void;
   getProductDetails: (value: string) => void;
   error: boolean;
-  searchedValue: string | undefined;
-  clearCriteria: (criteria?: 'searchedValue' | 'sortingCriteria') => void;
   isFiltersOpen: boolean;
   setIsFiltersOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  filters: string | undefined;
-  setFilters: React.Dispatch<React.SetStateAction<string | undefined>>;
+  criteriaData: CriteriaData;
+}
+
+function createFiltersQuery(filters: {
+  price: number[];
+  area: number[];
+  floors: Record<string, boolean>;
+  developers: Record<string, boolean>;
+}) {
+  const allFilters = [
+    `variants.attributes.Area:range (${filters.area[0].toString()} to ${filters.area[1].toString()})`,
+    `variants.price.centAmount:range (${(filters.price[0] * 100).toString()} to ${(filters.price[1] * 100).toString()})`,
+  ];
+  const floorsFilters = [];
+  const developersFilters = [];
+
+  if (Object.values(filters.floors).some((element) => element)) {
+    for (const key in filters.floors) {
+      if (filters.floors[key]) {
+        floorsFilters.push(`"${key}"`);
+      }
+    }
+  }
+
+  if (Object.values(filters.developers).some((element) => element)) {
+    for (const key in filters.developers) {
+      if (filters.developers[key]) {
+        developersFilters.push(`"${key}"`);
+      }
+    }
+  }
+
+  if (developersFilters.length > 0) {
+    allFilters.push(`variants.attributes.Developer.key: ${developersFilters.join(',')}`);
+  }
+  if (floorsFilters.length > 0) {
+    allFilters.push(`variants.attributes.Floors.key: ${floorsFilters.join(',')}`);
+  }
+
+  return allFilters;
 }
 
 const ProductsContext = createContext<ProductsContextType>({} as ProductsContextType);
@@ -32,52 +80,22 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
   const [productDetails, setProductDetails] = useState<ProductInfo | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
-  const [searchedValue, setSearchedValue] = useState<string | undefined>(undefined);
-  const [sortingCriteria, setSortingCriteria] = useState<string | undefined>(undefined);
-  const [filters, setFilters] = useState<string | undefined>(undefined);
   const [isFiltersOpen, setIsFiltersOpen] = useState<boolean>(false);
+  const [criteriaData, setCriteriaData] = useState<CriteriaData>(INITIAL_CRITERIA());
 
-  const clearCriteria = (criteria?: 'searchedValue' | 'sortingCriteria') => {
-    switch (criteria) {
-      case 'searchedValue': {
-        setSearchedValue(undefined);
-        break;
-      }
-      case 'sortingCriteria': {
-        setSortingCriteria(undefined);
-        break;
-      }
-      default: {
-        setSortingCriteria(undefined);
-        setSearchedValue(undefined);
-      }
-      // await getProductsByCriteria();
-    }
-  };
-
-  const getProductsByCriteria = async (criteria?: {
-    searchedValue?: string;
-    sortingCriteria?: string;
-    filters?: string[];
-  }) => {
+  const getProductsByCriteria = async (criteria: CriteriaData) => {
     try {
-      let sort: string | undefined;
-      if (criteria?.sortingCriteria === '') {
-        sort = undefined;
-      } else {
-        sort = criteria?.sortingCriteria ?? sortingCriteria;
-      }
-      console.log(criteria?.filters);
+      setCriteriaData(criteria);
       const response = await customerAPI
         .apiRoot()
         .productProjections()
         .search()
         .get({
           queryArgs: {
-            'text.en-US': criteria?.searchedValue ?? searchedValue,
+            'text.en-US': criteria.search,
             fuzzy: true,
-            sort: sort,
-            filter: criteria?.filters,
+            sort: criteria.sort,
+            filter: createFiltersQuery(criteria.filters),
           },
         })
         .execute();
@@ -85,8 +103,7 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
       const productsInfo = returnProductsData(response.body.results);
 
       setProductsInfo(productsInfo);
-      if (criteria?.searchedValue !== undefined) setSearchedValue(criteria.searchedValue);
-      if (criteria?.sortingCriteria) setSortingCriteria(criteria.sortingCriteria);
+
       setIsLoading(false);
     } catch (error) {
       console.error(error);
@@ -142,12 +159,9 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     getProductsByCriteria,
     getProductDetails,
     error,
-    searchedValue,
-    clearCriteria,
     isFiltersOpen,
     setIsFiltersOpen,
-    filters,
-    setFilters,
+    criteriaData,
   };
 
   return <ProductsContext.Provider value={ProductsContextValue}> {children}</ProductsContext.Provider>;

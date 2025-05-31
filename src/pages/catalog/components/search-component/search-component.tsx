@@ -8,10 +8,11 @@ import { useProducts } from '../../../../components/hooks/useProducts';
 
 export function SearchComponent() {
   const { register, handleSubmit, setValue } = useForm<{ search: string }>();
-  const { searchedValue, getProductsByCriteria } = useProducts();
+  const { getProductsByCriteria, criteriaData } = useProducts();
 
   const onSubmit = (data: { search: string }) => {
-    getProductsByCriteria({ searchedValue: data.search });
+    criteriaData.search = data.search;
+    getProductsByCriteria(criteriaData);
   };
 
   return (
@@ -27,14 +28,15 @@ export function SearchComponent() {
         size="xl"
         placeholder="Search"
         endContent={
-          searchedValue
+          criteriaData.search
             ? [
                 <SearchInputButton
                   key="clear"
                   icon={Xmark}
                   onClick={() => {
                     setValue('search', '');
-                    getProductsByCriteria({ searchedValue: '' });
+                    criteriaData.search = undefined;
+                    getProductsByCriteria(criteriaData);
                   }}
                 />,
                 <SearchInputButton key="search" icon={Magnifier} type="submit" />,

@@ -4,13 +4,13 @@ import { ProductsList } from './product/products';
 import { useEffect } from 'react';
 import styles from './style.module.css';
 import { FiltersControls } from './filters-content/filters-controls';
+import { INITIAL_CRITERIA } from '../../../../constants/constants';
 
 export function CatalogContent() {
-  const { productsInfo, getProductsByCriteria, isLoading, error, clearCriteria, isFiltersOpen } = useProducts();
+  const { productsInfo, getProductsByCriteria, isLoading, error, isFiltersOpen } = useProducts();
 
   useEffect(() => {
-    clearCriteria();
-    getProductsByCriteria();
+    getProductsByCriteria(INITIAL_CRITERIA());
   }, []);
 
   if (isLoading) {
