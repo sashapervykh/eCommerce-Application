@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
-import { Button, Loader, Menu } from '@gravity-ui/uikit';
-import { Xmark } from '@gravity-ui/icons';
+import { Button, Loader } from '@gravity-ui/uikit';
 import { useNavigate } from 'react-router-dom';
 import styles from './layout.module.css';
 import { AuthButtons } from './auth-buttons';
@@ -14,8 +13,6 @@ const navLinks = [
 ];
 
 export function MainLayout() {
-  console.log('Menu icon:', Menu);
-  console.log('Xmark icon:', Xmark);
   const navigate = useNavigate();
   const { isLoading } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);

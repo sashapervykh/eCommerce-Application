@@ -1,5 +1,11 @@
 .sort-component {
   display: flex;
   width: fit-content;
-  margin: 0 0 15px auto;
+  margin: 0 15px 15px 0;
+}
+
+@media (width <= 590px) {
+  .sort-component {
+    margin: 0 0 10px;
+  }
 }
