@@ -146,8 +146,11 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
       setProductDetails(productDetails);
       setIsLoading(false);
     } catch (error) {
-      console.error(error);
-      setError(true);
+      if (error instanceof Error) {
+        console.error(error);
+      } else {
+        setError(true);
+      }
       setIsLoading(false);
     }
   }, []);
