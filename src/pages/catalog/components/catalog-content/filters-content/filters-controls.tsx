@@ -5,7 +5,12 @@ import { useForm } from 'react-hook-form';
 import { useProducts } from '../../../../../components/hooks/useProducts';
 import { INITIAL_CRITERIA } from '../../../../../constants/constants';
 
-export function FiltersControls() {
+interface FiltersControlsProps {
+  categoryKey?: string;
+  subcategoryKey?: string;
+}
+
+export function FiltersControls({ categoryKey, subcategoryKey }: FiltersControlsProps) {
   const { handleSubmit, register } = useForm();
   const { criteriaData, getProductsByCriteria } = useProducts();
   const [priceValue, setPriceValue] = useState<number[]>([
@@ -172,7 +177,11 @@ export function FiltersControls() {
                 setThreeFloorsValue(false);
                 setAreaValue([0, 1000]);
                 setPriceValue([0, 1000000]);
-                getProductsByCriteria(INITIAL_CRITERIA());
+                getProductsByCriteria({
+                  ...INITIAL_CRITERIA(),
+                  categoryKey,
+                  subcategoryKey,
+                });
               }}
             >
               Clear

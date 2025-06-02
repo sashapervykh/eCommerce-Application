@@ -7,6 +7,8 @@ import { INITIAL_CRITERIA } from '../../constants/constants';
 interface CriteriaData {
   sort: string | undefined;
   search: string | undefined;
+  categoryKey?: string;
+  subcategoryKey?: string;
   filters: {
     price: number[];
     area: number[];
@@ -37,8 +39,9 @@ function createFiltersQuery(filters: {
     `variants.attributes.Area:range (${filters.area[0].toString()} to ${filters.area[1].toString()})`,
     `variants.price.centAmount:range (${(filters.price[0] * 100).toString()} to ${(filters.price[1] * 100).toString()})`,
   ];
-  const floorsFilters = [];
-  const developersFilters = [];
+
+  const floorsFilters: string[] = [];
+  const developersFilters: string[] = [];
 
   if (Object.values(filters.floors).some((element) => element)) {
     for (const key in filters.floors) {
@@ -78,38 +81,105 @@ const formatPrice = (price: number | undefined): string => {
 export const ProductsProvider = ({ children }: { children: React.ReactNode }) => {
   const [productsInfo, setProductsInfo] = useState<ProductInfo[] | null>(null);
   const [productDetails, setProductDetails] = useState<ProductInfo | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
   const [isFiltersOpen, setIsFiltersOpen] = useState<boolean>(false);
   const [criteriaData, setCriteriaData] = useState<CriteriaData>(INITIAL_CRITERIA());
+  const [isInitialLoad, setIsInitialLoad] = useState<boolean>(true);
+  const [lastFilters, setLastFilters] = useState<string[]>([]);
+  const [lastSort, setLastSort] = useState<string | undefined>(undefined);
+  const [lastSearch, setLastSearch] = useState<string | undefined>(undefined);
 
-  const getProductsByCriteria = async (criteria: CriteriaData) => {
-    try {
-      setCriteriaData(criteria);
-      const response = await customerAPI
-        .apiRoot()
-        .productProjections()
-        .search()
-        .get({
-          queryArgs: {
-            'text.en-US': criteria.search,
-            fuzzy: true,
-            sort: criteria.sort,
-            filter: createFiltersQuery(criteria.filters),
-          },
-        })
-        .execute();
+  const getProductsByCriteria = useCallback(
+    async (criteria: CriteriaData) => {
+      try {
+        setIsLoading(true);
+        setError(false);
 
-      const productsInfo = returnProductsData(response.body.results);
+        const { sort, search, categoryKey, subcategoryKey, filters } = criteria;
 
-      setProductsInfo(productsInfo);
+        let categoryFilter: string | undefined;
+        if (subcategoryKey) {
+          try {
+            const subcategoryResponse = await customerAPI
+              .apiRoot()
+              .categories()
+              .withKey({ key: subcategoryKey })
+              .get()
+              .execute();
+            categoryFilter = `categories.id:"${subcategoryResponse.body.id}"`;
+          } catch (error) {
+            console.error(error);
+            setProductsInfo([]);
+            setIsLoading(false);
+            return;
+          }
+        } else if (categoryKey) {
+          try {
+            const categoryResponse = await customerAPI
+              .apiRoot()
+              .categories()
+              .withKey({ key: categoryKey })
+              .get()
+              .execute();
+            categoryFilter = `categories.id:subtree("${categoryResponse.body.id}")`;
+          } catch (error) {
+            console.error(error);
+            setProductsInfo([]);
+            setIsLoading(false);
+            return;
+          }
+        }
 
-      setIsLoading(false);
-    } catch (error) {
-      console.error(error);
-      setError(true);
-    }
-  };
+        const allFilters = createFiltersQuery(filters);
+        if (categoryFilter) {
+          allFilters.push(categoryFilter);
+        }
+
+        if (!isInitialLoad) {
+          const filtersChanged = JSON.stringify(allFilters) !== JSON.stringify(lastFilters);
+          const sortChanged = sort !== lastSort;
+          const searchChanged = search !== lastSearch;
+          const categoryKeysChanged = categoryKey !== (criteriaData.subcategoryKey ?? criteriaData.categoryKey);
+
+          if (!filtersChanged && !sortChanged && !searchChanged && !categoryKeysChanged) {
+            setIsLoading(false);
+            return;
+          }
+        }
+
+        setCriteriaData(criteria);
+        setLastFilters(allFilters);
+        setLastSort(sort);
+        setLastSearch(search);
+        setIsInitialLoad(false);
+
+        const response = await customerAPI
+          .apiRoot()
+          .productProjections()
+          .search()
+          .get({
+            queryArgs: {
+              'text.en-US': search,
+              fuzzy: true,
+              sort,
+              filter: allFilters,
+            },
+          })
+          .execute();
+
+        const productsInfo = returnProductsData(response.body.results);
+
+        setProductsInfo(productsInfo);
+      } catch (error) {
+        console.error(error);
+        setError(true);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [isInitialLoad, criteriaData, lastFilters, lastSort, lastSearch],
+  );
 
   const getProductDetails = useCallback(async (key: string) => {
     try {
@@ -167,7 +237,7 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     criteriaData,
   };
 
-  return <ProductsContext.Provider value={ProductsContextValue}> {children}</ProductsContext.Provider>;
+  return <ProductsContext.Provider value={ProductsContextValue}>{children}</ProductsContext.Provider>;
 };
 
 export const useProducts = () => useContext(ProductsContext);

@@ -1,32 +1,13 @@
-import { Button } from '@gravity-ui/uikit';
 import { PageWrapper } from '../../components/page-wrapper/page-wrapper';
 import { CatalogContent } from './components/catalog-content/catalog-component';
-import { SearchComponent } from './components/search-component/search-component';
-import { SortComponent } from './components/sort-selector/sort-component';
-import styles from './style.module.css';
-import { useProducts } from '../../components/hooks/useProducts';
+import { useParams } from 'react-router-dom';
 
 export function CatalogPage() {
-  const { setIsFiltersOpen } = useProducts();
+  const { categoryKey, subcategoryKey } = useParams<{ categoryKey?: string; subcategoryKey?: string }>();
+
   return (
     <PageWrapper title="Catalog">
-      <h1>Our products</h1>
-      <div className={styles['list-controls']}>
-        <Button
-          size="xl"
-          className={styles['filters-button']}
-          view="outlined"
-          onClick={() => {
-            setIsFiltersOpen((previous: boolean) => !previous);
-          }}
-        >
-          Filter
-        </Button>
-        <SortComponent />
-        <SearchComponent />
-      </div>
-
-      <CatalogContent />
+      <CatalogContent categoryKey={categoryKey} subcategoryKey={subcategoryKey} />
     </PageWrapper>
   );
 }
