@@ -1,32 +1,59 @@
-import { Button } from '@gravity-ui/uikit';
+import { Button, Text, Spin } from '@gravity-ui/uikit';
+import styles from './style.module.css';
 import { SearchComponent } from '../search-component/search-component';
 import { SortComponent } from '../sort-selector/sort-component';
-import { Spin, Text } from '@gravity-ui/uikit';
-import { useProducts } from '../../../../components/hooks/useProducts';
+import { Breadcrumbs } from '../breadcrumbs/breadcrumbs';
 import { ProductsList } from './product/products';
-import { useEffect, useRef, useState } from 'react';
-import styles from './style.module.css';
 import { FiltersControls } from './filters-content/filters-controls';
+import { useProducts } from '../../../../components/hooks/useProducts';
 import { INITIAL_CRITERIA } from '../../../../constants/constants';
 import { returnCategoryData, CategoryData } from '../../../../utilities/return-category-data';
+import { useEffect, useRef, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
-export function CatalogContent({ categoryKey, subcategoryKey }: { categoryKey?: string; subcategoryKey?: string }) {
-  const { productsInfo, getProductsByCriteria, isLoading, error, isFiltersOpen } = useProducts();
+export function CatalogContent({
+  categoryKey: propertyCategoryKey,
+  subcategoryKey: propertySubcategoryKey,
+}: {
+  categoryKey?: string;
+  subcategoryKey?: string;
+}) {
+  const { categoryKey: parameterCategoryKey, subcategoryKey: parameterSubcategoryKey } = useParams<{
+    categoryKey?: string;
+    subcategoryKey?: string;
+  }>();
+
+  const categoryKey = propertyCategoryKey ?? parameterCategoryKey;
+  const subcategoryKey = propertySubcategoryKey ?? parameterSubcategoryKey;
+
+  const { productsInfo, getProductsByCriteria, isLoading, error, isFiltersOpen, setIsFiltersOpen } = useProducts();
   const lastCriteriaReference = useRef<string | null>(null);
   const [categoryData, setCategoryData] = useState<CategoryData | null>(null);
-  const [_isCategoryLoading, setIsCategoryLoading] = useState<boolean>(false);
-
-  const { setIsFiltersOpen } = useProducts();
+  const [subcategoryData, setSubcategoryData] = useState<CategoryData | null>(null);
+  const [isCategoryLoading, setIsCategoryLoading] = useState<boolean>(false);
 
   useEffect(() => {
     async function loadCategoryData() {
       setIsCategoryLoading(true);
-      const key = subcategoryKey ?? categoryKey;
-      const data = await returnCategoryData(key);
-      setCategoryData(data);
-      setIsCategoryLoading(false);
+      try {
+        if (categoryKey) {
+          const data = await returnCategoryData(categoryKey);
+          setCategoryData(data);
+        } else {
+          setCategoryData(null);
+        }
+        if (subcategoryKey) {
+          const data = await returnCategoryData(subcategoryKey);
+          setSubcategoryData(data);
+        } else {
+          setSubcategoryData(null);
+        }
+      } catch (error) {
+        console.error('Category load error:', error);
+      } finally {
+        setIsCategoryLoading(false);
+      }
     }
-
     void loadCategoryData();
   }, [categoryKey, subcategoryKey]);
 
@@ -43,7 +70,6 @@ export function CatalogContent({ categoryKey, subcategoryKey }: { categoryKey?: 
     const criteriaKey = JSON.stringify(criteria);
 
     if (lastCriteriaReference.current === criteriaKey) {
-      // Ensure that criterias changed
       return;
     }
 
@@ -51,7 +77,7 @@ export function CatalogContent({ categoryKey, subcategoryKey }: { categoryKey?: 
     lastCriteriaReference.current = criteriaKey;
   }, [categoryKey, subcategoryKey, getProductsByCriteria]);
 
-  if (isLoading) {
+  if (isLoading || isCategoryLoading) {
     return <Spin />;
   }
 
@@ -63,15 +89,25 @@ export function CatalogContent({ categoryKey, subcategoryKey }: { categoryKey?: 
     return <Spin />;
   }
 
+  const displayData = subcategoryData ?? categoryData;
+
   return (
     <div className={styles.catalog}>
       <div className={styles['catalog-header']}>
-        {categoryData && (
+        <Breadcrumbs
+          categoryKey={categoryKey}
+          subcategoryKey={subcategoryKey}
+          categoryData={categoryData}
+          subcategoryData={subcategoryData}
+        />
+        {displayData && (
           <>
-            <h1>{categoryData.name}</h1>
-            <Text variant="body-2" className={styles['category-description']}>
-              {categoryData.description}
-            </Text>
+            <h1>{displayData.name || 'Catalogue'}</h1>
+            {displayData.description && (
+              <Text variant="body-2" className={styles['category-description']}>
+                {displayData.description}
+              </Text>
+            )}
           </>
         )}
       </div>

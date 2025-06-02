@@ -1,0 +1,30 @@
+.breadcrumbs {
+  margin-bottom: 16px;
+}
+
+.breadcrumbs-list {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.breadcrumb-item {
+  display: flex;
+  align-items: center;
+}
+
+.breadcrumb-link {
+  text-decoration: none;
+  color: var(--g-color-text-primary);
+}
+
+.breadcrumb-link:hover {
+  text-decoration: underline;
+}
+
+.separator {
+  margin: 0 8px;
+  color: var(--g-color-text-secondary);
+}
