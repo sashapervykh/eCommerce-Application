@@ -71,3 +71,9 @@
 .wrapper:hover .image-wrapper {
   height: 280px;
 }
+
+@media (width <= 535px) {
+  .product-list-hidden {
+    display: none;
+  }
+}

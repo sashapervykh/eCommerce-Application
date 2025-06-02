@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useProducts } from '../../../../../components/hooks/useProducts';
 import { INITIAL_CRITERIA } from '../../../../../constants/constants';
+import { Xmark } from '@gravity-ui/icons';
 
 interface FiltersControlsProps {
   categoryKey?: string;
@@ -11,8 +12,9 @@ interface FiltersControlsProps {
 }
 
 export function FiltersControls({ categoryKey, subcategoryKey }: FiltersControlsProps) {
-  const { handleSubmit, register } = useForm();
-  const { criteriaData, getProductsByCriteria } = useProducts();
+  const { handleSubmit, register, reset } = useForm();
+  const { criteriaData, getProductsByCriteria, setIsFiltersOpen } = useProducts();
+
   const [priceValue, setPriceValue] = useState<number[]>([
     criteriaData.filters.price[0],
     criteriaData.filters.price[1],
@@ -41,15 +43,18 @@ export function FiltersControls({ categoryKey, subcategoryKey }: FiltersControls
     const developKeys = ['NebulaBuilders', 'StellarEstates', 'GalaxyConstruction', 'AstralArchitects'];
 
     Object.keys(data).forEach((key) => {
-      if (floorsKeys.find((element) => element === key) && data[key]) {
+      if (floorsKeys.find((element) => element === key)) {
         criteriaData.filters.floors[key] = data[key];
       }
-      if (developKeys.find((element) => element === key) && data[key]) {
+      if (developKeys.find((element) => element === key)) {
         criteriaData.filters.developers[key] = data[key];
       }
     });
 
     getProductsByCriteria(criteriaData);
+    if (window.innerWidth < 535) {
+      setIsFiltersOpen(false);
+    }
   };
 
   return (
@@ -61,11 +66,13 @@ export function FiltersControls({ categoryKey, subcategoryKey }: FiltersControls
             void handleSubmit(onSubmit)(event);
           }}
         >
+          <Xmark className={styles['close-button']} onClick={() => setIsFiltersOpen(false)}></Xmark>
           <div className={styles['filter-group']}>
             <Text variant="subheader-2">Price, $</Text>
             <Slider
               size="s"
               defaultValue={[priceValue[0], priceValue[1]]}
+              value={[priceValue[0], priceValue[1]]}
               min={0}
               max={1000000}
               step={100000}
@@ -89,6 +96,7 @@ export function FiltersControls({ categoryKey, subcategoryKey }: FiltersControls
             <Slider
               size="s"
               defaultValue={[areaValue[0], areaValue[1]]}
+              value={[areaValue[0], areaValue[1]]}
               min={0}
               max={1000}
               step={50}
@@ -168,6 +176,15 @@ export function FiltersControls({ categoryKey, subcategoryKey }: FiltersControls
               size="l"
               view="action"
               onClick={() => {
+                reset({
+                  '1': false,
+                  '2': false,
+                  '3': false,
+                  NebulaBuilders: false,
+                  StellarEstates: false,
+                  GalaxyConstruction: false,
+                  AstralArchitects: false,
+                });
                 setNebulaBuildersValue(false);
                 setStellarEstatesValue(false);
                 setGalaxyConstructionValue(false);

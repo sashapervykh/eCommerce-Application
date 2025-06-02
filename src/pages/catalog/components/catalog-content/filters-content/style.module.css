@@ -43,13 +43,23 @@
   justify-content: space-around;
 }
 
+.close-button {
+  display: none;
+}
+
 @media (width <= 535px) {
   .filters-wrapper {
     width: 100%;
-    position: absolute;
-    z-index: 5;
     background-color: white;
-    opacity: 1;
     padding: 20px;
+    margin-right: 0;
+  }
+
+  .close-button {
+    display: flex;
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    cursor: pointer;
   }
 }
