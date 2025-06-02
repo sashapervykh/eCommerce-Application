@@ -11,8 +11,9 @@ interface FiltersControlsProps {
 }
 
 export function FiltersControls({ categoryKey, subcategoryKey }: FiltersControlsProps) {
-  const { handleSubmit, register } = useForm();
-  const { criteriaData, getProductsByCriteria } = useProducts();
+  const { handleSubmit, register, reset } = useForm();
+  const { criteriaData, getProductsByCriteria, setIsFiltersOpen } = useProducts();
+
   const [priceValue, setPriceValue] = useState<number[]>([
     criteriaData.filters.price[0],
     criteriaData.filters.price[1],
@@ -52,6 +53,9 @@ export function FiltersControls({ categoryKey, subcategoryKey }: FiltersControls
     console.log(criteriaData);
     console.log(data);
     getProductsByCriteria(criteriaData);
+    if (window.innerWidth < 535) {
+      setIsFiltersOpen(false);
+    }
   };
 
   return (
@@ -68,6 +72,7 @@ export function FiltersControls({ categoryKey, subcategoryKey }: FiltersControls
             <Slider
               size="s"
               defaultValue={[priceValue[0], priceValue[1]]}
+              value={[priceValue[0], priceValue[1]]}
               min={0}
               max={1000000}
               step={100000}
@@ -91,6 +96,7 @@ export function FiltersControls({ categoryKey, subcategoryKey }: FiltersControls
             <Slider
               size="s"
               defaultValue={[areaValue[0], areaValue[1]]}
+              value={[areaValue[0], areaValue[1]]}
               min={0}
               max={1000}
               step={50}
@@ -170,6 +176,15 @@ export function FiltersControls({ categoryKey, subcategoryKey }: FiltersControls
               size="l"
               view="action"
               onClick={() => {
+                reset({
+                  '1': false,
+                  '2': false,
+                  '3': false,
+                  NebulaBuilders: false,
+                  StellarEstates: false,
+                  GalaxyConstruction: false,
+                  AstralArchitects: false,
+                });
                 setNebulaBuildersValue(false);
                 setStellarEstatesValue(false);
                 setGalaxyConstructionValue(false);
@@ -177,6 +192,7 @@ export function FiltersControls({ categoryKey, subcategoryKey }: FiltersControls
                 setOneFloorsValue(false);
                 setTwoFloorsValue(false);
                 setThreeFloorsValue(false);
+                console.log(oneFloorsValue, threeFloorsValue);
                 setAreaValue([0, 1000]);
                 setPriceValue([0, 1000000]);
                 getProductsByCriteria({

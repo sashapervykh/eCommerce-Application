@@ -46,10 +46,8 @@
 @media (width <= 535px) {
   .filters-wrapper {
     width: 100%;
-    position: absolute;
-    z-index: 5;
     background-color: white;
-    opacity: 1;
     padding: 20px;
+    margin-right: 0;
   }
 }
