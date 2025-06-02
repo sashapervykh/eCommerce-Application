@@ -1,30 +1,134 @@
-import { Spin, Text } from '@gravity-ui/uikit';
-import { useProducts } from '../../../../components/hooks/useProducts';
-import { ProductsList } from './product/products';
-import { useEffect } from 'react';
+import { Button, Text, Spin } from '@gravity-ui/uikit';
 import styles from './style.module.css';
+import { SearchComponent } from '../search-component/search-component';
+import { SortComponent } from '../sort-selector/sort-component';
+import { Breadcrumbs } from '../breadcrumbs/breadcrumbs';
+import { ProductsList } from './product/products';
 import { FiltersControls } from './filters-content/filters-controls';
+import { useProducts } from '../../../../components/hooks/useProducts';
 import { INITIAL_CRITERIA } from '../../../../constants/constants';
+import { returnCategoryData, CategoryData } from '../../../../utilities/return-category-data';
+import { useEffect, useRef, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
-export function CatalogContent() {
-  const { productsInfo, getProductsByCriteria, isLoading, error, isFiltersOpen } = useProducts();
+export function CatalogContent({
+  categoryKey: propertyCategoryKey,
+  subcategoryKey: propertySubcategoryKey,
+}: {
+  categoryKey?: string;
+  subcategoryKey?: string;
+}) {
+  const { categoryKey: parameterCategoryKey, subcategoryKey: parameterSubcategoryKey } = useParams<{
+    categoryKey?: string;
+    subcategoryKey?: string;
+  }>();
+
+  const categoryKey = propertyCategoryKey ?? parameterCategoryKey;
+  const subcategoryKey = propertySubcategoryKey ?? parameterSubcategoryKey;
+
+  const { productsInfo, getProductsByCriteria, error, isFiltersOpen, setIsFiltersOpen } = useProducts();
+  const lastCriteriaReference = useRef<string | null>(null);
+  const [categoryData, setCategoryData] = useState<CategoryData | null>(null);
+  const [subcategoryData, setSubcategoryData] = useState<CategoryData | null>(null);
+  const [_, setIsCategoryLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    getProductsByCriteria(INITIAL_CRITERIA());
-  }, []);
+    async function loadCategoryData() {
+      setIsCategoryLoading(true);
+      try {
+        if (categoryKey) {
+          const data = await returnCategoryData(categoryKey);
+          setCategoryData(data);
+        } else {
+          setCategoryData(null);
+        }
+        if (subcategoryKey) {
+          const data = await returnCategoryData(subcategoryKey);
+          setSubcategoryData(data);
+        } else {
+          setSubcategoryData(null);
+        }
+      } catch (error) {
+        console.error('Category load error:', error);
+      } finally {
+        setIsCategoryLoading(false);
+      }
+    }
+    void loadCategoryData();
+  }, [categoryKey, subcategoryKey]);
 
-  if (isLoading) {
-    return <Spin></Spin>;
+  useEffect(() => {
+    setIsFiltersOpen(false);
+  }, [categoryKey, subcategoryKey, setIsFiltersOpen]);
+
+  useEffect(() => {
+    const criteria = {
+      ...INITIAL_CRITERIA(),
+      categoryKey,
+      subcategoryKey,
+    };
+    const criteriaKey = JSON.stringify(criteria);
+
+    if (lastCriteriaReference.current === criteriaKey) {
+      return;
+    }
+
+    getProductsByCriteria(criteria);
+    lastCriteriaReference.current = criteriaKey;
+  }, [categoryKey, subcategoryKey, getProductsByCriteria]);
+
+  if (error) {
+    return <Text variant="body-2">{'Something went wrong. Please try again later.'}</Text>;
   }
 
-  if (error || !productsInfo) {
-    return <Text variant="body-2">{'Something goes wrong. Refresh the page to try again'}</Text>;
+  if (productsInfo === null) {
+    return <Spin />;
   }
+
+  const displayData = subcategoryData ?? categoryData;
 
   return (
-    <div className={styles['catalog-content']}>
-      {isFiltersOpen && <FiltersControls />}
-      <ProductsList productsInfo={productsInfo} />
+    <div className={styles.catalog}>
+      <div className={styles['catalog-header']}>
+        <Breadcrumbs
+          categoryKey={categoryKey}
+          subcategoryKey={subcategoryKey}
+          categoryData={categoryData}
+          subcategoryData={subcategoryData}
+        />
+        {displayData && (
+          <>
+            <h1>{displayData.name || 'Catalogue'}</h1>
+            {displayData.description && (
+              <Text variant="body-2" className={styles['category-description']}>
+                {displayData.description}
+              </Text>
+            )}
+          </>
+        )}
+      </div>
+      <div className={styles['list-controls']}>
+        <Button
+          size="xl"
+          className={styles['filters-button']}
+          view="outlined"
+          onClick={() => {
+            setIsFiltersOpen((previous: boolean) => !previous);
+          }}
+        >
+          Filter
+        </Button>
+        <SortComponent />
+        <SearchComponent />
+      </div>
+      <div className={styles['catalog-content']}>
+        {isFiltersOpen && <FiltersControls categoryKey={categoryKey} subcategoryKey={subcategoryKey} />}
+        {productsInfo.length === 0 ? (
+          <Text variant="body-2">{'No products found'}</Text>
+        ) : (
+          <ProductsList productsInfo={productsInfo} />
+        )}
+      </div>
     </div>
   );
 }

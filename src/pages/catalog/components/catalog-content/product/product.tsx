@@ -11,7 +11,7 @@ export function ProductCard({ productInfo }: { productInfo: ProductInfo }) {
       view="raised"
       key={productInfo.id}
       className={styles.wrapper}
-      onClick={() => navigate(`./${productInfo.key}`)}
+      onClick={() => navigate(`/products/${productInfo.key}`)}
     >
       <div className={styles['image-wrapper']}>
         {productInfo.images?.map((image, index) => {

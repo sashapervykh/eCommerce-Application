@@ -25,7 +25,9 @@ export function App() {
                 <Route element={<MainLayout />}>
                   <Route path="/" element={<HomePage />} />
                   <Route path="/catalog" element={<CatalogPage />} />
-                  <Route path="/catalog/:productId" element={<ProductPage />} />
+                  <Route path="/catalog/:categoryKey" element={<CatalogPage />} />
+                  <Route path="/catalog/:categoryKey/:subcategoryKey" element={<CatalogPage />} />
+                  <Route path="/products/:productId" element={<ProductPage />} />
                   <Route path="/about-us" element={<AboutPage />} />
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/registration" element={<RegistrationPage />} />
