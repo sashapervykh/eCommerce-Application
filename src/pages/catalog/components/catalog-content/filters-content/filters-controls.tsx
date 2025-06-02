@@ -41,14 +41,16 @@ export function FiltersControls({ categoryKey, subcategoryKey }: FiltersControls
     const developKeys = ['NebulaBuilders', 'StellarEstates', 'GalaxyConstruction', 'AstralArchitects'];
 
     Object.keys(data).forEach((key) => {
-      if (floorsKeys.find((element) => element === key) && data[key]) {
+      if (floorsKeys.find((element) => element === key)) {
         criteriaData.filters.floors[key] = data[key];
+        console.log('done');
       }
-      if (developKeys.find((element) => element === key) && data[key]) {
+      if (developKeys.find((element) => element === key)) {
         criteriaData.filters.developers[key] = data[key];
       }
     });
-
+    console.log(criteriaData);
+    console.log(data);
     getProductsByCriteria(criteriaData);
   };
 
