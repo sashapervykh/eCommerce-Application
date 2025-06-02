@@ -1,7 +1,6 @@
 import { Breadcrumbs as GravityBreadcrumbs, BreadcrumbsItem } from '@gravity-ui/uikit';
 import { useHref, useLinkClickHandler } from 'react-router';
 import styles from './style.module.css';
-import { memo } from 'react';
 
 interface BreadcrumbsProps {
   categoryKey?: string;
@@ -20,14 +19,7 @@ function RouterLink({ to, children }: { to: string; children: React.ReactNode })
   );
 }
 
-export const Breadcrumbs = memo(function Breadcrumbs({
-  categoryKey,
-  subcategoryKey,
-  categoryData,
-  subcategoryData,
-}: BreadcrumbsProps) {
-  console.log('Breadcrumbs props:', { categoryKey, subcategoryKey, categoryData, subcategoryData });
-
+export const Breadcrumbs = ({ categoryKey, subcategoryKey, categoryData, subcategoryData }: BreadcrumbsProps) => {
   return (
     <GravityBreadcrumbs className={styles.breadcrumbs} itemComponent={RouterLink}>
       <RouterLink to="/catalog">Catalog</RouterLink>
@@ -35,4 +27,4 @@ export const Breadcrumbs = memo(function Breadcrumbs({
       {subcategoryKey && categoryKey && <BreadcrumbsItem>{subcategoryData?.name ?? subcategoryKey}</BreadcrumbsItem>}
     </GravityBreadcrumbs>
   );
-});
+};

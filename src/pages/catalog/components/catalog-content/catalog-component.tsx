@@ -26,11 +26,11 @@ export function CatalogContent({
   const categoryKey = propertyCategoryKey ?? parameterCategoryKey;
   const subcategoryKey = propertySubcategoryKey ?? parameterSubcategoryKey;
 
-  const { productsInfo, getProductsByCriteria, isLoading, error, isFiltersOpen, setIsFiltersOpen } = useProducts();
+  const { productsInfo, getProductsByCriteria, error, isFiltersOpen, setIsFiltersOpen } = useProducts();
   const lastCriteriaReference = useRef<string | null>(null);
   const [categoryData, setCategoryData] = useState<CategoryData | null>(null);
   const [subcategoryData, setSubcategoryData] = useState<CategoryData | null>(null);
-  const [isCategoryLoading, setIsCategoryLoading] = useState<boolean>(false);
+  const [_, setIsCategoryLoading] = useState<boolean>(false);
 
   useEffect(() => {
     async function loadCategoryData() {
@@ -76,10 +76,6 @@ export function CatalogContent({
     getProductsByCriteria(criteria);
     lastCriteriaReference.current = criteriaKey;
   }, [categoryKey, subcategoryKey, getProductsByCriteria]);
-
-  if (isLoading || isCategoryLoading) {
-    return <Spin />;
-  }
 
   if (error) {
     return <Text variant="body-2">{'Something went wrong. Please try again later.'}</Text>;
