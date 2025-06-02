@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useProducts } from '../../components/hooks/useProducts';
 import { Card, Text, Spin, Button } from '@gravity-ui/uikit';
 import { useEffect, useState } from 'react';
@@ -22,9 +22,9 @@ type AttributeValue = AttributeValueObject | AttributeValueObject[] | string | n
 export function ProductPage() {
   const { productId } = useParams();
   const { productDetails, getProductDetails, isLoading, error } = useProducts();
-
   const [initialSlide, setInitialSlide] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   const getLabel = (item: AttributeValue | AttributeValueObject): string => {
     if (typeof item === 'object') {
@@ -162,7 +162,7 @@ export function ProductPage() {
             )}
           </div>
         </div>
-        <Button view="action" size="l" href="/catalog" className={styles['back-button']}>
+        <Button view="action" size="l" onClick={() => navigate('/catalog')} className={styles['back-button']}>
           Back to Catalog
         </Button>
       </Card>
