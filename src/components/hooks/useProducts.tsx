@@ -62,7 +62,7 @@ function createFiltersQuery(filters: {
   if (developersFilters.length > 0) {
     allFilters.push(`variants.attributes.Developer.key: ${developersFilters.join(',')}`);
   }
-  console.log(floorsFilters);
+
   if (floorsFilters.length > 0) {
     allFilters.push(`variants.attributes.Floors.key: ${floorsFilters.join(',')}`);
   }
