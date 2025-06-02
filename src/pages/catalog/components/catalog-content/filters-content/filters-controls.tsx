@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useProducts } from '../../../../../components/hooks/useProducts';
 import { INITIAL_CRITERIA } from '../../../../../constants/constants';
+import { Xmark } from '@gravity-ui/icons';
 
 interface FiltersControlsProps {
   categoryKey?: string;
@@ -50,8 +51,7 @@ export function FiltersControls({ categoryKey, subcategoryKey }: FiltersControls
         criteriaData.filters.developers[key] = data[key];
       }
     });
-    console.log(criteriaData);
-    console.log(data);
+
     getProductsByCriteria(criteriaData);
     if (window.innerWidth < 535) {
       setIsFiltersOpen(false);
@@ -67,6 +67,7 @@ export function FiltersControls({ categoryKey, subcategoryKey }: FiltersControls
             void handleSubmit(onSubmit)(event);
           }}
         >
+          <Xmark className={styles['close-button']} onClick={() => setIsFiltersOpen(false)}></Xmark>
           <div className={styles['filter-group']}>
             <Text variant="subheader-2">Price, $</Text>
             <Slider
