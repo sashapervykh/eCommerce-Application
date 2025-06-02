@@ -21,7 +21,7 @@ type AttributeValue = AttributeValueObject | AttributeValueObject[] | string | n
 
 export function ProductPage() {
   const { productId } = useParams();
-  const { productDetails, getProductDetails, isLoading, error } = useProducts();
+  const { productDetails, getProductDetails, isLoading, error, notFound } = useProducts();
   const [initialSlide, setInitialSlide] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
@@ -74,16 +74,24 @@ export function ProductPage() {
     }
   }, [productId, getProductDetails]);
 
-  if (isLoading) {
+  if (notFound) {
+    return <NotFoundPage />;
+  }
+
+  if (error) {
+    return (
+      <div className={styles['product-page']}>
+        <Text variant="body-2">An unknown error occurred. Please try again later.</Text>
+      </div>
+    );
+  }
+
+  if (isLoading || !productDetails) {
     return (
       <div className={styles['loading-container']}>
         <Spin></Spin>
       </div>
     );
-  }
-
-  if (error || !productDetails?.published) {
-    return <NotFoundPage />;
   }
 
   const hasImages = productDetails.images && productDetails.images.length > 0;

@@ -27,6 +27,12 @@ interface ProductsContextType {
   isFiltersOpen: boolean;
   setIsFiltersOpen: React.Dispatch<React.SetStateAction<boolean>>;
   criteriaData: CriteriaData;
+  notFound: boolean;
+}
+
+interface ApiError {
+  statusCode: number;
+  message: string;
 }
 
 function createFiltersQuery(filters: {
@@ -89,6 +95,7 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
   const [lastFilters, setLastFilters] = useState<string[]>([]);
   const [lastSort, setLastSort] = useState<string | undefined>(undefined);
   const [lastSearch, setLastSearch] = useState<string | undefined>(undefined);
+  const [notFound, setNotFound] = useState<boolean>(false);
 
   const getProductsByCriteria = useCallback(
     async (criteria: CriteriaData) => {
@@ -186,8 +193,12 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
       setIsLoading(true);
       setProductDetails(null);
       setError(false);
+      setNotFound(false);
       const response = await customerAPI.apiRoot().products().withKey({ key }).get().execute();
-      console.log('Product details response:', response.body);
+      if (!response.body.masterData.published) {
+        setNotFound(true);
+        return;
+      }
       const productInfo = response.body;
       const discountedPrice = productInfo.masterData.current.masterVariant.prices?.[0]?.discounted?.value.centAmount;
       const price = productInfo.masterData.current.masterVariant.prices?.[0].value.centAmount;
@@ -216,8 +227,9 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
       setProductDetails(productDetails);
       setIsLoading(false);
     } catch (error) {
-      if (error instanceof Error) {
-        console.error(error);
+      const apiError = error as ApiError;
+      if (apiError.statusCode === 404) {
+        setNotFound(true);
       } else {
         setError(true);
       }
@@ -235,6 +247,7 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     isFiltersOpen,
     setIsFiltersOpen,
     criteriaData,
+    notFound,
   };
 
   return <ProductsContext.Provider value={ProductsContextValue}>{children}</ProductsContext.Provider>;
