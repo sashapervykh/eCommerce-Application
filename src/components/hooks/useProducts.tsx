@@ -188,6 +188,7 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
         setProductsInfo(productsInfo);
       } catch (error) {
         console.error(error);
+        setError(true);
       } finally {
         setIsLoading(false);
       }
