@@ -5,7 +5,7 @@ export default defineConfig(({ mode }) => {
   const isDevelopmentMode = mode === 'development';
 
   return {
-    base: './',
+    base: '/',
     build: isDevelopmentMode
       ? {
           sourcemap: 'inline',
