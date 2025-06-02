@@ -45,7 +45,6 @@ export function FiltersControls({ categoryKey, subcategoryKey }: FiltersControls
     Object.keys(data).forEach((key) => {
       if (floorsKeys.find((element) => element === key)) {
         criteriaData.filters.floors[key] = data[key];
-        console.log('done');
       }
       if (developKeys.find((element) => element === key)) {
         criteriaData.filters.developers[key] = data[key];
@@ -193,7 +192,6 @@ export function FiltersControls({ categoryKey, subcategoryKey }: FiltersControls
                 setOneFloorsValue(false);
                 setTwoFloorsValue(false);
                 setThreeFloorsValue(false);
-                console.log(oneFloorsValue, threeFloorsValue);
                 setAreaValue([0, 1000]);
                 setPriceValue([0, 1000000]);
                 getProductsByCriteria({
