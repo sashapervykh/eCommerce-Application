@@ -10,6 +10,7 @@ import { INITIAL_CRITERIA } from '../../../../constants/constants';
 import { returnCategoryData, CategoryData } from '../../../../utilities/return-category-data';
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { NotFoundPage } from '../../../404/not-found';
 
 export function CatalogContent({
   categoryKey: propertyCategoryKey,
@@ -26,7 +27,7 @@ export function CatalogContent({
   const categoryKey = propertyCategoryKey ?? parameterCategoryKey;
   const subcategoryKey = propertySubcategoryKey ?? parameterSubcategoryKey;
 
-  const { productsInfo, getProductsByCriteria, error, isFiltersOpen, setIsFiltersOpen } = useProducts();
+  const { productsInfo, getProductsByCriteria, error, isFiltersOpen, setIsFiltersOpen, notFound } = useProducts();
   const lastCriteriaReference = useRef<string | null>(null);
   const [categoryData, setCategoryData] = useState<CategoryData | null>(null);
   const [subcategoryData, setSubcategoryData] = useState<CategoryData | null>(null);
@@ -76,6 +77,10 @@ export function CatalogContent({
     getProductsByCriteria(criteria);
     lastCriteriaReference.current = criteriaKey;
   }, [categoryKey, subcategoryKey, getProductsByCriteria]);
+
+  if (notFound) {
+    return <NotFoundPage />;
+  }
 
   if (error) {
     return <Text variant="body-2">{'Something went wrong. Please try again later.'}</Text>;

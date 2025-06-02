@@ -24,10 +24,10 @@ interface ProductsContextType {
   getProductsByCriteria: (criteria: CriteriaData) => void;
   getProductDetails: (value: string) => void;
   error: boolean;
+  notFound: boolean;
   isFiltersOpen: boolean;
   setIsFiltersOpen: React.Dispatch<React.SetStateAction<boolean>>;
   criteriaData: CriteriaData;
-  notFound: boolean;
 }
 
 interface ApiError {
@@ -89,19 +89,20 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
   const [productDetails, setProductDetails] = useState<ProductInfo | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
+  const [notFound, setNotFound] = useState<boolean>(false);
   const [isFiltersOpen, setIsFiltersOpen] = useState<boolean>(false);
   const [criteriaData, setCriteriaData] = useState<CriteriaData>(INITIAL_CRITERIA());
   const [isInitialLoad, setIsInitialLoad] = useState<boolean>(true);
   const [lastFilters, setLastFilters] = useState<string[]>([]);
   const [lastSort, setLastSort] = useState<string | undefined>(undefined);
   const [lastSearch, setLastSearch] = useState<string | undefined>(undefined);
-  const [notFound, setNotFound] = useState<boolean>(false);
 
   const getProductsByCriteria = useCallback(
     async (criteria: CriteriaData) => {
       try {
         setIsLoading(true);
         setError(false);
+        setNotFound(false);
 
         const { sort, search, categoryKey, subcategoryKey, filters } = criteria;
 
@@ -117,6 +118,10 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
             categoryFilter = `categories.id:"${subcategoryResponse.body.id}"`;
           } catch (error) {
             console.error(error);
+            const apiError = error as ApiError;
+            if (apiError.statusCode === 404) {
+              setNotFound(true);
+            }
             setProductsInfo([]);
             setIsLoading(false);
             return;
@@ -132,6 +137,10 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
             categoryFilter = `categories.id:subtree("${categoryResponse.body.id}")`;
           } catch (error) {
             console.error(error);
+            const apiError = error as ApiError;
+            if (apiError.statusCode === 404) {
+              setNotFound(true);
+            }
             setProductsInfo([]);
             setIsLoading(false);
             return;
@@ -176,11 +185,9 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
           .execute();
 
         const productsInfo = returnProductsData(response.body.results);
-
         setProductsInfo(productsInfo);
       } catch (error) {
         console.error(error);
-        setError(true);
       } finally {
         setIsLoading(false);
       }
@@ -244,10 +251,10 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     getProductsByCriteria,
     getProductDetails,
     error,
+    notFound,
     isFiltersOpen,
     setIsFiltersOpen,
     criteriaData,
-    notFound,
   };
 
   return <ProductsContext.Provider value={ProductsContextValue}>{children}</ProductsContext.Provider>;
