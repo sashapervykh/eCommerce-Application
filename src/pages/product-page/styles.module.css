@@ -1,0 +1,142 @@
+.product-page {
+  display: flex;
+  justify-content: center;
+}
+
+.product-card {
+  width: 100%;
+  padding: 20px;
+}
+
+.product-name {
+  margin-bottom: 40px;
+  text-align: center;
+  font-size: 40px;
+  line-height: 1;
+}
+
+.content-wrapper {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.images-wrapper {
+  flex: 1;
+  min-width: 250px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.product-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.price {
+  font-size: 15px;
+  color: #008000;
+}
+
+.text-wrapper {
+  flex: 1;
+  min-width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.full-price {
+  text-decoration: line-through;
+  color: #a8aeb3;
+}
+
+.description {
+  line-height: 1.5;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50vh;
+}
+
+.back-button {
+  margin-top: 20px;
+}
+
+:global(.swiper.swiper-initialized) {
+  display: flex;
+  align-items: center;
+}
+
+.swiper-container {
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.swiper-button-prev,
+.swiper-button-next {
+  background-color: #f0f0f0;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  position: absolute;
+  z-index: 5;
+  margin: 0 10px;
+  box-shadow: 0 2px 5px #0033;
+  transition: all 0.3s;
+  opacity: 0.8;
+}
+
+.swiper-button-next {
+  right: 0;
+}
+
+.swiper-button-prev:hover,
+.swiper-button-next:hover {
+  background-color: #fff;
+  opacity: 1;
+}
+
+.swiper-button-prev::after,
+.swiper-button-next::after {
+  font-size: 20px;
+}
+
+.swiper-pagination {
+  position: absolute;
+  bottom: 10px;
+  width: 100%;
+  z-index: 5;
+  text-align: center;
+}
+
+:global(.swiper-pagination-bullet) {
+  background: #f0f0f0;
+  box-shadow: 0 2px 5px #0033;
+  opacity: 1;
+  width: 16px;
+  height: 16px;
+  margin: 0 4px;
+  transition: all 0.3s;
+}
+
+:global(.swiper-pagination-bullet:hover) {
+  background-color: #fff;
+}
+
+:global(.swiper-pagination-bullet-active) {
+  opacity: 1;
+  border-color: transparent;
+  background-color: var(--g-color-base-brand);
+}

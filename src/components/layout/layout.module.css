@@ -25,6 +25,9 @@
   padding: 0 2rem;
   gap: 1rem;
   min-height: 60px;
+  z-index: 110;
+  position: relative;
+  background: #fff;
 }
 
 .logo {
@@ -39,6 +42,90 @@
   flex-wrap: wrap;
   align-items: center;
   padding: 0.5rem 0;
+}
+
+.catalog-menu-container {
+  position: relative;
+  display: inline-flex;
+}
+
+.chevron-icon {
+  margin-left: 0.5rem;
+  width: 16px;
+  height: 16px;
+}
+
+.catalog-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 100;
+  min-width: 200px;
+  background: var(--g-color-base-background);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 15%);
+  border-radius: 4px;
+  overflow: visible;
+  display: none;
+}
+
+.catalog-menu-container:hover .catalog-menu,
+.catalog-menu-container:focus-within .catalog-menu {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.menu-list,
+.submenu-list {
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem 0;
+}
+
+.nav-button span {
+  display: flex;
+  align-items: center;
+}
+
+.menu-item {
+  position: relative;
+}
+
+.menu-item-button {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  background: none;
+  border: none;
+  text-align: left;
+  color: var(--g-color-text-primary);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.menu-item-button:hover,
+.menu-item-button:focus {
+  background-color: #e9e9e9;
+  outline: none;
+}
+
+.submenu-list {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  min-width: 200px;
+  background: var(--g-color-base-background);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 15%);
+  border-radius: 4px;
+  display: none;
+  z-index: 101;
+}
+
+.menu-item:hover .submenu-list,
+.menu-item:focus-within .submenu-list {
+  display: block;
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .user {
@@ -80,5 +167,158 @@
 
   .main {
     padding: 3rem;
+  }
+}
+
+.burger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  margin-left: auto;
+  color: var(--g-color-text-primary);
+  transition: transform 0.3s ease;
+  z-index: 100;
+}
+
+.burger .g-icon {
+  color: currentcolor;
+  fill: currentcolor;
+}
+
+.burger svg {
+  fill: currentcolor;
+}
+
+.burger-icon {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 24px;
+  height: 24px;
+}
+
+.burger-line {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--g-color-text-primary);
+  margin: 5px 0;
+  transition: all 0.3s ease;
+}
+
+.nav-links {
+  display: flex;
+  gap: 1rem;
+}
+
+.burger.open .burger-line:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.burger.open .burger-line:nth-child(2) {
+  opacity: 0;
+}
+
+.burger.open .burger-line:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+.mobile-auth-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--g-color-line-generic);
+}
+
+.mobile-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  display: none;
+  background-color: var(--g-color-base-background);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
+  padding: 1rem 2rem;
+  flex-direction: column;
+  gap: 0.75rem;
+  z-index: 99;
+  max-height: calc(100vh - 60px);
+  overflow-y: auto;
+  transition: transform 0.5s ease;
+  opacity: 0;
+  transform: translateY(-100%);
+}
+
+.mobile-menu.open {
+  display: flex;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.burger:hover {
+  transform: scale(1.1);
+}
+
+@media (width < 767px) {
+  .burger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nav-links {
+    display: none;
+  }
+
+  .user {
+    display: none;
+  }
+
+  .header {
+    padding: 0;
+  }
+
+  .container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 auto;
+    padding: 1rem;
+    z-index: 110;
+    position: relative;
+    background: #fff;
+  }
+
+  .mobile-menu {
+    display: block;
+    opacity: 1;
+  }
+
+  .catalog-menu {
+    position: static;
+    width: 100%;
+    box-shadow: none;
+    display: block;
+  }
+
+  .catalog-menu-container:hover .catalog-menu {
+    display: block;
+  }
+
+  .submenu-list {
+    position: static;
+    width: 100%;
+    box-shadow: none;
+    display: block;
+    padding-left: 1rem;
+  }
+
+  .menu-item:hover .submenu-list {
+    display: block;
   }
 }

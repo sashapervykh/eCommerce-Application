@@ -1,0 +1,31 @@
+.catalog-content {
+  display: flex;
+  width: 100%;
+  position: relative;
+}
+
+.list-controls {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+  margin-top: 15px;
+}
+
+.filters-button {
+  font-weight: bold;
+  max-width: fit-content;
+  margin-right: 15px;
+  margin-bottom: 10px;
+}
+
+@media (width <= 592px) {
+  .list-controls {
+    flex-wrap: wrap;
+  }
+}
+
+@media (width <= 312px) {
+  .list-controls {
+    justify-content: space-around;
+  }
+}

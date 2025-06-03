@@ -1,0 +1,65 @@
+.filters-wrapper {
+  min-width: 250px;
+  margin-right: 15px;
+  height: fit-content;
+  padding-bottom: 10px;
+}
+
+.filter-group {
+  padding: 10px;
+}
+
+.slider {
+  margin-bottom: 10px;
+}
+
+.slider-label {
+  display: grid;
+  grid-template-columns: 1fr 4fr;
+  margin-bottom: 5px;
+  vertical-align: middle;
+}
+
+.label-text {
+  display: flex;
+  margin: auto auto auto 0;
+}
+
+.developers {
+  display: grid;
+  margin-top: 10px;
+  grid-gap: 5px;
+}
+
+.floors {
+  display: grid;
+  margin: 10px auto 10px 0;
+  grid-gap: 5px;
+  grid-template-columns: repeat(3, auto);
+}
+
+.filters-buttons {
+  display: flex;
+  justify-content: space-around;
+}
+
+.close-button {
+  display: none;
+}
+
+@media (width <= 535px) {
+  .filters-wrapper {
+    width: 100%;
+    background-color: white;
+    padding: 20px;
+    margin-right: 0;
+  }
+
+  .close-button {
+    display: flex;
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    cursor: pointer;
+  }
+}

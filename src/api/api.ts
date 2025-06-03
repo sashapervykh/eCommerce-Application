@@ -1,4 +1,14 @@
-import { projectKey } from '../commercetools-sdk';
+import { projectKey, ctpClient } from '../commercetools-sdk';
+import { createApiBuilderFromCtpClient } from '@commercetools/platform-sdk';
+
+interface CustomerResponse {
+  id: string;
+  version: number;
+}
+
+const apiRoot = createApiBuilderFromCtpClient(ctpClient).withProjectKey({
+  projectKey,
+});
 
 class API {
   authLink = `https://auth.us-central1.gcp.commercetools.com/oauth/${projectKey}/customers/token`;
@@ -83,6 +93,215 @@ class API {
     const result: unknown = await response.json();
     console.log('API response → for CrossCheck Testing:', result);
     return result;
+  }
+
+  async updateCustomer(
+    customerId: string,
+    version: number,
+    data: {
+      email?: string;
+      firstName?: string;
+      lastName?: string;
+      dateOfBirth?: string;
+      addresses?: {
+        action: 'addAddress' | 'changeAddress' | 'removeAddress';
+        addressId?: string;
+        address?: {
+          key: string;
+          streetName: string;
+          city: string;
+          country: string;
+          postalCode: string;
+        };
+      }[];
+      defaultShippingAddress?: number;
+      defaultBillingAddress?: number;
+    },
+  ): Promise<CustomerResponse> {
+    const actions = [];
+    if (data.email) {
+      actions.push({
+        action: 'changeEmail' as const,
+        email: data.email,
+      });
+    }
+    if (data.firstName) actions.push({ action: 'setFirstName' as const, firstName: data.firstName });
+    if (data.lastName) actions.push({ action: 'setLastName' as const, lastName: data.lastName });
+    if (data.dateOfBirth) actions.push({ action: 'setDateOfBirth' as const, dateOfBirth: data.dateOfBirth });
+
+    if (data.addresses) {
+      data.addresses.forEach((address) => {
+        if (address.action === 'addAddress' && address.address) {
+          actions.push({
+            action: 'addAddress',
+            address: address.address,
+          });
+        }
+      });
+    }
+
+    if (data.defaultShippingAddress !== undefined) {
+      actions.push({
+        action: 'setDefaultShippingAddress' as const,
+        addressId: data.defaultShippingAddress.toString(),
+      });
+    }
+
+    if (data.defaultBillingAddress !== undefined) {
+      actions.push({
+        action: 'setDefaultBillingAddress' as const,
+        addressId: data.defaultBillingAddress.toString(),
+      });
+    }
+
+    return apiRoot
+      .customers()
+      .withId({ ID: customerId })
+      .post({
+        body: {
+          version,
+          actions,
+        },
+      })
+      .execute()
+      .then((response) => response.body);
+  }
+
+  async changePassword(data: {
+    id: string;
+    version: number;
+    currentPassword: string;
+    newPassword: string;
+  }): Promise<CustomerResponse> {
+    return apiRoot
+      .customers()
+      .password()
+      .post({
+        body: data,
+      })
+      .execute()
+      .then((response) => response.body);
+  }
+
+  async addAddress(
+    customerId: string,
+    version: number,
+    address: {
+      key: string;
+      streetName: string;
+      city: string;
+      country: string;
+      postalCode: string;
+    },
+  ): Promise<CustomerResponse> {
+    return apiRoot
+      .customers()
+      .withId({ ID: customerId })
+      .post({
+        body: {
+          version,
+          actions: [
+            {
+              action: 'addAddress' as const,
+              address,
+            },
+          ],
+        },
+      })
+      .execute()
+      .then((response) => response.body);
+  }
+
+  async updateAddress(
+    customerId: string,
+    version: number,
+    addressId: string,
+    address: {
+      streetName?: string;
+      city?: string;
+      country: string;
+      postalCode?: string;
+    },
+  ): Promise<CustomerResponse> {
+    return apiRoot
+      .customers()
+      .withId({ ID: customerId })
+      .post({
+        body: {
+          version,
+          actions: [
+            {
+              action: 'changeAddress',
+              addressId,
+              address,
+            },
+          ],
+        },
+      })
+      .execute()
+      .then((response) => response.body);
+  }
+
+  async removeAddress(customerId: string, version: number, addressId: string): Promise<CustomerResponse> {
+    return apiRoot
+      .customers()
+      .withId({ ID: customerId })
+      .post({
+        body: {
+          version,
+          actions: [
+            {
+              action: 'removeAddress',
+              addressId,
+            },
+          ],
+        },
+      })
+      .execute()
+      .then((response) => response.body);
+  }
+
+  async setDefaultShippingAddress(customerId: string, version: number, addressId: string): Promise<CustomerResponse> {
+    return apiRoot
+      .customers()
+      .withId({ ID: customerId })
+      .post({
+        body: {
+          version,
+          actions: [
+            {
+              action: 'setDefaultShippingAddress',
+              addressId,
+            },
+          ],
+        },
+      })
+      .execute()
+      .then((response) => response.body);
+  }
+
+  async setDefaultBillingAddress(customerId: string, version: number, addressId: string): Promise<CustomerResponse> {
+    return apiRoot
+      .customers()
+      .withId({ ID: customerId })
+      .post({
+        body: {
+          version,
+          actions: [
+            {
+              action: 'setDefaultBillingAddress',
+              addressId,
+            },
+          ],
+        },
+      })
+      .execute()
+      .then((response) => response.body);
+  }
+
+  async getCategories() {
+    const response = await apiRoot.categories().get().execute();
+    return response.body.results;
   }
 }
 

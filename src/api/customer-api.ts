@@ -43,6 +43,24 @@ class CustomerAPI {
       .withHttpMiddleware(this.httpMiddlewareOptions)
       .build();
   }
+
+  createClientWithPasswordFlow(email: string, password: string) {
+    this.ctpClient = new ClientBuilder()
+      .withPasswordFlow({
+        host: 'https://auth.us-central1.gcp.commercetools.com/',
+        projectKey: projectKey,
+        credentials: {
+          clientId: import.meta.env.VITE_CLIENT_ID,
+          clientSecret: import.meta.env.VITE_CLIENT_SECRET,
+          user: {
+            username: email,
+            password: password,
+          },
+        },
+      })
+      .withHttpMiddleware(this.httpMiddlewareOptions)
+      .build();
+  }
 }
 
 export const customerAPI = new CustomerAPI();
