@@ -15,3 +15,21 @@ export const INITIAL_CRITERIA = () => {
     },
   };
 };
+
+export const DEVELOPERS_NAMES: Record<string, string> = {
+  NebulaBuilders: 'Nebula Builders',
+  StellarEstates: 'Stellar Estates',
+  GalaxyConstruction: 'Galaxy Construction',
+  AstralArchitects: 'Astral Architects',
+};
+
+export type DevelopersType = 'NebulaBuilders' | 'StellarEstates' | 'GalaxyConstruction' | 'AstralArchitects';
+export const DEVELOPERS_KEYS: DevelopersType[] = [
+  'NebulaBuilders',
+  'StellarEstates',
+  'GalaxyConstruction',
+  'AstralArchitects',
+];
+
+export type FloorsType = '1' | '2' | '3';
+export const FLOORS: FloorsType[] = ['1', '2', '3'];
