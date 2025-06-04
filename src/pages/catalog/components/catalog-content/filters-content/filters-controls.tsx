@@ -27,13 +27,11 @@ export function FiltersControls({ categoryKey, subcategoryKey }: FiltersControls
   const methods = useForm<FiltersFieldsType>({
     defaultValues: INITIAL_FORM_STATE,
   });
+  const { isFiltersOpen } = useProducts();
   const { criteriaData, getProductsByCriteria, setIsFiltersOpen } = useProducts();
 
-  const [priceValue, setPriceValue] = useState<number[]>([
-    criteriaData.filters.price[0],
-    criteriaData.filters.price[1],
-  ]);
-  const [areaValue, setAreaValue] = useState<number[]>([criteriaData.filters.area[0], criteriaData.filters.area[1]]);
+  const [priceValue, setPriceValue] = useState<number[]>(criteriaData.filters.price);
+  const [areaValue, setAreaValue] = useState<number[]>(criteriaData.filters.area);
 
   const onSubmit = (data: FiltersFieldsType) => {
     criteriaData.filters.area = areaValue;
@@ -49,16 +47,17 @@ export function FiltersControls({ categoryKey, subcategoryKey }: FiltersControls
     });
 
     getProductsByCriteria(criteriaData);
-    if (window.innerWidth < 535) {
+    if (window.innerWidth < 570) {
       setIsFiltersOpen(false);
     }
   };
 
   return (
     <>
-      <Card className={styles['filters-wrapper']}>
+      <Card className={`${styles['filters-wrapper']} ${isFiltersOpen ? styles['filters-shown'] : ''}`}>
         <FormProvider {...methods}>
           <form
+            className={styles.form}
             onSubmit={(event) => {
               event.preventDefault();
               void methods.handleSubmit(onSubmit)(event);
@@ -114,7 +113,7 @@ export function FiltersControls({ categoryKey, subcategoryKey }: FiltersControls
               <Text variant="subheader-2">Developers</Text>
               <div className={styles.developers}>
                 {DEVELOPERS_KEYS.map((element) => (
-                  <CheckComponent element={element} />
+                  <CheckComponent element={element} key={element} />
                 ))}
               </div>
             </div>
@@ -122,7 +121,7 @@ export function FiltersControls({ categoryKey, subcategoryKey }: FiltersControls
               <Text variant="subheader-2">Floors</Text>
               <label className={styles.floors}>
                 {FLOORS.map((element) => (
-                  <CheckComponent element={element} />
+                  <CheckComponent key={element} element={element} />
                 ))}
               </label>
             </div>

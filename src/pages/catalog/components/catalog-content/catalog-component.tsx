@@ -27,7 +27,7 @@ export function CatalogContent({
   const categoryKey = propertyCategoryKey ?? parameterCategoryKey;
   const subcategoryKey = propertySubcategoryKey ?? parameterSubcategoryKey;
 
-  const { productsInfo, getProductsByCriteria, error, isFiltersOpen, setIsFiltersOpen, notFound } = useProducts();
+  const { productsInfo, getProductsByCriteria, error, setIsFiltersOpen, notFound } = useProducts();
   const lastCriteriaReference = useRef<string | null>(null);
   const [categoryData, setCategoryData] = useState<CategoryData | null>(null);
   const [subcategoryData, setSubcategoryData] = useState<CategoryData | null>(null);
@@ -127,7 +127,7 @@ export function CatalogContent({
         <SearchComponent />
       </div>
       <div className={styles['catalog-content']}>
-        {isFiltersOpen && <FiltersControls categoryKey={categoryKey} subcategoryKey={subcategoryKey} />}
+        <FiltersControls categoryKey={categoryKey} subcategoryKey={subcategoryKey} />
         {productsInfo.length === 0 ? (
           <Text variant="body-2">{'No products found'}</Text>
         ) : (

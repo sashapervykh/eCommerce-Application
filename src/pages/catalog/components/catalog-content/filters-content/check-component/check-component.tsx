@@ -8,7 +8,6 @@ export function CheckComponent({ element }: { element: FloorsType | DevelopersTy
   const { control } = useFormContext<FiltersFieldsType>();
   return (
     <Controller
-      key={element}
       name={element}
       control={control}
       render={({ field }) => (
