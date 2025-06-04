@@ -1,35 +1,46 @@
-import { Card, Text, Modal } from '@gravity-ui/uikit';
-import { useState } from 'react';
+import { Card, Text, Modal, Icon } from '@gravity-ui/uikit';
+import { useState, useEffect } from 'react';
 import styles from './style.module.css';
+import { Xmark } from '@gravity-ui/icons';
 
 export function AboutPage() {
   const [selectedMember, setSelectedMember] = useState<number | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [rocketReady, setRocketReady] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setRocketReady(true), 300);
+    return () => clearTimeout(timer);
+  }, []);
 
   const teamMembers = [
     {
-      name: 'Andrey Voronin',
+      name: 'Andrey',
+      surname: 'Voronin',
       role: 'Mentor',
       github: 'AVor0n',
       bio: 'Experienced developer guiding the team through the project, providing architectural advice and code reviews.',
       contributions: 'Project architecture guidance, code quality oversight, and team mentoring.',
     },
     {
-      name: 'Aleksandr Pervykh',
+      name: 'Aleksandr',
+      surname: 'Pervykh',
       role: 'Frontend Developer',
       github: 'sashapervykh',
       bio: 'Passionate React developer focused on creating smooth user interfaces and interactive components.',
       contributions: 'Implemented core routing, product catalog, and state management.',
     },
     {
-      name: 'Evgeniy Smirnov',
+      name: 'Evgeniy',
+      surname: 'Smirnov',
       role: 'Frontend Developer',
       github: 'maxnope',
       bio: 'Specializes in API integration and data flow optimization between frontend and CommerceTools.',
       contributions: 'CommerceTools API integration, product data management, and cart functionality.',
     },
     {
-      name: 'Grigori Konopelko',
+      name: 'Grigori',
+      surname: 'Konopelko',
       role: 'Frontend Developer',
       github: 'gkonopelko',
       bio: 'Design-focused developer ensuring the application is both beautiful and user-friendly.',
@@ -47,7 +58,7 @@ export function AboutPage() {
       <div className={styles.stars}></div>
       <div className={styles['stars-2']}></div>
       <div className={styles.planets}></div>
-      <div className={styles['rocket-container']}>
+      <div className={`${styles['rocket-container']} ${rocketReady ? styles['rocket-ready'] : ''}`}>
         <div className={styles.rocket}>
           <div className={styles['rocket-body']}>
             <div className={styles['windows-row']}>
@@ -89,10 +100,13 @@ export function AboutPage() {
       {selectedMember !== null && (
         <Modal open={modalOpen} onOpenChange={setModalOpen}>
           <Card className={styles['modal-card']}>
-            <Text variant="display-1">{teamMembers[selectedMember].name}</Text>
-            <Text variant="header-1" color="secondary">
-              {teamMembers[selectedMember].role}
+            <button className={styles['close-button']} onClick={() => setModalOpen(false)} aria-label="Close modal">
+              <Icon data={Xmark} size={18} />
+            </button>
+            <Text variant="display-1">
+              {teamMembers[selectedMember].name} {teamMembers[selectedMember].surname}
             </Text>
+            <Text variant="header-1">{teamMembers[selectedMember].role}</Text>
             <Text className={styles['bio-text']}>{teamMembers[selectedMember].bio}</Text>
             <Text className={styles['contributions-title']}>
               <span className={styles['bold-text']}>Key Contributions:</span>
