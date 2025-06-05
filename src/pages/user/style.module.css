@@ -87,11 +87,6 @@
   align-items: center;
 }
 
-.address-info {
-  flex-grow: 1;
-  margin-bottom: 1rem;
-}
-
 .section-header {
   display: flex;
   justify-content: space-between;
@@ -122,11 +117,6 @@
   margin-bottom: 16px;
 }
 
-.address-info p {
-  margin: 0.5rem 0;
-  line-height: 1.5;
-}
-
 .checkbox {
   margin: 16px 0;
 }
@@ -134,13 +124,19 @@
 .address-card {
   margin-top: 2rem;
   padding: 1.5rem;
+  overflow: hidden;
 }
 
 .address-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: flex-start;
   margin-bottom: 1.5rem;
+}
+
+.address-header > * {
+  width: 100%;
 }
 
 .address-container {
@@ -153,18 +149,30 @@
   border: 1px solid var(--g-color-line-generic);
   border-radius: 8px;
   padding: 1rem;
+  overflow: hidden;
 }
 
 .address-actions {
   display: flex;
   gap: 0.5rem;
   margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.address-actions .button {
+  flex: 1 1 auto;
+  min-width: 100px;
 }
 
 .address-defaults {
   display: flex;
   gap: 1rem;
   margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.address-info-text {
+  word-break: break-all;
 }
 
 .address-form-container {
@@ -184,16 +192,13 @@
   width: 100%;
 }
 
-.address-edit-container {
+.address-edit-form {
   padding: 1rem;
   border: 1px solid var(--g-color-line-generic);
   border-radius: 8px;
   margin-bottom: 1rem;
-}
-
-.address-info p strong {
-  display: inline-block;
-  min-width: 100px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .password-change-section {
@@ -234,5 +239,41 @@
   .margin-right {
     margin-right: 0;
     margin-bottom: 10px;
+  }
+}
+
+@media (width <= 400px) {
+  .address-header {
+    flex-direction: column;
+  }
+
+  .address-header .button {
+    width: 100%;
+  }
+
+  .address-actions {
+    flex-direction: column;
+  }
+
+  .address-actions .button {
+    width: 100%;
+  }
+
+  .address-defaults {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .form-actions .button {
+    width: 100%;
+  }
+
+  .text-input,
+  .select {
+    width: 100% !important;
   }
 }
