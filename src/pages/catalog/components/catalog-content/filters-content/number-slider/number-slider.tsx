@@ -7,11 +7,13 @@ import styles from './style.module.css';
 export function NumberSlider({ type }: { type: 'area' | 'price' }) {
   const { control, setValue } = useFormContext();
   const { criteriaData } = useProducts();
-  const value = type === 'area' ? criteriaData.filters.area : criteriaData.filters.price;
+  const [numberValue, setNumberValue] = useState<[number, number]>(
+    type === 'area' ? criteriaData.filters.area : criteriaData.filters.price,
+  );
 
   const [_, setInputValue] = useState<[string, string]>([
-    value[0].toLocaleString('en-US'),
-    value[1].toLocaleString('en-US'),
+    numberValue[0].toLocaleString('en-US'),
+    numberValue[1].toLocaleString('en-US'),
   ]);
   const max = type === 'area' ? 1000 : 1000000;
 
@@ -19,10 +21,11 @@ export function NumberSlider({ type }: { type: 'area' | 'price' }) {
     let enteredValue = parseInt(event.target.value.replace(/,/g, ''));
     enteredValue = Number.isNaN(enteredValue) ? 0 : enteredValue;
     enteredValue = enteredValue > max ? max : enteredValue;
-    const from = inputNumber === 0 ? enteredValue : value[0];
-    const to = inputNumber === 1 ? enteredValue : value[1];
+    const from = inputNumber === 0 ? enteredValue : numberValue[0];
+    const to = inputNumber === 1 ? enteredValue : numberValue[1];
     const newValue: [number, number] = from < to ? [from, to] : [to, from];
     setValue(type, newValue);
+    setNumberValue(newValue);
     setInputValue([newValue[0].toLocaleString('en-US'), newValue[1].toLocaleString('en-US')]);
   };
 
