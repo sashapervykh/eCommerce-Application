@@ -4,11 +4,12 @@ import { Card, Text, Spin, Button } from '@gravity-ui/uikit';
 import { useEffect, useState } from 'react';
 import { NotFoundPage } from '../404/not-found';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination } from 'swiper/modules';
+import { Navigation, Pagination, Zoom } from 'swiper/modules';
 import { ChevronLeft, ChevronRight, Xmark } from '@gravity-ui/icons';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
+import 'swiper/css/zoom';
 import styles from './styles.module.css';
 import modalStyles from './modal.module.css';
 
@@ -181,7 +182,7 @@ export function ProductPage() {
               <Xmark width={20} height={20} color="#000" />
             </div>
             <Swiper
-              modules={[Navigation, Pagination]}
+              modules={[Zoom, ...(hasMultipleImages ? [Navigation, Pagination] : [])]}
               navigation={
                 hasMultipleImages
                   ? {
@@ -191,6 +192,7 @@ export function ProductPage() {
                   : false
               }
               pagination={hasMultipleImages ? { clickable: true } : false}
+              zoom={{ maxRatio: 3, minRatio: 1 }}
               spaceBetween={10}
               slidesPerView={1}
               loop={hasMultipleImages}
@@ -199,11 +201,13 @@ export function ProductPage() {
             >
               {productDetails.images?.map((image, index) => (
                 <SwiperSlide key={index} onClick={handleSlideClick}>
-                  <img
-                    src={image.url}
-                    alt={image.label ?? `${productDetails.name} image`}
-                    className={modalStyles['modal-image']}
-                  />
+                  <div className="swiper-zoom-container" data-swiper-zoom>
+                    <img
+                      src={image.url}
+                      alt={image.label ?? `${productDetails.name} image`}
+                      className={modalStyles['modal-image']}
+                    />
+                  </div>
                 </SwiperSlide>
               ))}
               {hasMultipleImages && (
