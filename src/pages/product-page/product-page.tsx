@@ -1,11 +1,12 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useProducts } from '../../components/hooks/useProducts';
-import { Card, Text, Spin, Button } from '@gravity-ui/uikit';
+import { Card, Text, Spin, Button, Toaster } from '@gravity-ui/uikit';
 import { useEffect, useState } from 'react';
 import { NotFoundPage } from '../404/not-found';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
 import { ChevronLeft, ChevronRight, Xmark } from '@gravity-ui/icons';
+import { customerAPI } from '../../api/customer-api';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
@@ -21,10 +22,22 @@ type AttributeValue = AttributeValueObject | AttributeValueObject[] | string | n
 
 export function ProductPage() {
   const { productId } = useParams();
-  const { productDetails, getProductDetails, isLoading, error, notFound } = useProducts();
+  const { productDetails, getProductDetails, isLoading, error, notFound, addToCart, isProductInCart } = useProducts();
   const [initialSlide, setInitialSlide] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isInCart, setIsInCart] = useState(false);
   const navigate = useNavigate();
+  const toaster = new Toaster();
+
+  const getFullCartInfo = async () => {
+    try {
+      const response = await customerAPI.apiRoot().me().carts().get().execute();
+      const cart = response.body.results[0];
+      console.log('Current cart info:', cart);
+    } catch (error) {
+      console.error('Error fetching full cart info:', error);
+    }
+  };
 
   const getLabel = (item: AttributeValue | AttributeValueObject): string => {
     if (typeof item === 'object') {
@@ -58,6 +71,28 @@ export function ProductPage() {
     setIsModalOpen(false);
   };
 
+  const handleAddToCart = async () => {
+    if (productDetails?.id) {
+      try {
+        await addToCart(productDetails.id);
+        setIsInCart(true);
+        toaster.add({
+          name: 'cart-success',
+          title: 'Success',
+          content: 'Product added to cart!',
+          theme: 'success',
+        });
+      } catch (_error) {
+        toaster.add({
+          name: 'cart-error',
+          title: 'Error',
+          content: 'Failed to add product to cart.',
+          theme: 'danger',
+        });
+      }
+    }
+  };
+
   useEffect(() => {
     if (isModalOpen) {
       const originalOverflow = document.body.style.overflow;
@@ -71,8 +106,19 @@ export function ProductPage() {
   useEffect(() => {
     if (productId) {
       getProductDetails(productId);
+      void getFullCartInfo();
     }
   }, [productId, getProductDetails]);
+
+  useEffect(() => {
+    const checkCart = async () => {
+      if (productDetails?.id) {
+        const inCart = await isProductInCart(productDetails.id);
+        setIsInCart(inCart);
+      }
+    };
+    void checkCart();
+  }, [productDetails, isProductInCart]);
 
   if (notFound) {
     return <NotFoundPage />;
@@ -168,6 +214,15 @@ export function ProductPage() {
                 </ul>
               </Text>
             )}
+            <Button
+              view="action"
+              size="l"
+              onClick={handleAddToCart}
+              disabled={isInCart}
+              className={styles['add-to-cart-button']}
+            >
+              {isInCart ? 'Already in Cart' : 'Add to Cart'}
+            </Button>
           </div>
         </div>
         <Button view="action" size="l" onClick={() => navigate('/catalog')} className={styles['back-button']}>

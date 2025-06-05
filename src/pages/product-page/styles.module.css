@@ -140,3 +140,8 @@
   border-color: transparent;
   background-color: var(--g-color-base-brand);
 }
+
+.add-to-cart-button {
+  margin-top: 20px;
+  width: fit-content;
+}

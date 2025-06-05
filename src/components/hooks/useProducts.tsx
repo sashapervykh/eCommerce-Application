@@ -3,6 +3,7 @@ import { customerAPI } from '../../api/customer-api';
 import { ProductInfo } from '../../pages/catalog/components/catalog-content/product/types';
 import { returnProductsData } from '../../utilities/return-product-data';
 import { INITIAL_CRITERIA } from '../../constants/constants';
+import { addToCart, getBasketItems, isProductInCart, BasketItem } from '../../utilities/return-basket-items';
 
 interface CriteriaData {
   sort: string | undefined;
@@ -28,6 +29,9 @@ interface ProductsContextType {
   isFiltersOpen: boolean;
   setIsFiltersOpen: React.Dispatch<React.SetStateAction<boolean>>;
   criteriaData: CriteriaData;
+  addToCart: (productId: string, quantity?: number) => Promise<void>;
+  isProductInCart: (productId: string) => Promise<boolean>;
+  getBasketItems: () => Promise<BasketItem[]>;
 }
 
 interface ApiError {
@@ -246,6 +250,18 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     }
   }, []);
 
+  const addProductToCart = async (productId: string, quantity = 1) => {
+    await addToCart(productId, quantity);
+  };
+
+  const checkProductInCart = async (productId: string) => {
+    return await isProductInCart(productId);
+  };
+
+  const fetchBasketItems = async () => {
+    return await getBasketItems();
+  };
+
   const ProductsContextValue = {
     productsInfo,
     productDetails,
@@ -257,6 +273,9 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     isFiltersOpen,
     setIsFiltersOpen,
     criteriaData,
+    addToCart: addProductToCart,
+    isProductInCart: checkProductInCart,
+    getBasketItems: fetchBasketItems,
   };
 
   return <ProductsContext.Provider value={ProductsContextValue}>{children}</ProductsContext.Provider>;
