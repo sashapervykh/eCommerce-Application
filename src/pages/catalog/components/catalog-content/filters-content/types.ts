@@ -1,4 +1,6 @@
 export interface FiltersFieldsType {
+  price: [number, number];
+  area: [number, number];
   '1': boolean;
   '2': boolean;
   '3': boolean;
@@ -6,5 +8,5 @@ export interface FiltersFieldsType {
   StellarEstates: boolean;
   GalaxyConstruction: boolean;
   AstralArchitects: boolean;
-  [key: string]: boolean;
+  [key: string]: [number, number] | boolean;
 }

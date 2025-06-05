@@ -1,4 +1,18 @@
-export const INITIAL_CRITERIA = () => {
+export const INITIAL_CRITERIA: () => {
+  sort: string | undefined;
+  search: string | undefined;
+  filters: {
+    price: [number, number];
+    area: [number, number];
+    floors: { 1: boolean; 2: boolean; 3: boolean };
+    developers: {
+      NebulaBuilders: boolean;
+      StellarEstates: boolean;
+      GalaxyConstruction: boolean;
+      AstralArchitects: boolean;
+    };
+  };
+} = () => {
   return {
     sort: undefined,
     search: undefined,

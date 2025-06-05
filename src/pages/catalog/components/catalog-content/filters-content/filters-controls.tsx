@@ -1,19 +1,21 @@
-import { Button, Card, Slider, Text, TextInput } from '@gravity-ui/uikit';
+import { Button, Card, Text } from '@gravity-ui/uikit';
 import styles from './style.module.css';
-import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useProducts } from '../../../../../components/hooks/useProducts';
 import { DEVELOPERS_KEYS, FLOORS, INITIAL_CRITERIA } from '../../../../../constants/constants';
 import { Xmark } from '@gravity-ui/icons';
 import { CheckComponent } from './check-component/check-component';
 import { FiltersFieldsType } from './types';
+import { NumberSlider } from './number-slider/number-slider';
 
 interface FiltersControlsProps {
   categoryKey?: string;
   subcategoryKey?: string;
 }
 
-const INITIAL_FORM_STATE = {
+const INITIAL_FORM_STATE: FiltersFieldsType = {
+  price: [0, 1000000],
+  area: [0, 1000],
   '1': false,
   '2': false,
   '3': false,
@@ -30,21 +32,20 @@ export function FiltersControls({ categoryKey, subcategoryKey }: FiltersControls
   const { isFiltersOpen } = useProducts();
   const { criteriaData, getProductsByCriteria, setIsFiltersOpen } = useProducts();
 
-  const [priceValue, setPriceValue] = useState<number[]>(criteriaData.filters.price);
-  const [areaValue, setAreaValue] = useState<number[]>(criteriaData.filters.area);
-
   const onSubmit = (data: FiltersFieldsType) => {
-    criteriaData.filters.area = areaValue;
-    criteriaData.filters.price = priceValue;
+    console.log(data);
+    criteriaData.filters.area = data.area;
+    criteriaData.filters.price = data.price;
 
-    Object.keys(data).forEach((key) => {
-      if (key in criteriaData.filters.floors) {
-        criteriaData.filters.floors[key] = data[key];
+    for (const key of Object.keys(data)) {
+      const value: unknown = data[key];
+      if (key in criteriaData.filters.floors && typeof value === 'boolean') {
+        criteriaData.filters.floors[key] = value;
       }
-      if (key in criteriaData.filters.developers) {
-        criteriaData.filters.developers[key] = data[key];
+      if (key in criteriaData.filters.developers && typeof value === 'boolean') {
+        criteriaData.filters.developers[key] = value;
       }
-    });
+    }
 
     getProductsByCriteria(criteriaData);
     if (window.innerWidth < 570) {
@@ -64,50 +65,17 @@ export function FiltersControls({ categoryKey, subcategoryKey }: FiltersControls
             }}
           >
             <Xmark className={styles['close-button']} onClick={() => setIsFiltersOpen(false)}></Xmark>
+
             <div className={styles['filter-group']}>
               <Text variant="subheader-2">Price, $</Text>
-              <Slider
-                size="s"
-                defaultValue={[priceValue[0], priceValue[1]]}
-                value={[priceValue[0], priceValue[1]]}
-                min={0}
-                max={1000000}
-                step={100000}
-                onUpdate={(value) => setPriceValue(value)}
-              ></Slider>
-              <label className={styles['slider-label']}>
-                {' '}
-                <div className={styles['label-text']}>from:</div>
-                <TextInput value={priceValue[0].toLocaleString('en-US')}></TextInput>
-              </label>
-              <label className={styles['slider-label']}>
-                <div>to:</div>
-                <TextInput value={priceValue[1].toLocaleString('en-US')}></TextInput>
-              </label>
+              <NumberSlider type="price" />
             </div>
 
             <div className={styles['filter-group']}>
               <Text variant="subheader-2">
                 Area, m<sup>2</sup>
               </Text>
-              <Slider
-                size="s"
-                defaultValue={[areaValue[0], areaValue[1]]}
-                value={[areaValue[0], areaValue[1]]}
-                min={0}
-                max={1000}
-                step={50}
-                onUpdate={(value) => setAreaValue(value)}
-              ></Slider>
-              <label className={styles['slider-label']}>
-                {' '}
-                <div className={styles['label-text']}>from:</div>
-                <TextInput value={areaValue[0].toLocaleString('en-US')}></TextInput>
-              </label>
-              <label className={styles['slider-label']}>
-                <div>to:</div>
-                <TextInput value={areaValue[1].toLocaleString('en-US')}></TextInput>
-              </label>
+              <NumberSlider type="area" />
             </div>
             <div className={styles['filter-group']}>
               <Text variant="subheader-2">Developers</Text>
@@ -131,8 +99,7 @@ export function FiltersControls({ categoryKey, subcategoryKey }: FiltersControls
                 view="action"
                 onClick={() => {
                   methods.reset(INITIAL_FORM_STATE);
-                  setAreaValue([0, 1000]);
-                  setPriceValue([0, 1000000]);
+
                   getProductsByCriteria({
                     ...INITIAL_CRITERIA(),
                     categoryKey,
