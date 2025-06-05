@@ -129,7 +129,7 @@ export function CatalogContent({
       </div>
       <div className={styles['catalog-content']}>
         <FiltersControls categoryKey={categoryKey} subcategoryKey={subcategoryKey} />
-        {isResultsLoading && <Spin className={isFiltersOpen ? styles.hidden : ''}></Spin>}
+        {isResultsLoading && <Spin className={`${styles.spin} ${isFiltersOpen ? styles.hidden : ''}`}></Spin>}
         {!isResultsLoading &&
           (productsInfo.length === 0 ? (
             <Text className={isFiltersOpen ? styles.hidden : ''} variant="body-2">

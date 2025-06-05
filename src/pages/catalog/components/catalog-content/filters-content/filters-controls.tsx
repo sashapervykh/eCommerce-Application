@@ -33,7 +33,6 @@ export function FiltersControls({ categoryKey, subcategoryKey }: FiltersControls
   const { criteriaData, getProductsByCriteria, setIsFiltersOpen } = useProducts();
 
   const onSubmit = (data: FiltersFieldsType) => {
-    console.log(data);
     criteriaData.filters.area = data.area;
     criteriaData.filters.price = data.price;
 
