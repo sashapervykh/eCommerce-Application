@@ -1,5 +1,6 @@
 .filters-wrapper {
   min-width: 250px;
+  max-width: 250px;
   margin-right: 15px;
   height: fit-content;
   padding-bottom: 10px;
@@ -47,6 +48,7 @@
 @media (width <= 570px) {
   .filters-wrapper {
     display: none;
+    max-width: none;
   }
 
   .filters-shown {
