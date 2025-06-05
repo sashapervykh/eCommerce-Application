@@ -22,7 +22,8 @@ type AttributeValue = AttributeValueObject | AttributeValueObject[] | string | n
 
 export function ProductPage() {
   const { productId } = useParams();
-  const { productDetails, getProductDetails, isLoading, error, notFound, addToCart, isProductInCart } = useProducts();
+  const { productDetails, getProductDetails, isLoading, error, notFound, addToCart, isProductInCart, removeFromCart } =
+    useProducts();
   const [initialSlide, setInitialSlide] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isInCart, setIsInCart] = useState(false);
@@ -82,11 +83,35 @@ export function ProductPage() {
           content: 'Product added to cart!',
           theme: 'success',
         });
+        await getFullCartInfo();
       } catch (_error) {
         toaster.add({
           name: 'cart-error',
           title: 'Error',
           content: 'Failed to add product to cart.',
+          theme: 'danger',
+        });
+      }
+    }
+  };
+
+  const handleRemoveFromCart = async () => {
+    if (productDetails?.id) {
+      try {
+        await removeFromCart(productDetails.id);
+        setIsInCart(false);
+        toaster.add({
+          name: 'cart-remove-success',
+          title: 'Success',
+          content: 'Product removed from cart!',
+          theme: 'success',
+        });
+        await getFullCartInfo();
+      } catch (_error) {
+        toaster.add({
+          name: 'cart-remove-error',
+          title: 'Error',
+          content: 'Failed to remove product from cart.',
           theme: 'danger',
         });
       }
@@ -214,15 +239,26 @@ export function ProductPage() {
                 </ul>
               </Text>
             )}
-            <Button
-              view="action"
-              size="l"
-              onClick={handleAddToCart}
-              disabled={isInCart}
-              className={styles['add-to-cart-button']}
-            >
-              {isInCart ? 'Already in Cart' : 'Add to Cart'}
-            </Button>
+            {isInCart ? (
+              <Button
+                view="outlined-danger"
+                size="l"
+                onClick={handleRemoveFromCart}
+                className={styles['add-to-cart-button']}
+              >
+                Remove from Cart
+              </Button>
+            ) : (
+              <Button
+                view="action"
+                size="l"
+                onClick={handleAddToCart}
+                disabled={isInCart}
+                className={styles['add-to-cart-button']}
+              >
+                Add to Cart
+              </Button>
+            )}
           </div>
         </div>
         <Button view="action" size="l" onClick={() => navigate('/catalog')} className={styles['back-button']}>

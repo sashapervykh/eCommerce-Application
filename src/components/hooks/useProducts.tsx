@@ -3,7 +3,13 @@ import { customerAPI } from '../../api/customer-api';
 import { ProductInfo } from '../../pages/catalog/components/catalog-content/product/types';
 import { returnProductsData } from '../../utilities/return-product-data';
 import { INITIAL_CRITERIA } from '../../constants/constants';
-import { addToCart, getBasketItems, isProductInCart, BasketItem } from '../../utilities/return-basket-items';
+import {
+  addToCart,
+  getBasketItems,
+  isProductInCart,
+  BasketItem,
+  removeFromCart,
+} from '../../utilities/return-basket-items';
 
 interface CriteriaData {
   sort: string | undefined;
@@ -30,6 +36,7 @@ interface ProductsContextType {
   setIsFiltersOpen: React.Dispatch<React.SetStateAction<boolean>>;
   criteriaData: CriteriaData;
   addToCart: (productId: string, quantity?: number) => Promise<void>;
+  removeFromCart: (productId: string) => Promise<void>;
   isProductInCart: (productId: string) => Promise<boolean>;
   getBasketItems: () => Promise<BasketItem[]>;
 }
@@ -254,6 +261,10 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     await addToCart(productId, quantity);
   };
 
+  const removeProductFromCart = async (productId: string) => {
+    await removeFromCart(productId);
+  };
+
   const checkProductInCart = async (productId: string) => {
     return await isProductInCart(productId);
   };
@@ -274,6 +285,7 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     setIsFiltersOpen,
     criteriaData,
     addToCart: addProductToCart,
+    removeFromCart: removeProductFromCart,
     isProductInCart: checkProductInCart,
     getBasketItems: fetchBasketItems,
   };

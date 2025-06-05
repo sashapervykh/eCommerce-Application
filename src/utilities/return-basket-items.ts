@@ -10,6 +10,10 @@ export async function getBasketItems(): Promise<BasketItem[]> {
   try {
     const response = await customerAPI.apiRoot().me().carts().get().execute();
 
+    if (response.body.results.length == 0) {
+      return [];
+    }
+
     const cart = response.body.results[0];
 
     return cart.lineItems.map((item: LineItem) => ({
@@ -28,17 +32,19 @@ export async function addToCart(productId: string, quantity = 1): Promise<void> 
 
     let cart = response.body.results[0];
 
-    const createCartResponse = await customerAPI
-      .apiRoot()
-      .me()
-      .carts()
-      .post({
-        body: {
-          currency: 'USD',
-        },
-      })
-      .execute();
-    cart = createCartResponse.body;
+    if (response.body.results.length == 0) {
+      const createCartResponse = await customerAPI
+        .apiRoot()
+        .me()
+        .carts()
+        .post({
+          body: {
+            currency: 'USD',
+          },
+        })
+        .execute();
+      cart = createCartResponse.body;
+    }
 
     await customerAPI
       .apiRoot()
@@ -61,6 +67,38 @@ export async function addToCart(productId: string, quantity = 1): Promise<void> 
   } catch (error) {
     console.error('Error adding item to cart:', error);
     throw error;
+  }
+}
+
+export async function removeFromCart(productId: string): Promise<void> {
+  try {
+    const response = await customerAPI.apiRoot().me().carts().get().execute();
+    const cart = response.body.results[0];
+
+    const lineItem = cart.lineItems.find((item: LineItem) => item.productId === productId);
+    if (!lineItem) {
+      throw new Error('Product not found in cart');
+    }
+
+    await customerAPI
+      .apiRoot()
+      .me()
+      .carts()
+      .withId({ ID: cart.id })
+      .post({
+        body: {
+          version: cart.version,
+          actions: [
+            {
+              action: 'removeLineItem',
+              lineItemId: lineItem.id,
+            },
+          ],
+        },
+      })
+      .execute();
+  } catch (_error) {
+    throw new Error('Failed to remove product from cart');
   }
 }
 
