@@ -11,22 +11,24 @@ export function NumberSlider({ type }: { type: 'area' | 'price' }) {
     type === 'area' ? criteriaData.filters.area : criteriaData.filters.price,
   );
 
-  const [_, setInputValue] = useState<[string, string]>([
-    numberValue[0].toLocaleString('en-US'),
-    numberValue[1].toLocaleString('en-US'),
-  ]);
   const max = type === 'area' ? 1000 : 1000000;
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>, inputNumber: number) => {
     let enteredValue = parseInt(event.target.value.replace(/,/g, ''));
     enteredValue = Number.isNaN(enteredValue) ? 0 : enteredValue;
     enteredValue = enteredValue > max ? max : enteredValue;
-    const from = inputNumber === 0 ? enteredValue : numberValue[0];
-    const to = inputNumber === 1 ? enteredValue : numberValue[1];
+    const newValue: [number, number] = [...numberValue];
+    newValue[inputNumber] = enteredValue;
+    setValue(type, newValue);
+    setNumberValue(newValue);
+  };
+
+  const handleInputBlur = () => {
+    const from = numberValue[0];
+    const to = numberValue[1];
     const newValue: [number, number] = from < to ? [from, to] : [to, from];
     setValue(type, newValue);
     setNumberValue(newValue);
-    setInputValue([newValue[0].toLocaleString('en-US'), newValue[1].toLocaleString('en-US')]);
   };
 
   return (
@@ -46,7 +48,6 @@ export function NumberSlider({ type }: { type: 'area' | 'price' }) {
               step={type === 'area' ? 100 : 100000}
               onUpdate={(value: [number, number]) => {
                 setValue(type, value);
-                setInputValue([value[0].toLocaleString('en-US'), value[1].toLocaleString('en-US')]);
               }}
             />
             <label className={styles['slider-label']}>
@@ -57,6 +58,9 @@ export function NumberSlider({ type }: { type: 'area' | 'price' }) {
                 onChange={(event) => {
                   handleInputChange(event, 0);
                 }}
+                onBlur={() => {
+                  handleInputBlur();
+                }}
               ></TextInput>
             </label>
             <label className={styles['slider-label']}>
@@ -65,6 +69,9 @@ export function NumberSlider({ type }: { type: 'area' | 'price' }) {
                 value={field.value[1].toLocaleString('en-US')}
                 onChange={(event) => {
                   handleInputChange(event, 1);
+                }}
+                onBlur={() => {
+                  handleInputBlur();
                 }}
               ></TextInput>
             </label>

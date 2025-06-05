@@ -26,11 +26,20 @@ const INITIAL_FORM_STATE: FiltersFieldsType = {
 };
 
 export function FiltersControls({ categoryKey, subcategoryKey }: FiltersControlsProps) {
+  const { isFiltersOpen, criteriaData, getProductsByCriteria, setIsFiltersOpen } = useProducts();
   const methods = useForm<FiltersFieldsType>({
-    defaultValues: INITIAL_FORM_STATE,
+    defaultValues: {
+      price: criteriaData.filters.price,
+      area: criteriaData.filters.area,
+      '1': criteriaData.filters.floors['1'],
+      '2': criteriaData.filters.floors['2'],
+      '3': criteriaData.filters.floors['3'],
+      NebulaBuilders: criteriaData.filters.developers.NebulaBuilders,
+      StellarEstates: criteriaData.filters.developers.StellarEstates,
+      GalaxyConstruction: criteriaData.filters.developers.GalaxyConstruction,
+      AstralArchitects: criteriaData.filters.developers.AstralArchitects,
+    },
   });
-  const { isFiltersOpen } = useProducts();
-  const { criteriaData, getProductsByCriteria, setIsFiltersOpen } = useProducts();
 
   const onSubmit = (data: FiltersFieldsType) => {
     criteriaData.filters.area = data.area;
