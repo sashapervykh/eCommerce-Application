@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useProducts } from '../../components/hooks/useProducts';
-import { Card, Text, Spin, Button } from '@gravity-ui/uikit';
+import { useCart } from '../../components/hooks/useCart';
+import { Card, Text, Spin, Button, useToaster } from '@gravity-ui/uikit';
 import { useEffect, useState } from 'react';
 import { NotFoundPage } from '../404/not-found';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -23,9 +24,12 @@ type AttributeValue = AttributeValueObject | AttributeValueObject[] | string | n
 export function ProductPage() {
   const { productId } = useParams();
   const { productDetails, getProductDetails, isLoading, error, notFound } = useProducts();
+  const { addToCart, isProductInCart, removeFromCart } = useCart();
   const [initialSlide, setInitialSlide] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isInCart, setIsInCart] = useState(false);
   const navigate = useNavigate();
+  const toaster = useToaster();
 
   const getLabel = (item: AttributeValue | AttributeValueObject): string => {
     if (typeof item === 'object') {
@@ -59,6 +63,46 @@ export function ProductPage() {
     setIsModalOpen(false);
   };
 
+  const handleAddToCart = async () => {
+    if (productDetails?.id) {
+      try {
+        await addToCart(productDetails.id);
+        setIsInCart(true);
+        toaster.add({
+          name: 'cart-success',
+          content: 'Product added to cart!',
+          theme: 'success',
+        });
+      } catch (_error) {
+        toaster.add({
+          name: 'cart-error',
+          content: 'Failed to add product to cart.',
+          theme: 'info',
+        });
+      }
+    }
+  };
+
+  const handleRemoveFromCart = async () => {
+    if (productDetails?.id) {
+      try {
+        await removeFromCart(productDetails.id);
+        setIsInCart(false);
+        toaster.add({
+          name: 'cart-remove-success',
+          content: 'Product removed from cart!',
+          theme: 'info',
+        });
+      } catch (_error) {
+        toaster.add({
+          name: 'cart-remove-error',
+          content: 'Failed to remove product from cart.',
+          theme: 'info',
+        });
+      }
+    }
+  };
+
   useEffect(() => {
     if (isModalOpen) {
       const originalOverflow = document.body.style.overflow;
@@ -74,6 +118,16 @@ export function ProductPage() {
       getProductDetails(productId);
     }
   }, [productId, getProductDetails]);
+
+  useEffect(() => {
+    const checkCart = async () => {
+      if (productDetails?.id) {
+        const inCart = await isProductInCart(productDetails.id);
+        setIsInCart(inCart);
+      }
+    };
+    void checkCart();
+  }, [productDetails, isProductInCart]);
 
   if (notFound) {
     return <NotFoundPage />;
@@ -168,6 +222,21 @@ export function ProductPage() {
                   ))}
                 </ul>
               </Text>
+            )}
+            {isInCart ? (
+              <Button view="outlined" size="l" onClick={handleRemoveFromCart} className={styles['add-to-cart-button']}>
+                Remove from Cart
+              </Button>
+            ) : (
+              <Button
+                view="action"
+                size="l"
+                onClick={handleAddToCart}
+                disabled={isInCart}
+                className={styles['add-to-cart-button']}
+              >
+                Add to Cart
+              </Button>
             )}
           </div>
         </div>

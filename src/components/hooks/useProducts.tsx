@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { customerAPI } from '../../api/customer-api';
 import { ProductInfo } from '../../pages/catalog/components/catalog-content/product/types';
 import { returnProductsData } from '../../utilities/return-product-data';
@@ -97,6 +97,12 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
   const [lastFilters, setLastFilters] = useState<string[]>([]);
   const [lastSort, setLastSort] = useState<string | undefined>(undefined);
   const [lastSearch, setLastSearch] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (customerAPI.isAnonymous) {
+      customerAPI.createAnonymCustomer();
+    }
+  }, []);
 
   const getProductsByCriteria = useCallback(
     async (criteria: CriteriaData) => {

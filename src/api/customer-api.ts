@@ -1,6 +1,7 @@
 import { createApiBuilderFromCtpClient } from '@commercetools/platform-sdk';
 import { projectKey } from '../commercetools-sdk';
 import { Client, ClientBuilder, HttpMiddlewareOptions } from '@commercetools/ts-client';
+import { getOrCreateAnonymId } from '../utilities/return-anonim-id';
 
 class CustomerAPI {
   ctpClient: Client | undefined;
@@ -9,12 +10,23 @@ class CustomerAPI {
     httpClient: fetch,
   };
 
+  isAnonymous = true;
+
+  constructor() {
+    this.createAnonymCustomer();
+  }
+
   apiRoot() {
-    const apiRoot = createApiBuilderFromCtpClient(this.ctpClient).withProjectKey({ projectKey });
-    return apiRoot;
+    if (!this.ctpClient) {
+      throw new Error('Client is not initialized');
+    }
+    return createApiBuilderFromCtpClient(this.ctpClient).withProjectKey({ projectKey });
   }
 
   createAnonymCustomer() {
+    this.isAnonymous = true;
+    getOrCreateAnonymId();
+
     this.ctpClient = new ClientBuilder()
       .withAnonymousSessionFlow({
         host: 'https://auth.us-central1.gcp.commercetools.com/',
@@ -26,6 +38,7 @@ class CustomerAPI {
   }
 
   createAuthenticatedCustomer(token_type: string, access_token: string) {
+    this.isAnonymous = false;
     this.ctpClient = new ClientBuilder()
       .withExistingTokenFlow(`${token_type} ${access_token}`, { force: true })
       .withHttpMiddleware(this.httpMiddlewareOptions)
@@ -33,6 +46,7 @@ class CustomerAPI {
   }
 
   createCustomerWithRefreshToken(refresh_token: string) {
+    this.isAnonymous = false;
     this.ctpClient = new ClientBuilder()
       .withRefreshTokenFlow({
         host: 'https://auth.us-central1.gcp.commercetools.com/',
@@ -45,6 +59,7 @@ class CustomerAPI {
   }
 
   createClientWithPasswordFlow(email: string, password: string) {
+    this.isAnonymous = false;
     this.ctpClient = new ClientBuilder()
       .withPasswordFlow({
         host: 'https://auth.us-central1.gcp.commercetools.com/',
