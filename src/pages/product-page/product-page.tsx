@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useProducts } from '../../components/hooks/useProducts';
-import { Card, Text, Spin, Button, Toaster } from '@gravity-ui/uikit';
+import { Card, Text, Spin, Button, useToaster } from '@gravity-ui/uikit';
 import { useEffect, useState } from 'react';
 import { NotFoundPage } from '../404/not-found';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -28,7 +28,7 @@ export function ProductPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isInCart, setIsInCart] = useState(false);
   const navigate = useNavigate();
-  const toaster = new Toaster();
+  const toaster = useToaster();
 
   const getFullCartInfo = async () => {
     try {
@@ -79,7 +79,6 @@ export function ProductPage() {
         setIsInCart(true);
         toaster.add({
           name: 'cart-success',
-          title: 'Success',
           content: 'Product added to cart!',
           theme: 'success',
         });
@@ -87,9 +86,8 @@ export function ProductPage() {
       } catch (_error) {
         toaster.add({
           name: 'cart-error',
-          title: 'Error',
           content: 'Failed to add product to cart.',
-          theme: 'danger',
+          theme: 'info',
         });
       }
     }
@@ -102,17 +100,15 @@ export function ProductPage() {
         setIsInCart(false);
         toaster.add({
           name: 'cart-remove-success',
-          title: 'Success',
           content: 'Product removed from cart!',
-          theme: 'success',
+          theme: 'info',
         });
         await getFullCartInfo();
       } catch (_error) {
         toaster.add({
           name: 'cart-remove-error',
-          title: 'Error',
           content: 'Failed to remove product from cart.',
-          theme: 'danger',
+          theme: 'info',
         });
       }
     }
@@ -240,12 +236,7 @@ export function ProductPage() {
               </Text>
             )}
             {isInCart ? (
-              <Button
-                view="outlined-danger"
-                size="l"
-                onClick={handleRemoveFromCart}
-                className={styles['add-to-cart-button']}
-              >
+              <Button view="outlined" size="l" onClick={handleRemoveFromCart} className={styles['add-to-cart-button']}>
                 Remove from Cart
               </Button>
             ) : (
