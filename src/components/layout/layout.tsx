@@ -8,6 +8,7 @@ import { CatalogMenuButton } from '../navigation-button/catalog-button';
 import { useAuth } from '../hooks/useAuth';
 import { useCategories } from '../hooks/useCategories';
 import { catalogItems } from '../../utilities/return-catalog-items';
+import { Footer } from '../footer/footer';
 
 const navLinks = [
   { text: 'Home', route: '/' },
@@ -127,6 +128,7 @@ export function MainLayout() {
       <main className={styles.main}>
         <Outlet />
       </main>
+      <Footer />
     </div>
   );
 }
