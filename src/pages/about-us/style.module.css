@@ -389,3 +389,26 @@
     transform: translateY(-10px);
   }
 }
+
+.testimonial-links {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.testimonial-title {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.testimonial-link {
+  display: block;
+  margin-top: 0.3rem;
+}
+
+.window img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
