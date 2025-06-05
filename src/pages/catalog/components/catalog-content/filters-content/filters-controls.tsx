@@ -2,7 +2,12 @@ import { Button, Card, Text } from '@gravity-ui/uikit';
 import styles from './style.module.css';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useProducts } from '../../../../../components/hooks/useProducts';
-import { DEVELOPERS_KEYS, FLOORS, INITIAL_CRITERIA } from '../../../../../constants/constants';
+import {
+  DEVELOPERS_KEYS,
+  FLOORS,
+  INITIAL_CRITERIA,
+  INITIAL_FILTERS_FORM_STATE,
+} from '../../../../../constants/constants';
 import { Xmark } from '@gravity-ui/icons';
 import { CheckComponent } from './check-component/check-component';
 import { FiltersFieldsType } from './types';
@@ -13,32 +18,10 @@ interface FiltersControlsProps {
   subcategoryKey?: string;
 }
 
-const INITIAL_FORM_STATE: FiltersFieldsType = {
-  price: [0, 1000000],
-  area: [0, 1000],
-  '1': false,
-  '2': false,
-  '3': false,
-  NebulaBuilders: false,
-  StellarEstates: false,
-  GalaxyConstruction: false,
-  AstralArchitects: false,
-};
-
 export function FiltersControls({ categoryKey, subcategoryKey }: FiltersControlsProps) {
   const { isFiltersOpen, criteriaData, getProductsByCriteria, setIsFiltersOpen } = useProducts();
   const methods = useForm<FiltersFieldsType>({
-    defaultValues: {
-      price: criteriaData.filters.price,
-      area: criteriaData.filters.area,
-      '1': criteriaData.filters.floors['1'],
-      '2': criteriaData.filters.floors['2'],
-      '3': criteriaData.filters.floors['3'],
-      NebulaBuilders: criteriaData.filters.developers.NebulaBuilders,
-      StellarEstates: criteriaData.filters.developers.StellarEstates,
-      GalaxyConstruction: criteriaData.filters.developers.GalaxyConstruction,
-      AstralArchitects: criteriaData.filters.developers.AstralArchitects,
-    },
+    defaultValues: INITIAL_FILTERS_FORM_STATE,
   });
 
   const onSubmit = (data: FiltersFieldsType) => {
@@ -106,7 +89,7 @@ export function FiltersControls({ categoryKey, subcategoryKey }: FiltersControls
                 size="l"
                 view="action"
                 onClick={() => {
-                  methods.reset(INITIAL_FORM_STATE);
+                  methods.reset(INITIAL_FILTERS_FORM_STATE);
 
                   getProductsByCriteria({
                     ...INITIAL_CRITERIA(),

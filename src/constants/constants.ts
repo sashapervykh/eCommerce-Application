@@ -1,3 +1,5 @@
+import { FiltersFieldsType } from '../pages/catalog/components/catalog-content/filters-content/types';
+
 export const INITIAL_CRITERIA: () => {
   sort: string | undefined;
   search: string | undefined;
@@ -47,3 +49,15 @@ export const DEVELOPERS_KEYS: DevelopersType[] = [
 
 export type FloorsType = '1' | '2' | '3';
 export const FLOORS: FloorsType[] = ['1', '2', '3'];
+
+export const INITIAL_FILTERS_FORM_STATE: FiltersFieldsType = {
+  price: [0, 1000000],
+  area: [0, 1000],
+  '1': false,
+  '2': false,
+  '3': false,
+  NebulaBuilders: false,
+  StellarEstates: false,
+  GalaxyConstruction: false,
+  AstralArchitects: false,
+};

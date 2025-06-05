@@ -1,8 +1,10 @@
 import { Slider, TextInput } from '@gravity-ui/uikit';
 import { useProducts } from '../../../../../../components/hooks/useProducts';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import styles from './style.module.css';
+import { INITIAL_FILTERS_FORM_STATE } from '../../../../../../constants/constants';
+import { useLocation } from 'react-router-dom';
 
 export function NumberSlider({ type }: { type: 'area' | 'price' }) {
   const { control, setValue } = useFormContext();
@@ -10,6 +12,12 @@ export function NumberSlider({ type }: { type: 'area' | 'price' }) {
   const [numberValue, setNumberValue] = useState<[number, number]>(
     type === 'area' ? criteriaData.filters.area : criteriaData.filters.price,
   );
+  const location = useLocation();
+
+  useEffect(() => {
+    setValue(type, type === 'area' ? INITIAL_FILTERS_FORM_STATE.area : INITIAL_FILTERS_FORM_STATE.price);
+    setNumberValue(type === 'area' ? INITIAL_FILTERS_FORM_STATE.area : INITIAL_FILTERS_FORM_STATE.price);
+  }, [setValue, type, location.pathname, location.search]);
 
   const max = type === 'area' ? 1000 : 1000000;
 
