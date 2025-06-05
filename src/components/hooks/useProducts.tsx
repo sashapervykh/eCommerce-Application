@@ -1,16 +1,8 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { customerAPI } from '../../api/customer-api';
 import { ProductInfo } from '../../pages/catalog/components/catalog-content/product/types';
 import { returnProductsData } from '../../utilities/return-product-data';
 import { INITIAL_CRITERIA } from '../../constants/constants';
-import { useEffect } from 'react';
-import {
-  addToCart,
-  getBasketItems,
-  isProductInCart,
-  BasketItem,
-  removeFromCart,
-} from '../../utilities/return-basket-items';
 
 interface CriteriaData {
   sort: string | undefined;
@@ -36,10 +28,6 @@ interface ProductsContextType {
   isFiltersOpen: boolean;
   setIsFiltersOpen: React.Dispatch<React.SetStateAction<boolean>>;
   criteriaData: CriteriaData;
-  addToCart: (productId: string, quantity?: number) => Promise<void>;
-  removeFromCart: (productId: string) => Promise<void>;
-  isProductInCart: (productId: string) => Promise<boolean>;
-  getBasketItems: () => Promise<BasketItem[]>;
 }
 
 interface ApiError {
@@ -264,22 +252,6 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     }
   }, []);
 
-  const addProductToCart = async (productId: string, quantity = 1) => {
-    await addToCart(productId, quantity);
-  };
-
-  const removeProductFromCart = async (productId: string) => {
-    await removeFromCart(productId);
-  };
-
-  const checkProductInCart = async (productId: string) => {
-    return await isProductInCart(productId);
-  };
-
-  const fetchBasketItems = async () => {
-    return await getBasketItems();
-  };
-
   const ProductsContextValue = {
     productsInfo,
     productDetails,
@@ -291,10 +263,6 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     isFiltersOpen,
     setIsFiltersOpen,
     criteriaData,
-    addToCart: addProductToCart,
-    removeFromCart: removeProductFromCart,
-    isProductInCart: checkProductInCart,
-    getBasketItems: fetchBasketItems,
   };
 
   return <ProductsContext.Provider value={ProductsContextValue}>{children}</ProductsContext.Provider>;

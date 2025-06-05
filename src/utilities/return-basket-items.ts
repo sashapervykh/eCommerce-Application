@@ -8,6 +8,17 @@ export interface BasketItem {
 
 const CART_ID_KEY = 'anonymous_cart_id';
 
+export async function getFullCartInfo() {
+  try {
+    const response = await customerAPI.apiRoot().me().carts().get().execute();
+    const cart = response.body.results[0];
+    return cart;
+  } catch (error) {
+    console.error('Error fetching full cart info:', error);
+    return null;
+  }
+}
+
 export async function getBasketItems(): Promise<BasketItem[]> {
   try {
     let cart;
