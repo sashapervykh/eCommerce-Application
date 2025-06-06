@@ -9,10 +9,10 @@
 .wrapper {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   margin-bottom: 20px;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
-  width: 260px;
 }
 
 .image-wrapper {
@@ -59,8 +59,8 @@
 
 .wrapper:hover {
   margin: -10px;
-  background-color: var(--g-color-base-brand);
   width: 280px;
+  overflow: hidden;
 }
 
 .wrapper:hover .image {
@@ -70,6 +70,10 @@
 
 .wrapper:hover .image-wrapper {
   height: 280px;
+}
+
+.wrapper button {
+  margin: 15px auto;
 }
 
 @media (width <= 535px) {
