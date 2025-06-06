@@ -6,7 +6,7 @@
 
 This is the final project of RS School 2025. Tis is API client integrated with CommerceTools. The application is developed in team of three students 👨‍💻👩‍💻👨‍💻 and their mentor:
 
-![alt text](image.png)
+![alt text](/src/assets/images/image.png)
 
 - mentor Andrey Voronin [AVor0n](https://github.com/AVor0n)
 - Aleksandr Pervykh [sashapervykh](https://github.com/sashapervykh)
