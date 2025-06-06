@@ -15,7 +15,8 @@ export function AddToCartButton({ product, className }: AddToCartButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const toaster = useToaster();
 
-  const handleAdd = async () => {
+  const handleAdd = async (event: React.MouseEvent) => {
+    event.stopPropagation();
     setIsLoading(true);
     try {
       await handleAddToCart();
@@ -35,7 +36,8 @@ export function AddToCartButton({ product, className }: AddToCartButtonProps) {
     }
   };
 
-  const handleRemove = async () => {
+  const handleRemove = async (event: React.MouseEvent) => {
+    event.stopPropagation();
     setIsLoading(true);
     try {
       await handleRemoveFromCart();
