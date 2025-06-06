@@ -2,6 +2,7 @@ import { Button, useToaster } from '@gravity-ui/uikit';
 import { ShoppingCart } from '@gravity-ui/icons';
 import { useCartActions } from '../hooks/useCartActions';
 import { ProductInfo } from '../../pages/catalog/components/catalog-content/product/types';
+import { useState } from 'react';
 import styles from './styles.module.css';
 
 interface AddToCartButtonProps {
@@ -11,9 +12,11 @@ interface AddToCartButtonProps {
 
 export function AddToCartButton({ product, className }: AddToCartButtonProps) {
   const { isInCart, handleAddToCart, handleRemoveFromCart } = useCartActions(product.id);
+  const [isLoading, setIsLoading] = useState(false);
   const toaster = useToaster();
 
   const handleAdd = async () => {
+    setIsLoading(true);
     try {
       await handleAddToCart();
       toaster.add({
@@ -27,10 +30,13 @@ export function AddToCartButton({ product, className }: AddToCartButtonProps) {
         content: 'Failed to add product to cart.',
         theme: 'info',
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleRemove = async () => {
+    setIsLoading(true);
     try {
       await handleRemoveFromCart();
       toaster.add({
@@ -44,13 +50,21 @@ export function AddToCartButton({ product, className }: AddToCartButtonProps) {
         content: 'Failed to remove product from cart.',
         theme: 'info',
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <>
       {isInCart ? (
-        <Button view="outlined" size="l" onClick={handleRemove} className={className ?? styles['add-to-cart-button']}>
+        <Button
+          view="outlined"
+          size="l"
+          onClick={handleRemove}
+          className={className ?? styles['add-to-cart-button']}
+          loading={isLoading}
+        >
           Remove from Cart
         </Button>
       ) : (
@@ -60,6 +74,7 @@ export function AddToCartButton({ product, className }: AddToCartButtonProps) {
           onClick={handleAdd}
           disabled={isInCart}
           className={className ?? styles['add-to-cart-button']}
+          loading={isLoading}
         >
           Add to Cart
           <ShoppingCart width={20} height={20} />
