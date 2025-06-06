@@ -4,6 +4,7 @@ import { api } from '../../api/api';
 import { isErrorResponse, isTokenResponse } from '../../utilities/return-checked-token-response';
 import { customerAPI } from '../../api/customer-api';
 import { useNavigate } from 'react-router-dom';
+import { mergeCarts } from '../../utilities/return-basket-items';
 
 interface UserData {
   email: string;
@@ -82,13 +83,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUserInfo(customerData.body.customer);
         localStorage.setItem('refresh_token', response.refresh_token);
 
+        try {
+          await mergeCarts();
+        } catch (error) {
+          console.error('Failed to merge carts:', error);
+          setServerError('Failed to merge anonymous cart with user cart.');
+        }
+
         if (!preventRedirect) {
           await navigate('/');
         }
       }
     } catch (error) {
-      console.error(error);
-      throw error;
+      console.error('Login error:', error);
+      setServerError('An unexpected error occurred during login.');
     }
   };
 
@@ -111,6 +119,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = () => {
     customerAPI.createAnonymCustomer();
     localStorage.removeItem('refresh_token');
+    localStorage.removeItem('anonymous_user_id');
+    localStorage.removeItem('anonymous_cart_id');
     setUserInfo(null);
   };
 
@@ -122,6 +132,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           await refresh(refresh_token);
         } catch {
           setUserInfo(null);
+          customerAPI.createAnonymCustomer();
         }
       } else {
         customerAPI.createAnonymCustomer();
@@ -144,7 +155,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     refreshUser,
   };
 
-  return <AuthContext.Provider value={authContextValue}> {children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={authContextValue}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => useContext(AuthContext);

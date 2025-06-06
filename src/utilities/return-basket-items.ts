@@ -1,4 +1,4 @@
-import { LineItem } from '@commercetools/platform-sdk';
+import { LineItem, MyCartAddLineItemAction } from '@commercetools/platform-sdk';
 import { customerAPI } from '../api/customer-api';
 import { getOrCreateAnonymId } from '../utilities/return-anonim-id';
 export interface BasketItem {
@@ -63,9 +63,8 @@ export async function getBasketItems(): Promise<BasketItem[]> {
             })
             .execute();
           cart = createCartResponse.body;
+          localStorage.setItem(CART_ID_KEY, cart.id);
         }
-
-        localStorage.setItem(CART_ID_KEY, cart.id);
       }
     } else {
       const response = await customerAPI.apiRoot().me().carts().get().execute();
@@ -250,4 +249,78 @@ export async function removeFromCart(productId: string): Promise<void> {
 export async function isProductInCart(productId: string): Promise<boolean> {
   const basketItems = await getBasketItems();
   return basketItems.some((item) => item.productId === productId);
+}
+
+export async function mergeCarts(): Promise<void> {
+  try {
+    const anonymousCartId = localStorage.getItem(CART_ID_KEY);
+    const anonymousId = getOrCreateAnonymId();
+
+    if (!anonymousCartId) {
+      return;
+    }
+
+    let anonymousCart;
+    try {
+      const anonymousCartResponse = await customerAPI.apiRoot().carts().withId({ ID: anonymousCartId }).get().execute();
+      anonymousCart = anonymousCartResponse.body;
+      if (anonymousCart.anonymousId !== anonymousId) {
+        console.error('Anonymous cart does not match anonymousId');
+        localStorage.removeItem(CART_ID_KEY);
+        return;
+      }
+    } catch (error) {
+      console.error('Error fetching anonymous cart:', error);
+      localStorage.removeItem(CART_ID_KEY);
+      return;
+    }
+
+    if (anonymousCart.lineItems.length === 0) {
+      localStorage.removeItem(CART_ID_KEY);
+      return;
+    }
+
+    const response = await customerAPI.apiRoot().me().carts().get().execute();
+    const userCart = response.body.results[0];
+
+    const userCartProductIds = userCart.lineItems.map((item: LineItem) => item.productId);
+    const addLineItemActions: MyCartAddLineItemAction[] = anonymousCart.lineItems
+      .filter((item: LineItem) => !userCartProductIds.includes(item.productId))
+      .map((item: LineItem) => ({
+        action: 'addLineItem',
+        productId: item.productId,
+        quantity: item.quantity,
+      }));
+
+    if (addLineItemActions.length > 0) {
+      await customerAPI
+        .apiRoot()
+        .me()
+        .carts()
+        .withId({ ID: userCart.id })
+        .post({
+          body: {
+            version: userCart.version,
+            actions: addLineItemActions,
+          },
+        })
+        .execute();
+    }
+    await customerAPI
+      .apiRoot()
+      .carts()
+      .withId({ ID: anonymousCartId })
+      .delete({
+        queryArgs: {
+          version: anonymousCart.version,
+        },
+      })
+      .execute();
+
+    localStorage.removeItem(CART_ID_KEY);
+  } catch (error) {
+    console.error('Error merging carts:', error);
+    localStorage.removeItem(CART_ID_KEY);
+    throw error;
+  }
 }
