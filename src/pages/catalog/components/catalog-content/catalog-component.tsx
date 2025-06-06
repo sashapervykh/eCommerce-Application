@@ -27,7 +27,16 @@ export function CatalogContent({
   const categoryKey = propertyCategoryKey ?? parameterCategoryKey;
   const subcategoryKey = propertySubcategoryKey ?? parameterSubcategoryKey;
 
-  const { productsInfo, getProductsByCriteria, error, isFiltersOpen, setIsFiltersOpen, notFound } = useProducts();
+  const {
+    productsInfo,
+    getProductsByCriteria,
+    error,
+    isFiltersOpen,
+    setIsFiltersOpen,
+    notFound,
+    fetchCartItems,
+    isCartLoading,
+  } = useProducts();
   const lastCriteriaReference = useRef<string | null>(null);
   const [categoryData, setCategoryData] = useState<CategoryData | null>(null);
   const [subcategoryData, setSubcategoryData] = useState<CategoryData | null>(null);
@@ -75,8 +84,9 @@ export function CatalogContent({
     }
 
     getProductsByCriteria(criteria);
+    void fetchCartItems();
     lastCriteriaReference.current = criteriaKey;
-  }, [categoryKey, subcategoryKey, getProductsByCriteria]);
+  }, [categoryKey, subcategoryKey, getProductsByCriteria, fetchCartItems]);
 
   if (notFound) {
     return <NotFoundPage />;
@@ -86,7 +96,7 @@ export function CatalogContent({
     return <Text variant="body-2">{'Something went wrong. Please try again later.'}</Text>;
   }
 
-  if (productsInfo === null) {
+  if (productsInfo === null || isCartLoading) {
     return <Spin />;
   }
 

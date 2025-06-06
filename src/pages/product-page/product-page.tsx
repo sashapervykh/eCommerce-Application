@@ -23,7 +23,7 @@ type AttributeValue = AttributeValueObject | AttributeValueObject[] | string | n
 
 export function ProductPage() {
   const { productId } = useParams();
-  const { productDetails, getProductDetails, isLoading, error, notFound } = useProducts();
+  const { productDetails, getProductDetails, isLoading, error, notFound, fetchCartItems } = useProducts();
   const [initialSlide, setInitialSlide] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
@@ -73,8 +73,9 @@ export function ProductPage() {
   useEffect(() => {
     if (productId) {
       getProductDetails(productId);
+      void fetchCartItems();
     }
-  }, [productId, getProductDetails]);
+  }, [productId, getProductDetails, fetchCartItems]);
 
   if (notFound) {
     return <NotFoundPage />;

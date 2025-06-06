@@ -1,26 +1,13 @@
 import { useState, useEffect } from 'react';
-
-import { useCart } from '../../components/hooks/useCart';
+import { useProducts } from './useProducts';
 
 export function useCartActions(productId: string) {
-  const { addToCart, isProductInCart, removeFromCart } = useCart();
-  const [isInCart, setIsInCart] = useState(false);
-  const [isCartCheckLoading, setIsCartCheckLoading] = useState(true);
+  const { addToCart, isProductInCart, removeFromCart, cartItems } = useProducts();
+  const [isInCart, setIsInCart] = useState(isProductInCart(productId));
 
   useEffect(() => {
-    const checkCart = async () => {
-      setIsCartCheckLoading(true);
-      try {
-        const inCart = await isProductInCart(productId);
-        setIsInCart(inCart);
-      } catch (error) {
-        console.error('Error checking cart status:', error);
-      } finally {
-        setIsCartCheckLoading(false);
-      }
-    };
-    void checkCart();
-  }, [productId, isProductInCart]);
+    setIsInCart(isProductInCart(productId));
+  }, [cartItems, productId, isProductInCart]);
 
   const handleAddToCart = async () => {
     await addToCart(productId);
@@ -32,5 +19,5 @@ export function useCartActions(productId: string) {
     setIsInCart(false);
   };
 
-  return { isInCart, handleAddToCart, handleRemoveFromCart, isCartCheckLoading };
+  return { isInCart, handleAddToCart, handleRemoveFromCart };
 }
