@@ -126,7 +126,7 @@ export function AboutPage() {
               rel="noopener noreferrer"
               className={styles['github-link']}
             >
-              <Text color="info">View GitHub Profile</Text>
+              <Text color="link">View GitHub Profile</Text>
             </a>
             {teamMembers[selectedMember].role === 'Mentor' && (
               <div className={styles['testimonial-links']}>
@@ -137,7 +137,7 @@ export function AboutPage() {
                   rel="noopener noreferrer"
                   className={styles['testimonial-link']}
                 >
-                  <Text color="info">Feedback from student #1</Text>
+                  <Text color="link">Feedback from student #1</Text>
                 </a>
                 <a
                   href="https://discord.com/channels/516715744646660106/517977765421776919/1380209359308460094"
@@ -145,7 +145,7 @@ export function AboutPage() {
                   rel="noopener noreferrer"
                   className={styles['testimonial-link']}
                 >
-                  <Text color="info">Feedback from student #2</Text>
+                  <Text color="link">Feedback from student #2</Text>
                 </a>
               </div>
             )}

@@ -245,7 +245,7 @@
   padding: 1.25rem;
   background-color: rgb(26 42 74 / 95%);
   backdrop-filter: blur(0.5rem);
-  border-radius: 1rem;
+  border-radius: 5px;
   display: flex;
   flex-direction: column;
   gap: 0.625rem;
@@ -271,6 +271,7 @@
 .github-link {
   margin-top: 0.625rem;
   display: inline-block;
+  text-decoration: none;
 }
 
 /* Team info */
@@ -405,6 +406,7 @@
 .testimonial-link {
   display: block;
   margin-top: 0.3rem;
+  text-decoration: none;
 }
 
 .window img {
