@@ -1,0 +1,14 @@
+.button-content {
+  display: flex;
+  width: fit-content;
+}
+
+.products-number {
+  display: flex;
+  box-sizing: border-box;
+  margin: auto auto auto 10px;
+  text-align: center;
+  padding: 2px;
+  width: fit-content;
+  height: 90%;
+}
