@@ -12,15 +12,31 @@
 }
 
 .filters-button {
+  display: none;
   font-weight: bold;
   max-width: fit-content;
   margin-right: 15px;
   margin-bottom: 10px;
 }
 
+.spin {
+  display: flex;
+  margin: auto;
+}
+
+.hidden {
+  display: none;
+}
+
 @media (width <= 592px) {
   .list-controls {
     flex-wrap: wrap;
+  }
+}
+
+@media (width < 570px) {
+  .filters-button {
+    display: block;
   }
 }
 
