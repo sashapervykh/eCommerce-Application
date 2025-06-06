@@ -263,7 +263,7 @@
   transform: scale(1.1);
 }
 
-@media (width < 767px) {
+@media (width < 838px) {
   .burger {
     display: flex;
     align-items: center;

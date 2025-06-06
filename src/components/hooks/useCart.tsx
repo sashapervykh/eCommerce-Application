@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useState } from 'react';
 import {
   addToCart,
   getBasketItems,
@@ -8,6 +8,8 @@ import {
 } from '../../utilities/return-basket-items';
 
 interface CartContextType {
+  productsInCartAmount: number | undefined;
+  updateProductsInCartAmount: () => void;
   addToCart: (productId: string, quantity?: number) => Promise<void>;
   removeFromCart: (productId: string) => Promise<void>;
   isProductInCart: (productId: string) => Promise<boolean>;
@@ -17,12 +19,21 @@ interface CartContextType {
 const CartContext = createContext<CartContextType>({} as CartContextType);
 
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
+  const [productsInCartAmount, setProductsInCartAmount] = useState<number | undefined>(undefined);
+
+  const updateProductsInCartAmount = async () => {
+    const cart = await getBasketItems();
+    setProductsInCartAmount(cart.length);
+  };
+
   const addProductToCart = async (productId: string, quantity = 1) => {
     await addToCart(productId, quantity);
+    await updateProductsInCartAmount();
   };
 
   const removeProductFromCart = async (productId: string) => {
     await removeFromCart(productId);
+    await updateProductsInCartAmount();
   };
 
   const checkProductInCart = async (productId: string) => {
@@ -38,6 +49,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     removeFromCart: removeProductFromCart,
     isProductInCart: checkProductInCart,
     getBasketItems: fetchBasketItems,
+    updateProductsInCartAmount: updateProductsInCartAmount,
+    productsInCartAmount: productsInCartAmount,
   };
 
   return <CartContext.Provider value={CartContextValue}>{children}</CartContext.Provider>;
