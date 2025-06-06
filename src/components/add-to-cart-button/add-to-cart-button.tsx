@@ -1,4 +1,5 @@
 import { Button, useToaster } from '@gravity-ui/uikit';
+import { ShoppingCart } from '@gravity-ui/icons';
 import { useCartActions } from '../hooks/useCartActions';
 import { ProductInfo } from '../../pages/catalog/components/catalog-content/product/types';
 import styles from './styles.module.css';
@@ -61,6 +62,7 @@ export function AddToCartButton({ product, className }: AddToCartButtonProps) {
           className={className ?? styles['add-to-cart-button']}
         >
           Add to Cart
+          <ShoppingCart width={20} height={20} />
         </Button>
       )}
     </>
