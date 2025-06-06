@@ -3,6 +3,7 @@ import { useProducts } from '../../components/hooks/useProducts';
 import { Card, Text, Spin, Button } from '@gravity-ui/uikit';
 import { useEffect, useState } from 'react';
 import { NotFoundPage } from '../404/not-found';
+import { AddToCartButton } from '../../components/add-to-cart-button/add-to-cart-button';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Zoom } from 'swiper/modules';
 import { ChevronLeft, ChevronRight, Xmark } from '@gravity-ui/icons';
@@ -12,7 +13,6 @@ import 'swiper/css/pagination';
 import 'swiper/css/zoom';
 import styles from './styles.module.css';
 import modalStyles from './modal.module.css';
-import { AddToCartButton } from '../../components/add-to-cart-button/add-to-cart-button';
 
 interface AttributeValueObject {
   key: string;

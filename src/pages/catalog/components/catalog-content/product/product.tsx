@@ -2,6 +2,7 @@ import { ProductInfo } from './types';
 import styles from './styles.module.css';
 import { Card, Text } from '@gravity-ui/uikit';
 import { useNavigate } from 'react-router-dom';
+import { AddToCartButton } from '../../../../../components/add-to-cart-button/add-to-cart-button';
 
 export function ProductCard({ productInfo }: { productInfo: ProductInfo }) {
   const navigate = useNavigate();
@@ -34,6 +35,7 @@ export function ProductCard({ productInfo }: { productInfo: ProductInfo }) {
         <Text variant="body-2" className={(styles.text, styles.description)} ellipsis={true} ellipsisLines={5}>
           <b>Description:</b> {productInfo.description}
         </Text>
+        <AddToCartButton product={productInfo} />
       </div>
     </Card>
   );
