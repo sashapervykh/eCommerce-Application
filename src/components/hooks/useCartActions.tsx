@@ -5,11 +5,19 @@ import { useCart } from '../../components/hooks/useCart';
 export function useCartActions(productId: string) {
   const { addToCart, isProductInCart, removeFromCart } = useCart();
   const [isInCart, setIsInCart] = useState(false);
+  const [isCartCheckLoading, setIsCartCheckLoading] = useState(true);
 
   useEffect(() => {
     const checkCart = async () => {
-      const inCart = await isProductInCart(productId);
-      setIsInCart(inCart);
+      setIsCartCheckLoading(true);
+      try {
+        const inCart = await isProductInCart(productId);
+        setIsInCart(inCart);
+      } catch (error) {
+        console.error('Error checking cart status:', error);
+      } finally {
+        setIsCartCheckLoading(false);
+      }
     };
     void checkCart();
   }, [productId, isProductInCart]);
@@ -24,5 +32,5 @@ export function useCartActions(productId: string) {
     setIsInCart(false);
   };
 
-  return { isInCart, handleAddToCart, handleRemoveFromCart };
+  return { isInCart, handleAddToCart, handleRemoveFromCart, isCartCheckLoading };
 }

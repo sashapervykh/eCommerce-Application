@@ -170,7 +170,9 @@ export function ProductPage() {
                 </ul>
               </Text>
             )}
-            <AddToCartButton product={productDetails} />
+            <div className={styles['actions-wrapper']}>
+              <AddToCartButton product={productDetails} />
+            </div>
           </div>
         </div>
         <Button view="action" size="l" onClick={() => navigate('/catalog')} className={styles['back-button']}>

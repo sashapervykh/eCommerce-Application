@@ -1,4 +1,4 @@
-import { Button, useToaster } from '@gravity-ui/uikit';
+import { Button, Spin, useToaster } from '@gravity-ui/uikit';
 import { ShoppingCart } from '@gravity-ui/icons';
 import { useCartActions } from '../hooks/useCartActions';
 import { ProductInfo } from '../../pages/catalog/components/catalog-content/product/types';
@@ -11,7 +11,7 @@ interface AddToCartButtonProps {
 }
 
 export function AddToCartButton({ product, className }: AddToCartButtonProps) {
-  const { isInCart, handleAddToCart, handleRemoveFromCart } = useCartActions(product.id);
+  const { isInCart, handleAddToCart, handleRemoveFromCart, isCartCheckLoading } = useCartActions(product.id);
   const [isLoading, setIsLoading] = useState(false);
   const toaster = useToaster();
 
@@ -56,6 +56,14 @@ export function AddToCartButton({ product, className }: AddToCartButtonProps) {
       setIsLoading(false);
     }
   };
+
+  if (isCartCheckLoading) {
+    return (
+      <div className={styles.spinner}>
+        <Spin size="s" className={styles['loading-spinner']} />
+      </div>
+    );
+  }
 
   return (
     <>
