@@ -9,6 +9,7 @@
 .wrapper {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   margin-bottom: 20px;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
