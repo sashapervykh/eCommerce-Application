@@ -290,6 +290,7 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
 
   const removeProductFromCart = async (productId: string) => {
     await removeFromCart(productId);
+    setCartItems((previous) => previous.filter((item) => item.productId !== productId));
   };
 
   const isProductInCart = (productId: string) => {
