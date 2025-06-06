@@ -11,8 +11,8 @@ interface CriteriaData {
   categoryKey?: string;
   subcategoryKey?: string;
   filters: {
-    price: number[];
-    area: number[];
+    price: [number, number];
+    area: [number, number];
     floors: Record<string, boolean>;
     developers: Record<string, boolean>;
   };
@@ -22,7 +22,8 @@ interface ProductsContextType {
   productsInfo: ProductInfo[] | null;
   productDetails: ProductInfo | null;
   isLoading: boolean;
-  getProductsByCriteria: (criteria?: CriteriaData) => void;
+  isResultsLoading: boolean;
+  getProductsByCriteria: (criteria: CriteriaData) => void;
   getProductDetails: (value: string) => void;
   error: boolean;
   notFound: boolean;
@@ -98,6 +99,7 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
   const [productDetails, setProductDetails] = useState<ProductInfo | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isCartLoading, setIsCartLoading] = useState<boolean>(false);
+  const [isResultsLoading, setIsResultsLoading] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
   const [notFound, setNotFound] = useState<boolean>(false);
   const [isFiltersOpen, setIsFiltersOpen] = useState<boolean>(false);
@@ -125,6 +127,7 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     async (criteria: CriteriaData = INITIAL_CRITERIA()) => {
       try {
         setIsLoading(true);
+        setIsResultsLoading(true);
         setError(false);
         setNotFound(false);
 
@@ -148,6 +151,7 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
             }
             setProductsInfo([]);
             setIsLoading(false);
+            setIsResultsLoading(false);
             return;
           }
         } else if (categoryKey) {
@@ -167,6 +171,7 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
             }
             setProductsInfo([]);
             setIsLoading(false);
+            setIsResultsLoading(false);
             return;
           }
         }
@@ -184,6 +189,7 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
 
           if (!filtersChanged && !sortChanged && !searchChanged && !categoryKeysChanged) {
             setIsLoading(false);
+            setIsResultsLoading(false);
             return;
           }
         }
@@ -215,6 +221,7 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
         setError(true);
       } finally {
         setIsLoading(false);
+        setIsResultsLoading(false);
       }
     },
     [isInitialLoad, criteriaData, lastFilters, lastSort, lastSearch],
@@ -298,7 +305,8 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
   const ProductsContextValue = {
     productsInfo,
     productDetails,
-    isLoading: isLoading,
+    isLoading,
+    isResultsLoading,
     getProductsByCriteria,
     getProductDetails,
     error,

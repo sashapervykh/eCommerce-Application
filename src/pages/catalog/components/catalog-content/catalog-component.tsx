@@ -36,6 +36,7 @@ export function CatalogContent({
     notFound,
     fetchCartItems,
     isCartLoading,
+    isResultsLoading,
   } = useProducts();
   const lastCriteriaReference = useRef<string | null>(null);
   const [categoryData, setCategoryData] = useState<CategoryData | null>(null);
@@ -137,12 +138,16 @@ export function CatalogContent({
         <SearchComponent />
       </div>
       <div className={styles['catalog-content']}>
-        {isFiltersOpen && <FiltersControls categoryKey={categoryKey} subcategoryKey={subcategoryKey} />}
-        {productsInfo.length === 0 ? (
-          <Text variant="body-2">{'No products found'}</Text>
-        ) : (
-          <ProductsList productsInfo={productsInfo} />
-        )}
+        <FiltersControls categoryKey={categoryKey} subcategoryKey={subcategoryKey} />
+        {isResultsLoading && <Spin className={`${styles.spin} ${isFiltersOpen ? styles.hidden : ''}`}></Spin>}
+        {!isResultsLoading &&
+          (productsInfo.length === 0 ? (
+            <Text className={isFiltersOpen ? styles.hidden : ''} variant="body-2">
+              {'No products found'}
+            </Text>
+          ) : (
+            <ProductsList productsInfo={productsInfo} />
+          ))}
       </div>
     </div>
   );

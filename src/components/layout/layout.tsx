@@ -8,6 +8,8 @@ import { CatalogMenuButton } from '../navigation-button/catalog-button';
 import { useAuth } from '../hooks/useAuth';
 import { useCategories } from '../hooks/useCategories';
 import { catalogItems } from '../../utilities/return-catalog-items';
+import { Footer } from '../footer/footer';
+import { CartButton } from '../cart-button/cart-button';
 
 const navLinks = [
   { text: 'Home', route: '/' },
@@ -16,6 +18,7 @@ const navLinks = [
 ];
 
 export function MainLayout() {
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const { isLoading } = useAuth();
   const { categories, isLoading: categoriesLoading, error: categoriesError } = useCategories();
@@ -89,6 +92,7 @@ export function MainLayout() {
                 </Button>
               ),
             )}
+            {!isAuthenticated && <CartButton buttonSize={'m'} buttonWidth={undefined} />}
           </nav>
           <div className={styles.user}>
             <AuthButtons />
@@ -118,6 +122,7 @@ export function MainLayout() {
               </Button>
             ),
           )}
+          {!isAuthenticated && <CartButton buttonSize={'m'} buttonWidth={undefined} />}
           <div className={styles['mobile-auth-buttons']}>
             <AuthButtons />
           </div>
@@ -127,6 +132,7 @@ export function MainLayout() {
       <main className={styles.main}>
         <Outlet />
       </main>
+      <Footer />
     </div>
   );
 }
