@@ -1,8 +1,14 @@
 .filters-wrapper {
   min-width: 250px;
+  max-width: 250px;
   margin-right: 15px;
   height: fit-content;
   padding-bottom: 10px;
+}
+
+.form {
+  display: grid;
+  width: 100%;
 }
 
 .filter-group {
@@ -11,18 +17,6 @@
 
 .slider {
   margin-bottom: 10px;
-}
-
-.slider-label {
-  display: grid;
-  grid-template-columns: 1fr 4fr;
-  margin-bottom: 5px;
-  vertical-align: middle;
-}
-
-.label-text {
-  display: flex;
-  margin: auto auto auto 0;
 }
 
 .developers {
@@ -47,8 +41,18 @@
   display: none;
 }
 
-@media (width <= 535px) {
+.hidden {
+  display: none;
+}
+
+@media (width <= 570px) {
   .filters-wrapper {
+    display: none;
+    max-width: none;
+  }
+
+  .filters-shown {
+    display: flex;
     width: 100%;
     background-color: white;
     padding: 20px;

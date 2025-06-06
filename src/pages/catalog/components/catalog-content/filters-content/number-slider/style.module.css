@@ -1,0 +1,11 @@
+.slider-label {
+  display: grid;
+  grid-template-columns: 1fr 4fr;
+  margin-bottom: 5px;
+  vertical-align: middle;
+}
+
+.label-text {
+  display: flex;
+  margin: auto auto auto 0;
+}

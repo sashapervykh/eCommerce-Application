@@ -3,6 +3,7 @@ import { useProducts } from '../../components/hooks/useProducts';
 import { Card, Text, Spin, Button } from '@gravity-ui/uikit';
 import { useEffect, useState } from 'react';
 import { NotFoundPage } from '../404/not-found';
+import { AddToCartButton } from '../../components/add-to-cart-button/add-to-cart-button';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Zoom } from 'swiper/modules';
 import { ChevronLeft, ChevronRight, Xmark } from '@gravity-ui/icons';
@@ -169,6 +170,7 @@ export function ProductPage() {
                 </ul>
               </Text>
             )}
+            <AddToCartButton product={productDetails} />
           </div>
         </div>
         <Button view="action" size="l" onClick={() => navigate('/catalog')} className={styles['back-button']}>
