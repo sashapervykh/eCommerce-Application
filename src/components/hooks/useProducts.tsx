@@ -1,8 +1,9 @@
-import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { createContext, useContext, useState, useCallback } from 'react';
 import { customerAPI } from '../../api/customer-api';
 import { ProductInfo } from '../../pages/catalog/components/catalog-content/product/types';
 import { returnProductsData } from '../../utilities/return-product-data';
 import { INITIAL_CRITERIA } from '../../constants/constants';
+import { addToCart, getBasketItems, BasketItem, removeFromCart } from '../../utilities/return-basket-items';
 
 interface CriteriaData {
   sort: string | undefined;
@@ -29,6 +30,13 @@ interface ProductsContextType {
   isFiltersOpen: boolean;
   setIsFiltersOpen: React.Dispatch<React.SetStateAction<boolean>>;
   criteriaData: CriteriaData;
+  addToCart: (productId: string, quantity?: number) => Promise<void>;
+  removeFromCart: (productId: string) => Promise<void>;
+  isProductInCart: (productId: string) => boolean;
+  getBasketItems: () => Promise<BasketItem[]>;
+  cartItems: BasketItem[];
+  fetchCartItems: () => Promise<void>;
+  isCartLoading: boolean;
 }
 
 interface ApiError {
@@ -90,6 +98,7 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
   const [productsInfo, setProductsInfo] = useState<ProductInfo[] | null>(null);
   const [productDetails, setProductDetails] = useState<ProductInfo | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isCartLoading, setIsCartLoading] = useState<boolean>(false);
   const [isResultsLoading, setIsResultsLoading] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
   const [notFound, setNotFound] = useState<boolean>(false);
@@ -99,15 +108,23 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
   const [lastFilters, setLastFilters] = useState<string[]>([]);
   const [lastSort, setLastSort] = useState<string | undefined>(undefined);
   const [lastSearch, setLastSearch] = useState<string | undefined>(undefined);
+  const [cartItems, setCartItems] = useState<BasketItem[]>([]);
 
-  useEffect(() => {
-    if (customerAPI.isAnonymous) {
-      customerAPI.createAnonymCustomer();
+  const fetchCartItems = useCallback(async () => {
+    setIsCartLoading(true);
+    try {
+      const items = await getBasketItems();
+      setCartItems(items);
+    } catch (error) {
+      console.error('Error fetching cart items:', error);
+      setCartItems([]);
+    } finally {
+      setIsCartLoading(false);
     }
   }, []);
 
   const getProductsByCriteria = useCallback(
-    async (criteria: CriteriaData) => {
+    async (criteria: CriteriaData = INITIAL_CRITERIA()) => {
       try {
         setIsLoading(true);
         setIsResultsLoading(true);
@@ -233,7 +250,6 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
       } else {
         currentPrice = formatPrice(price);
       }
-
       const productDetails: ProductInfo = {
         id: productInfo.id,
         key: productInfo.key ?? productInfo.masterData.current.name['en-US'].split(' ').join(''),
@@ -259,6 +275,34 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     }
   }, []);
 
+  const addProductToCart = async (productId: string, quantity = 1) => {
+    await addToCart(productId, quantity);
+    setCartItems((previous) => {
+      const existingItem = previous.find((item) => item.productId === productId);
+      if (existingItem) {
+        return previous.map((item) =>
+          item.productId === productId ? { ...item, quantity: item.quantity + quantity } : item,
+        );
+      }
+      return [...previous, { productId, quantity }];
+    });
+  };
+
+  const removeProductFromCart = async (productId: string) => {
+    await removeFromCart(productId);
+    setCartItems((previous) => previous.filter((item) => item.productId !== productId));
+  };
+
+  const isProductInCart = (productId: string) => {
+    return cartItems.some((item) => item.productId === productId);
+  };
+
+  const fetchBasketItems = async () => {
+    const items = await getBasketItems();
+    setCartItems(items);
+    return items;
+  };
+
   const ProductsContextValue = {
     productsInfo,
     productDetails,
@@ -271,6 +315,13 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     isFiltersOpen,
     setIsFiltersOpen,
     criteriaData,
+    addToCart: addProductToCart,
+    removeFromCart: removeProductFromCart,
+    isProductInCart,
+    getBasketItems: fetchBasketItems,
+    cartItems,
+    fetchCartItems,
+    isCartLoading: isCartLoading,
   };
 
   return <ProductsContext.Provider value={ProductsContextValue}>{children}</ProductsContext.Provider>;

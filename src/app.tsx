@@ -22,8 +22,8 @@ export function App() {
       <ToasterProvider toaster={new Toaster()}>
         <BrowserRouter>
           <AuthProvider>
-            <ProductsProvider>
-              <CartProvider>
+            <CartProvider>
+              <ProductsProvider>
                 <Routes>
                   <Route element={<MainLayout />}>
                     <Route path="/" element={<HomePage />} />
@@ -40,8 +40,8 @@ export function App() {
                     <Route path="/cart" element={<CartPage />} />
                   </Route>
                 </Routes>
-              </CartProvider>
-            </ProductsProvider>
+              </ProductsProvider>
+            </CartProvider>
           </AuthProvider>
         </BrowserRouter>
         <ToasterComponent />

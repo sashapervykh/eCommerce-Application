@@ -72,6 +72,10 @@
   height: 280px;
 }
 
+.actions-wrapper {
+  height: 66px;
+}
+
 .wrapper button {
   margin: 15px auto;
 }
