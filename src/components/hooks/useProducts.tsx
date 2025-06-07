@@ -3,7 +3,7 @@ import { customerAPI } from '../../api/customer-api';
 import { ProductInfo } from '../../pages/catalog/components/catalog-content/product/types';
 import { returnProductsData } from '../../utilities/return-product-data';
 import { INITIAL_CRITERIA } from '../../constants/constants';
-import { addToCart, getBasketItems, BasketItem, removeFromCart } from '../../utilities/return-basket-items';
+import { getBasketItems, BasketItem } from '../../utilities/return-basket-items';
 
 interface CriteriaData {
   sort: string | undefined;
@@ -30,8 +30,6 @@ interface ProductsContextType {
   isFiltersOpen: boolean;
   setIsFiltersOpen: React.Dispatch<React.SetStateAction<boolean>>;
   criteriaData: CriteriaData;
-  addToCart: (productId: string, quantity?: number) => Promise<void>;
-  removeFromCart: (productId: string) => Promise<void>;
   isProductInCart: (productId: string) => boolean;
   getBasketItems: () => Promise<BasketItem[]>;
   cartItems: BasketItem[];
@@ -275,23 +273,6 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     }
   }, []);
 
-  const addProductToCart = async (productId: string, quantity = 1) => {
-    await addToCart(productId, quantity);
-    setCartItems((previous) => {
-      const existingItem = previous.find((item) => item.productId === productId);
-      if (existingItem) {
-        return previous.map((item) =>
-          item.productId === productId ? { ...item, quantity: item.quantity + quantity } : item,
-        );
-      }
-      return [...previous, { productId, quantity }];
-    });
-  };
-
-  const removeProductFromCart = async (productId: string) => {
-    await removeFromCart(productId);
-  };
-
   const isProductInCart = (productId: string) => {
     return cartItems.some((item) => item.productId === productId);
   };
@@ -314,8 +295,6 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     isFiltersOpen,
     setIsFiltersOpen,
     criteriaData,
-    addToCart: addProductToCart,
-    removeFromCart: removeProductFromCart,
     isProductInCart,
     getBasketItems: fetchBasketItems,
     cartItems,

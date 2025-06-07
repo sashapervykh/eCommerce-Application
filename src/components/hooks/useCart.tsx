@@ -1,9 +1,9 @@
 import { createContext, useContext, useState } from 'react';
 import {
   addToCart,
+  removeFromCart,
   getBasketItems,
   isProductInCart,
-  removeFromCart,
   BasketItem,
 } from '../../utilities/return-basket-items';
 

@@ -71,7 +71,7 @@ export function AddToCartButton({ product, className }: AddToCartButtonProps) {
           className={className ?? styles['add-to-cart-button']}
           loading={isLoading}
         >
-          Remove from Cart!
+          Remove from Cart
         </Button>
       ) : (
         <Button
