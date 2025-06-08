@@ -1,9 +1,9 @@
 import { createContext, useContext, useState } from 'react';
 import {
   addToCart,
+  removeFromCart,
   getBasketItems,
   isProductInCart,
-  removeFromCart,
   BasketItem,
 } from '../../utilities/return-basket-items';
 
@@ -40,15 +40,11 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     return await isProductInCart(productId);
   };
 
-  const fetchBasketItems = async () => {
-    return await getBasketItems();
-  };
-
   const CartContextValue = {
     addToCart: addProductToCart,
     removeFromCart: removeProductFromCart,
     isProductInCart: checkProductInCart,
-    getBasketItems: fetchBasketItems,
+    getBasketItems: getBasketItems,
     updateProductsInCartAmount: updateProductsInCartAmount,
     productsInCartAmount: productsInCartAmount,
   };

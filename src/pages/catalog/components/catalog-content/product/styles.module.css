@@ -57,21 +57,6 @@
   margin: 0 auto;
 }
 
-.wrapper:hover {
-  margin: -10px;
-  width: 280px;
-  overflow: hidden;
-}
-
-.wrapper:hover .image {
-  width: 280px;
-  height: 280px;
-}
-
-.wrapper:hover .image-wrapper {
-  height: 280px;
-}
-
 .actions-wrapper {
   height: 66px;
 }

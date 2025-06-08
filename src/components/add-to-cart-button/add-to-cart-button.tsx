@@ -1,8 +1,9 @@
+import { useState } from 'react';
 import { Button, useToaster } from '@gravity-ui/uikit';
 import { ShoppingCart } from '@gravity-ui/icons';
-import { useCartActions } from '../hooks/useCartActions';
 import { ProductInfo } from '../../pages/catalog/components/catalog-content/product/types';
-import { useState } from 'react';
+import { useCartActions } from '../hooks/useCartActions';
+import { useCart } from '../hooks/useCart';
 import styles from './styles.module.css';
 
 interface AddToCartButtonProps {
@@ -14,12 +15,14 @@ export function AddToCartButton({ product, className }: AddToCartButtonProps) {
   const { isInCart, handleAddToCart, handleRemoveFromCart } = useCartActions(product.id);
   const [isLoading, setIsLoading] = useState(false);
   const toaster = useToaster();
+  const { updateProductsInCartAmount } = useCart();
 
   const handleAdd = async (event: React.MouseEvent) => {
     event.stopPropagation();
     setIsLoading(true);
     try {
       await handleAddToCart();
+      updateProductsInCartAmount();
       toaster.add({
         name: 'cart-success',
         content: 'Product added to cart!',
@@ -41,6 +44,7 @@ export function AddToCartButton({ product, className }: AddToCartButtonProps) {
     setIsLoading(true);
     try {
       await handleRemoveFromCart();
+      updateProductsInCartAmount();
       toaster.add({
         name: 'cart-remove-success',
         content: 'Product removed from cart!',

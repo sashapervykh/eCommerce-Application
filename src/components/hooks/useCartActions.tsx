@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useProducts } from './useProducts';
+import { useCart } from '../hooks/useCart';
 
 export function useCartActions(productId: string) {
-  const { addToCart, isProductInCart, removeFromCart, cartItems } = useProducts();
+  const { isProductInCart, cartItems } = useProducts();
+  const { addToCart, removeFromCart } = useCart();
+
   const [isInCart, setIsInCart] = useState(isProductInCart(productId));
 
   useEffect(() => {
