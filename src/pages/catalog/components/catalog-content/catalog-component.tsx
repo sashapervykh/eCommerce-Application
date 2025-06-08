@@ -6,6 +6,7 @@ import { Breadcrumbs } from '../breadcrumbs/breadcrumbs';
 import { ProductsList } from './product/products';
 import { FiltersControls } from './filters-content/filters-controls';
 import { useProducts } from '../../../../components/hooks/useProducts';
+import { useCart } from '../../../../components/hooks/useCart';
 import { INITIAL_CRITERIA } from '../../../../constants/constants';
 import { returnCategoryData, CategoryData } from '../../../../utilities/return-category-data';
 import { useEffect, useRef, useState } from 'react';
@@ -27,17 +28,9 @@ export function CatalogContent({
   const categoryKey = propertyCategoryKey ?? parameterCategoryKey;
   const subcategoryKey = propertySubcategoryKey ?? parameterSubcategoryKey;
 
-  const {
-    productsInfo,
-    getProductsByCriteria,
-    error,
-    isFiltersOpen,
-    setIsFiltersOpen,
-    notFound,
-    fetchCartItems,
-    isCartLoading,
-    isResultsLoading,
-  } = useProducts();
+  const { fetchCartItems, isCartLoading } = useCart();
+  const { productsInfo, getProductsByCriteria, error, isFiltersOpen, setIsFiltersOpen, notFound, isResultsLoading } =
+    useProducts();
   const lastCriteriaReference = useRef<string | null>(null);
   const [categoryData, setCategoryData] = useState<CategoryData | null>(null);
   const [subcategoryData, setSubcategoryData] = useState<CategoryData | null>(null);

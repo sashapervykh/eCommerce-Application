@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import {
   addToCart,
   removeFromCart,
@@ -14,12 +14,35 @@ interface CartContextType {
   removeFromCart: (productId: string) => Promise<void>;
   isProductInCart: (productId: string) => Promise<boolean>;
   getBasketItems: () => Promise<BasketItem[]>;
+  fetchCartItems: () => Promise<void>;
+  cartItems: BasketItem[];
+  isCartLoading: boolean;
 }
 
 const CartContext = createContext<CartContextType>({} as CartContextType);
 
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [productsInCartAmount, setProductsInCartAmount] = useState<number | undefined>(undefined);
+
+  const [isCartLoading, setIsCartLoading] = useState<boolean>(false);
+  const [cartItems, setCartItems] = useState<BasketItem[]>([]);
+
+  const fetchCartItems = useCallback(async () => {
+    setIsCartLoading(true);
+    try {
+      const items = await getBasketItems();
+      setCartItems(items);
+    } catch (error) {
+      console.error('Error fetching cart items:', error);
+      setCartItems([]);
+    } finally {
+      setIsCartLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void fetchCartItems();
+  }, [fetchCartItems]);
 
   const updateProductsInCartAmount = async () => {
     const cart = await getBasketItems();
@@ -47,6 +70,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     getBasketItems: getBasketItems,
     updateProductsInCartAmount: updateProductsInCartAmount,
     productsInCartAmount: productsInCartAmount,
+    fetchCartItems: fetchCartItems,
+    isCartLoading,
+    cartItems,
   };
 
   return <CartContext.Provider value={CartContextValue}>{children}</CartContext.Provider>;

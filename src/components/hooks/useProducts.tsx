@@ -3,8 +3,6 @@ import { customerAPI } from '../../api/customer-api';
 import { ProductInfo } from '../../pages/catalog/components/catalog-content/product/types';
 import { returnProductsData } from '../../utilities/return-product-data';
 import { INITIAL_CRITERIA } from '../../constants/constants';
-import { getBasketItems, BasketItem } from '../../utilities/return-basket-items';
-
 interface CriteriaData {
   sort: string | undefined;
   search: string | undefined;
@@ -30,11 +28,6 @@ interface ProductsContextType {
   isFiltersOpen: boolean;
   setIsFiltersOpen: React.Dispatch<React.SetStateAction<boolean>>;
   criteriaData: CriteriaData;
-  isProductInCart: (productId: string) => boolean;
-  getBasketItems: () => Promise<BasketItem[]>;
-  cartItems: BasketItem[];
-  fetchCartItems: () => Promise<void>;
-  isCartLoading: boolean;
 }
 
 interface ApiError {
@@ -96,7 +89,6 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
   const [productsInfo, setProductsInfo] = useState<ProductInfo[] | null>(null);
   const [productDetails, setProductDetails] = useState<ProductInfo | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isCartLoading, setIsCartLoading] = useState<boolean>(false);
   const [isResultsLoading, setIsResultsLoading] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
   const [notFound, setNotFound] = useState<boolean>(false);
@@ -106,20 +98,6 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
   const [lastFilters, setLastFilters] = useState<string[]>([]);
   const [lastSort, setLastSort] = useState<string | undefined>(undefined);
   const [lastSearch, setLastSearch] = useState<string | undefined>(undefined);
-  const [cartItems, setCartItems] = useState<BasketItem[]>([]);
-
-  const fetchCartItems = useCallback(async () => {
-    setIsCartLoading(true);
-    try {
-      const items = await getBasketItems();
-      setCartItems(items);
-    } catch (error) {
-      console.error('Error fetching cart items:', error);
-      setCartItems([]);
-    } finally {
-      setIsCartLoading(false);
-    }
-  }, []);
 
   const getProductsByCriteria = useCallback(
     async (criteria: CriteriaData = INITIAL_CRITERIA()) => {
@@ -273,10 +251,6 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     }
   }, []);
 
-  const isProductInCart = (productId: string) => {
-    return cartItems.some((item) => item.productId === productId);
-  };
-
   const ProductsContextValue = {
     productsInfo,
     productDetails,
@@ -289,11 +263,6 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     isFiltersOpen,
     setIsFiltersOpen,
     criteriaData,
-    isProductInCart,
-    getBasketItems,
-    cartItems,
-    fetchCartItems,
-    isCartLoading: isCartLoading,
   };
 
   return <ProductsContext.Provider value={ProductsContextValue}>{children}</ProductsContext.Provider>;

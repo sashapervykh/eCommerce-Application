@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useProducts } from '../../components/hooks/useProducts';
+import { useCart } from '../../components/hooks/useCart';
 import { Card, Text, Spin, Button } from '@gravity-ui/uikit';
 import { useEffect, useState } from 'react';
 import { NotFoundPage } from '../404/not-found';
@@ -23,7 +24,8 @@ type AttributeValue = AttributeValueObject | AttributeValueObject[] | string | n
 
 export function ProductPage() {
   const { productId } = useParams();
-  const { productDetails, getProductDetails, isLoading, error, notFound, fetchCartItems } = useProducts();
+  const { fetchCartItems, isCartLoading } = useCart();
+  const { productDetails, getProductDetails, error, notFound } = useProducts();
   const [initialSlide, setInitialSlide] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
@@ -89,7 +91,7 @@ export function ProductPage() {
     );
   }
 
-  if (isLoading || !productDetails) {
+  if (isCartLoading || !productDetails) {
     return (
       <div className={styles['loading-container']}>
         <Spin></Spin>
