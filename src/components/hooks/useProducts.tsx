@@ -277,12 +277,6 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     return cartItems.some((item) => item.productId === productId);
   };
 
-  const fetchBasketItems = async () => {
-    const items = await getBasketItems();
-    setCartItems(items);
-    return items;
-  };
-
   const ProductsContextValue = {
     productsInfo,
     productDetails,
@@ -296,7 +290,7 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     setIsFiltersOpen,
     criteriaData,
     isProductInCart,
-    getBasketItems: fetchBasketItems,
+    getBasketItems,
     cartItems,
     fetchCartItems,
     isCartLoading: isCartLoading,
