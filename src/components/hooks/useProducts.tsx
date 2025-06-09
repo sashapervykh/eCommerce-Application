@@ -4,6 +4,7 @@ import { ProductInfo } from '../../pages/catalog/components/catalog-content/prod
 import { returnProductsData } from '../../utilities/return-product-data';
 import { INITIAL_CRITERIA } from '../../constants/constants';
 import { getBasketItems, BasketItem } from '../../utilities/return-basket-items';
+import { Image } from '@commercetools/platform-sdk';
 
 interface CriteriaData {
   sort: string | undefined;
@@ -35,11 +36,21 @@ interface ProductsContextType {
   cartItems: BasketItem[];
   fetchCartItems: () => Promise<void>;
   isCartLoading: boolean;
+  getProductByID: (product: BasketItem) => Promise<CartItemType | undefined>;
 }
 
 interface ApiError {
   statusCode: number;
   message: string;
+}
+
+export interface CartItemType {
+  id: string;
+  name: string;
+  price: string;
+  fullPrice?: string;
+  images?: Image[];
+  quantity: number;
 }
 
 function createFiltersQuery(filters: {
@@ -273,6 +284,35 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     }
   }, []);
 
+  const getProductByID = async (product: BasketItem) => {
+    try {
+      const response = await customerAPI.apiRoot().products().withId({ ID: product.productId }).get().execute();
+
+      const productInfo = response.body;
+      const discountedPrice = productInfo.masterData.current.masterVariant.prices?.[0]?.discounted?.value.centAmount;
+      const price = productInfo.masterData.current.masterVariant.prices?.[0].value.centAmount;
+      let currentPrice: string;
+      let fullPrice: string | undefined;
+
+      if (discountedPrice) {
+        currentPrice = formatPrice(discountedPrice);
+        fullPrice = price ? formatPrice(price) : undefined;
+      } else {
+        currentPrice = formatPrice(price);
+      }
+      return {
+        id: productInfo.id,
+        name: productInfo.masterData.current.name['en-US'],
+        price: currentPrice,
+        fullPrice: fullPrice,
+        images: productInfo.masterData.current.masterVariant.images,
+        quantity: product.quantity,
+      };
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const isProductInCart = (productId: string) => {
     return cartItems.some((item) => item.productId === productId);
   };
@@ -294,6 +334,7 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     cartItems,
     fetchCartItems,
     isCartLoading: isCartLoading,
+    getProductByID,
   };
 
   return <ProductsContext.Provider value={ProductsContextValue}>{children}</ProductsContext.Provider>;
