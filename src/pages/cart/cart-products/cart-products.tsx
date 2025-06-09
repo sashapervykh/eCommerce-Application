@@ -36,7 +36,7 @@ export function CartProducts() {
     void fetchAllProducts();
   }, [cartItems]);
 
-  if (productsInCartAmount === 0) return <Text>No product added to the order</Text>;
+  if (productsInCartAmount === 0) return <Text variant="body-3">No product added to the order</Text>;
 
   if (isCartLoading || !cartProductsData) return <Spin className={styles.spinner}></Spin>;
 
