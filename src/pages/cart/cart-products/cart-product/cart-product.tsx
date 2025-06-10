@@ -1,6 +1,7 @@
 import { Card, Text } from '@gravity-ui/uikit';
-import { CartItemType } from '../../../components/hooks/useProducts';
 import styles from './styles.module.css';
+import { CartItemType } from '../../../../components/hooks/useProducts';
+import { AmountController } from './amount-controller/amount-controller';
 
 export function CartProduct({ product }: { product: CartItemType }) {
   return (
@@ -15,11 +16,9 @@ export function CartProduct({ product }: { product: CartItemType }) {
         </Text>
       </div>
       <div className={styles['product-part']}>
+        <AmountController product={product} />
         <Text className={styles.line} variant="body-2">
-          <b>Amount:</b> {product.quantity}
-        </Text>
-        <Text className={styles.line} variant="body-2">
-          <b>Price:</b> ${product.price}
+          <b>Total:</b> ${product.price}
         </Text>
       </div>
     </Card>

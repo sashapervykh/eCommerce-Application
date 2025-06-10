@@ -3,7 +3,7 @@ import { CartItemType, useProducts } from '../../../components/hooks/useProducts
 import { Skeleton, Spin, Text } from '@gravity-ui/uikit';
 import { useCart } from '../../../components/hooks/useCart';
 import styles from './styles.module.css';
-import { CartProduct } from './cart-product';
+import { CartProduct } from './cart-product/cart-product';
 
 export function CartProducts() {
   const { productsInCartAmount } = useCart();
