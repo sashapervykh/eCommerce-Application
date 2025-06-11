@@ -1,4 +1,4 @@
-import { Button } from '@gravity-ui/uikit';
+import { Button, Text } from '@gravity-ui/uikit';
 import { CircleMinus, CirclePlus } from '@gravity-ui/icons';
 import { CartItemType, useProducts } from '../../../../../components/hooks/useProducts';
 import styles from './styles.module.css';
@@ -12,18 +12,29 @@ export function AmountController({ product }: { product: CartItemType }) {
     defaultValues: { amount: product.quantity },
   });
   const [operation, setOperation] = useState<'plus' | 'minus' | undefined>(undefined);
-  const { addToCart, removeFromCart } = useCart();
+  const { addToCart, removeFromCart, setRemovingProducts, removingProducts } = useCart();
   const { fetchCartItems } = useProducts();
   const [previousAmount, setPreviousAmount] = useState<number>(product.quantity);
+  const [isRemoving, setIsRemoving] = useState<boolean | undefined>(removingProducts[product.id]);
 
   const handelAmountChange = () => {
     let value = getValues('amount');
+
     if (operation === 'plus') {
-      setValue('amount', value + 1);
+      setValue('amount', ++value);
     } else if (operation === 'minus') {
-      value = value === 0 ? 0 : value - 1;
+      value = value === 0 ? 0 : --value;
       setValue('amount', value);
     }
+
+    if (value === 0) {
+      setIsRemoving(true);
+      setRemovingProducts((previous) => {
+        previous[product.id] = true;
+        return previous;
+      });
+    }
+
     setOperation(undefined);
   };
 
@@ -32,6 +43,7 @@ export function AmountController({ product }: { product: CartItemType }) {
     if (currentAmount === 0) {
       await removeFromCart(product.id);
       await fetchCartItems();
+
       return;
     }
     const difference = currentAmount - previousAmount;
@@ -51,65 +63,75 @@ export function AmountController({ product }: { product: CartItemType }) {
   };
 
   return (
-    <form
-      className={styles['amount-form']}
-      onSubmit={(event) => {
-        void handleSubmit(debouncedOnSubmit)(event);
-      }}
-    >
-      <Button
-        type="submit"
-        className={styles['amount-button']}
-        view="flat"
-        onClick={() => {
-          setOperation('minus');
+    <>
+      {isRemoving && (
+        <div className={styles['removing-wrapper']}>
+          <Text className={styles['removing-message']} variant="body-3">
+            Removing from cart...
+          </Text>
+        </div>
+      )}
+
+      <form
+        className={styles['amount-form']}
+        onSubmit={(event) => {
+          void handleSubmit(debouncedOnSubmit)(event);
         }}
       >
-        <CircleMinus className={styles.icon} />
-      </Button>
-      <label className={styles['amount-label']}>
-        <Controller
-          control={control}
-          name="amount"
-          render={({ field }) => (
-            <input
-              className={styles['amount-input']}
-              value={field.value}
-              onChange={(event) => {
-                if (event.target.value === '') {
-                  field.onChange(0);
-                  return;
-                }
-                if (!/^\d+$/.test(event.target.value)) return;
-                const value = parseInt(event.target.value);
-                if (Number.isNaN(value)) return;
-                field.onChange(value);
-              }}
-              onBlur={(event) => {
-                setOperation(undefined);
-                void handleSubmit(debouncedOnSubmit)(event);
-              }}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter') {
-                  event.preventDefault();
+        <Button
+          type="submit"
+          className={styles['amount-button']}
+          view="flat"
+          onClick={() => {
+            setOperation('minus');
+          }}
+        >
+          <CircleMinus className={styles.icon} />
+        </Button>
+        <label className={styles['amount-label']}>
+          <Controller
+            control={control}
+            name="amount"
+            render={({ field }) => (
+              <input
+                className={styles['amount-input']}
+                value={field.value}
+                onChange={(event) => {
+                  if (event.target.value === '') {
+                    field.onChange(0);
+                    return;
+                  }
+                  if (!/^\d+$/.test(event.target.value)) return;
+                  const value = parseInt(event.target.value);
+                  if (Number.isNaN(value)) return;
+                  field.onChange(value);
+                }}
+                onBlur={(event) => {
                   setOperation(undefined);
                   void handleSubmit(debouncedOnSubmit)(event);
-                }
-              }}
-            ></input>
-          )}
-        />
-      </label>
-      <Button
-        type="submit"
-        className={`${styles['amount-button']} ${styles['button-plus']}`}
-        view="flat"
-        onClick={() => {
-          setOperation('plus');
-        }}
-      >
-        <CirclePlus className={styles.icon} />
-      </Button>
-    </form>
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') {
+                    event.preventDefault();
+                    setOperation(undefined);
+                    void handleSubmit(debouncedOnSubmit)(event);
+                  }
+                }}
+              ></input>
+            )}
+          />
+        </label>
+        <Button
+          type="submit"
+          className={`${styles['amount-button']} ${styles['button-plus']}`}
+          view="flat"
+          onClick={() => {
+            setOperation('plus');
+          }}
+        >
+          <CirclePlus className={styles.icon} />
+        </Button>
+      </form>
+    </>
   );
 }

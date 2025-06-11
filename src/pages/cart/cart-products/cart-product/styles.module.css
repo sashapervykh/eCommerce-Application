@@ -22,7 +22,15 @@
 }
 
 .product-wrapper {
+  position: relative;
   display: flex;
   padding: 10px;
   margin-bottom: 15px;
+}
+
+.remove-message {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(10px);
 }
