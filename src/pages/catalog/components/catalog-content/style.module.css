@@ -46,42 +46,30 @@
   }
 }
 
-.pagenumbers {
-  display: flex;
-  gap: 8px;
-  margin: 0 16px;
+.product-container,
+.products-list {
+  width: 100%;
 }
 
 .pagination {
   display: flex;
   justify-content: center;
-  align-items: center;
-  padding: 16px 0;
-  margin-top: 24px;
   width: 100%;
-  flex-wrap: wrap;
-}
-
-@media (width < 600px) {
-  .pagenumbers {
-    margin: 8px 0;
-    order: 3;
-    width: 100%;
-    justify-content: center;
-  }
-
-  .pagination > button {
-    order: 1;
-  }
-
-  .pagination > button:last-child {
-    order: 2;
-  }
-}
-
-.paginationwrapper {
-  display: flex;
-  justify-content: center;
   margin-top: 20px;
-  width: 100%;
+}
+
+.pagination-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.page-numbers {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.ellipsis {
+  padding: 0 8px;
 }

@@ -46,7 +46,7 @@ export function CatalogContent({
   const [subcategoryData, setSubcategoryData] = useState<CategoryData | null>(null);
   const [_, setIsCategoryLoading] = useState<boolean>(false);
 
-  const itemsPerPage = 10;
+  const itemsPerPage = 9;
 
   useEffect(() => {
     async function loadCategoryData() {
@@ -155,14 +155,18 @@ export function CatalogContent({
         {isResultsLoading && <Spin />}
         {!isResultsLoading && (
           <>
-            <ProductsList productsInfo={productsInfo} />
-            <div className={styles.paginationWrapper}>
-              <Pagination
-                currentPage={currentPage}
-                totalItems={totalProducts}
-                itemsPerPage={itemsPerPage}
-                onPageChange={handlePageChange}
-              />
+            <div className={styles['product-container']}>
+              <div className={styles['products-list']}>
+                <ProductsList productsInfo={productsInfo} />
+              </div>
+              <div className={styles['pagination-wrapper']}>
+                <Pagination
+                  currentPage={currentPage}
+                  totalItems={totalProducts}
+                  itemsPerPage={itemsPerPage}
+                  onPageChange={handlePageChange}
+                />
+              </div>
             </div>
           </>
         )}

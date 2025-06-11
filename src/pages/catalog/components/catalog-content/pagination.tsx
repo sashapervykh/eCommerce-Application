@@ -64,32 +64,40 @@ export function Pagination({ currentPage, totalItems, itemsPerPage, onPageChange
 
   return (
     <div className={styles.pagination}>
-      <Button view="outlined" disabled={currentPage === 1} onClick={() => onPageChange(currentPage - 1)}>
-        Previous
-      </Button>
+      <div className={styles['pagination-content']}>
+        <Button view="outlined" disabled={currentPage === 1} onClick={() => onPageChange(currentPage - 1)} size="l">
+          Previous
+        </Button>
 
-      <div className={styles.pagenumbers}>
-        {getPageNumbers().map((page, index) =>
-          page === '...' ? (
-            <Text key={index} variant="body-2">
-              ...
-            </Text>
-          ) : (
-            <Button
-              key={index}
-              view={currentPage === page ? 'outlined-action' : 'outlined'}
-              onClick={() => onPageChange(page as number)}
-              disabled={currentPage === page}
-            >
-              {page}
-            </Button>
-          ),
-        )}
+        <div className={styles['page-numbers']}>
+          {getPageNumbers().map((page, index) =>
+            page === '...' ? (
+              <Text key={index} variant="body-2" className={styles.ellipsis}>
+                ...
+              </Text>
+            ) : (
+              <Button
+                key={index}
+                view={currentPage === page ? 'outlined-action' : 'outlined'}
+                onClick={() => onPageChange(page as number)}
+                disabled={currentPage === page}
+                size="l"
+              >
+                {page}
+              </Button>
+            ),
+          )}
+        </div>
+
+        <Button
+          view="outlined"
+          disabled={currentPage === totalPages}
+          onClick={() => onPageChange(currentPage + 1)}
+          size="l"
+        >
+          Next
+        </Button>
       </div>
-
-      <Button view="outlined" disabled={currentPage === totalPages} onClick={() => onPageChange(currentPage + 1)}>
-        Next
-      </Button>
     </div>
   );
 }
