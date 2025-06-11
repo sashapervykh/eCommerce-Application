@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { useCart } from '../../../../../components/hooks/useCart';
 
 export function AmountController({ product }: { product: CartItemType }) {
-  // let [debouceTimeout, setDebouceTimeout] = useState<NodeJS.Timeout | undefined>(undefined);
+  const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | undefined>(undefined);
   const { handleSubmit, getValues, setValue, control } = useForm({
     defaultValues: { amount: product.quantity },
   });
@@ -70,11 +70,8 @@ export function AmountController({ product }: { product: CartItemType }) {
   // };
 
   const onSubmit = async () => {
-    handelAmountChange();
     const currentAmount = getValues('amount');
-    console.log(currentAmount);
     const difference = currentAmount - previousAmount;
-    console.log(difference);
     if (difference > 0) {
       await addToCart(product.id, difference);
       setPreviousAmount(currentAmount);
@@ -84,11 +81,17 @@ export function AmountController({ product }: { product: CartItemType }) {
     }
   };
 
+  const debouncedOnSubmit = () => {
+    handelAmountChange();
+    if (debounceTimeout) clearTimeout(debounceTimeout);
+    setDebounceTimeout(setTimeout(onSubmit, 500));
+  };
+
   return (
     <form
       className={styles['amount-form']}
       onSubmit={(event) => {
-        void handleSubmit(onSubmit)(event);
+        void handleSubmit(debouncedOnSubmit)(event);
       }}
     >
       <Button
@@ -122,13 +125,13 @@ export function AmountController({ product }: { product: CartItemType }) {
               }}
               onBlur={(event) => {
                 setOperation(undefined);
-                void handleSubmit(onSubmit)(event);
+                void handleSubmit(debouncedOnSubmit)(event);
               }}
               onKeyDown={(event) => {
                 if (event.key === 'Enter') {
                   event.preventDefault();
                   setOperation(undefined);
-                  void handleSubmit(onSubmit)(event);
+                  void handleSubmit(debouncedOnSubmit)(event);
                 }
               }}
             ></input>
