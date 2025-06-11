@@ -16,37 +16,6 @@ export function AmountController({ product }: { product: CartItemType }) {
   const { fetchCartItems } = useProducts();
   const [previousAmount, setPreviousAmount] = useState<number>(product.quantity);
 
-  // const handleIncrement = async () => {
-  //   let value = getValues('amount');
-  //   value += 1;
-  //   setValue('amount', value);
-  //   await addToCart(product.id, 1);
-  // };
-
-  // const handleDecrement = async () => {
-  //   const value = getValues('amount');
-  //   if (value === 1) {
-  //     setValue('amount', 0);
-  //     await removeFromCart(product.id);
-  //     await fetchCartItems();
-  //   } else {
-  //     await removeFromCart(product.id, 1);
-  //     setValue('amount', value - 1);
-  //   }
-  // };
-
-  // const handleDirectInput = async () => {
-  //   const value = getValues('amount');
-  //   if (value === 0) {
-  //     setValue('amount', 0);
-  //     await removeFromCart(product.id);
-  //     await fetchCartItems();
-  //   } else {
-  //     await removeFromCart(product.id, 1);
-  //     setValue('amount', value - 1);
-  //   }
-  // };
-
   const handelAmountChange = () => {
     let value = getValues('amount');
     if (operation === 'plus') {
@@ -57,17 +26,6 @@ export function AmountController({ product }: { product: CartItemType }) {
     }
     setOperation(undefined);
   };
-
-  // const onSubmit = async () => {
-  //   if (operation === 'plus') {
-  //     await handleIncrement();
-  //     console.log('increment');
-  //   } else if (operation === 'minus') {
-  //     await handleDecrement();
-  //     console.log('increment');
-  //   }
-  //   setOperation(undefined);
-  // };
 
   const onSubmit = async () => {
     const currentAmount = getValues('amount');
@@ -105,7 +63,6 @@ export function AmountController({ product }: { product: CartItemType }) {
         view="flat"
         onClick={() => {
           setOperation('minus');
-          console.log('minus');
         }}
       >
         <CircleMinus className={styles.icon} />

@@ -12,12 +12,10 @@ export function CartProducts() {
 
   useEffect(() => {
     void fetchCartItems();
-    console.log(1);
   }, []);
 
   useEffect(() => {
     if (cartItems.length === 0) return;
-    console.log(cartItems);
     setCartProductsData([]);
 
     const fetchAllProducts = async () => {

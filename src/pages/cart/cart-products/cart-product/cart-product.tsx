@@ -18,7 +18,7 @@ export function CartProduct({ product }: { product: CartItemType }) {
       <div className={styles['product-part']}>
         <AmountController product={product} />
         <Text className={styles.line} variant="body-2">
-          <b>Total:</b> ${product.price}
+          <b>Total:</b> ${product.totalPrice}
         </Text>
       </div>
     </Card>

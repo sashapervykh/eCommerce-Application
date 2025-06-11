@@ -5,6 +5,7 @@ import { returnProductsData } from '../../utilities/return-product-data';
 import { INITIAL_CRITERIA } from '../../constants/constants';
 import { getBasketItems, BasketItem } from '../../utilities/return-basket-items';
 import { Image } from '@commercetools/platform-sdk';
+import { formatPrice } from '../../utilities/format-price';
 
 interface CriteriaData {
   sort: string | undefined;
@@ -48,6 +49,7 @@ export interface CartItemType {
   id: string;
   name: string;
   price: string;
+  totalPrice: string;
   fullPrice?: string;
   images?: Image[];
   quantity: number;
@@ -95,13 +97,6 @@ function createFiltersQuery(filters: {
 }
 
 const ProductsContext = createContext<ProductsContextType>({} as ProductsContextType);
-
-const formatPrice = (price: number | undefined): string => {
-  if (price === undefined) {
-    return '0.00';
-  }
-  return (price / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-};
 
 export const ProductsProvider = ({ children }: { children: React.ReactNode }) => {
   const [productsInfo, setProductsInfo] = useState<ProductInfo[] | null>(null);
@@ -291,20 +286,22 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
       const productInfo = response.body;
       const discountedPrice = productInfo.masterData.current.masterVariant.prices?.[0]?.discounted?.value.centAmount;
       const price = productInfo.masterData.current.masterVariant.prices?.[0].value.centAmount;
-      let currentPrice: string;
-      let fullPrice: string | undefined;
+      let currentPrice: number | undefined;
+      let fullPrice: number | undefined;
 
       if (discountedPrice) {
-        currentPrice = formatPrice(discountedPrice);
-        fullPrice = price ? formatPrice(price) : undefined;
+        currentPrice = discountedPrice;
+        fullPrice = price;
       } else {
-        currentPrice = formatPrice(price);
+        currentPrice = price;
       }
+
       return {
         id: productInfo.id,
         name: productInfo.masterData.current.name['en-US'],
-        price: currentPrice,
-        fullPrice: fullPrice,
+        price: formatPrice(currentPrice),
+        totalPrice: formatPrice(currentPrice ? currentPrice * product.quantity : currentPrice),
+        fullPrice: formatPrice(fullPrice),
         images: productInfo.masterData.current.masterVariant.images,
         quantity: product.quantity,
       };
