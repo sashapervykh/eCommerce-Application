@@ -7,7 +7,8 @@ import {
   BasketItem,
 } from '../../utilities/return-basket-items';
 
-type ChangingType = Record<string, boolean>;
+type RemovingType = Record<string, boolean>;
+type ChangingType = Record<string, boolean | number>;
 
 interface CartContextType {
   productsInCartAmount: number | undefined;
@@ -16,18 +17,18 @@ interface CartContextType {
   removeFromCart: (productId: string, quantity?: number) => Promise<void>;
   isProductInCart: (productId: string) => Promise<boolean>;
   getBasketItems: () => Promise<BasketItem[]>;
-  removingProducts: ChangingType;
-  setRemovingProducts: React.Dispatch<React.SetStateAction<ChangingType>>;
-  isAmountChanging: ChangingType;
-  setIsAmountChanging: React.Dispatch<React.SetStateAction<ChangingType>>;
+  removingProducts: RemovingType;
+  setRemovingProducts: React.Dispatch<React.SetStateAction<RemovingType>>;
+  productsWithChangedAmount: ChangingType;
+  setProductsWithChangedAmount: React.Dispatch<React.SetStateAction<ChangingType>>;
 }
 
 const CartContext = createContext<CartContextType>({} as CartContextType);
 
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [productsInCartAmount, setProductsInCartAmount] = useState<number | undefined>(undefined);
-  const [removingProducts, setRemovingProducts] = useState<ChangingType>({});
-  const [isAmountChanging, setIsAmountChanging] = useState<ChangingType>({});
+  const [removingProducts, setRemovingProducts] = useState<RemovingType>({});
+  const [productsWithChangedAmount, setProductsWithChangedAmount] = useState<ChangingType>({});
 
   const updateProductsInCartAmount = async () => {
     const cart = await getBasketItems();
@@ -57,8 +58,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     productsInCartAmount: productsInCartAmount,
     removingProducts,
     setRemovingProducts,
-    isAmountChanging,
-    setIsAmountChanging,
+    productsWithChangedAmount,
+    setProductsWithChangedAmount,
   };
 
   return <CartContext.Provider value={CartContextValue}>{children}</CartContext.Provider>;

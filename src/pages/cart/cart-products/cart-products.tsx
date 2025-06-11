@@ -6,9 +6,17 @@ import styles from './styles.module.css';
 import { CartProduct } from './cart-product/cart-product';
 
 export function CartProducts() {
-  const { productsInCartAmount, removingProducts, setRemovingProducts } = useCart();
+  const {
+    productsInCartAmount,
+    removingProducts,
+    setRemovingProducts,
+    productsWithChangedAmount,
+    setProductsWithChangedAmount,
+  } = useCart();
   const { cartItems, fetchCartItems, getProductByID, isCartLoading } = useProducts();
   const [cartProductsData, setCartProductsData] = useState<CartItemType[] | undefined>();
+  const isChangeInTheBasket =
+    !Object.values(removingProducts).some(Boolean) && !Object.values(productsWithChangedAmount).some(Boolean);
 
   useEffect(() => {
     void fetchCartItems();
@@ -16,28 +24,28 @@ export function CartProducts() {
 
   useEffect(() => {
     const result: CartItemType[] = [];
-    const removingInProcess = Object.values(removingProducts).some(Boolean);
+    const changingInProcess =
+      Object.values(removingProducts).some(Boolean) || Object.values(productsWithChangedAmount).some(Boolean);
 
     if (cartItems.length === 0) return;
-    if (!removingInProcess) setCartProductsData([]);
+    if (!changingInProcess) setCartProductsData([]);
 
     const fetchAllProducts = async () => {
       for (const item of cartItems) {
         const productData = await getProductByID(item);
         if (!productData) continue;
-        if (!removingInProcess) {
+        if (!changingInProcess) {
           setCartProductsData((previous) => {
             if (!previous) return [productData];
             const isIncluded = previous.find((product) => product.id === productData.id);
             return isIncluded ? previous : [...previous, productData];
           });
         }
-        if (removingInProcess) {
+        if (changingInProcess) {
           result.push(productData);
-          console.log('isRemoving');
         }
       }
-      if (removingInProcess) {
+      if (changingInProcess) {
         setCartProductsData(result);
         Object.keys(removingProducts)
           .filter((key) => !result.find((element) => element.id === key))
@@ -45,6 +53,20 @@ export function CartProducts() {
             removingProducts[key] = false;
             setRemovingProducts(removingProducts);
           });
+        Object.keys(productsWithChangedAmount).forEach((key) => {
+          const changedProduct = result.find((product) => product.id === key);
+
+          if (!changedProduct) {
+            productsWithChangedAmount[key] = false;
+            setProductsWithChangedAmount(productsWithChangedAmount);
+            return;
+          }
+
+          if (changedProduct.quantity === productsWithChangedAmount[key]) {
+            productsWithChangedAmount[key] = false;
+            setProductsWithChangedAmount(productsWithChangedAmount);
+          }
+        });
       }
     };
 
@@ -53,8 +75,7 @@ export function CartProducts() {
 
   if (productsInCartAmount === 0) return <Text variant="body-3">No product added to the order</Text>;
 
-  if ((isCartLoading && !Object.values(removingProducts).some(Boolean)) || !cartProductsData)
-    return <Spin className={styles.spinner}></Spin>;
+  if ((isCartLoading && isChangeInTheBasket) || !cartProductsData) return <Spin className={styles.spinner}></Spin>;
 
   return (
     <div className={styles['product-list']}>
