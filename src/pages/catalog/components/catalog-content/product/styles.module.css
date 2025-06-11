@@ -30,10 +30,6 @@
   display: block;
   width: 260px;
   height: 260px;
-  object-fit: cover;
-  position: absolute;
-  top: 0;
-  left: 0;
 }
 
 .text-wrapper {
