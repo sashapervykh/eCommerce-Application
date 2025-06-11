@@ -11,7 +11,7 @@ interface CartContextType {
   productsInCartAmount: number | undefined;
   updateProductsInCartAmount: () => void;
   addToCart: (productId: string, quantity?: number) => Promise<void>;
-  removeFromCart: (productId: string) => Promise<void>;
+  removeFromCart: (productId: string, quantity?: number) => Promise<void>;
   isProductInCart: (productId: string) => Promise<boolean>;
   getBasketItems: () => Promise<BasketItem[]>;
 }
@@ -31,8 +31,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     await updateProductsInCartAmount();
   };
 
-  const removeProductFromCart = async (productId: string) => {
-    await removeFromCart(productId);
+  const removeProductFromCart = async (productId: string, quantity?: number) => {
+    await removeFromCart(productId, quantity);
     await updateProductsInCartAmount();
   };
 

@@ -1,6 +1,6 @@
 import { Button } from '@gravity-ui/uikit';
 import { CircleMinus, CirclePlus } from '@gravity-ui/icons';
-import { CartItemType } from '../../../../../components/hooks/useProducts';
+import { CartItemType, useProducts } from '../../../../../components/hooks/useProducts';
 import styles from './styles.module.css';
 import { Controller, useForm } from 'react-hook-form';
 import { useState } from 'react';
@@ -11,7 +11,8 @@ export function AmountController({ product }: { product: CartItemType }) {
     defaultValues: { amount: product.quantity },
   });
   const [operation, setOperation] = useState<'plus' | 'minus' | undefined>(undefined);
-  const { addToCart } = useCart();
+  const { addToCart, removeFromCart } = useCart();
+  const { fetchCartItems } = useProducts();
 
   const handleIncrement = async () => {
     let value = getValues('amount');
@@ -20,10 +21,17 @@ export function AmountController({ product }: { product: CartItemType }) {
     await addToCart(product.id, 1);
   };
 
-  const handleDecrement = () => {
-    let value = getValues('amount');
-    value = value === 0 ? 0 : value - 1;
-    setValue('amount', value);
+  const handleDecrement = async () => {
+    const value = getValues('amount');
+    if (value === 1) {
+      setValue('amount', 0);
+      await removeFromCart(product.id);
+      await fetchCartItems();
+    } else {
+      await removeFromCart(product.id, 1);
+      setValue('amount', value - 1);
+    }
+
     console.log(111);
   };
 
@@ -32,7 +40,7 @@ export function AmountController({ product }: { product: CartItemType }) {
       await handleIncrement();
       console.log('increment');
     } else if (operation === 'minus') {
-      handleDecrement();
+      await handleDecrement();
       console.log('increment');
     }
     setOperation(undefined);
