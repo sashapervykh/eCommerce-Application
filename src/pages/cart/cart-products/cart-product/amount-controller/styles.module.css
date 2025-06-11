@@ -40,3 +40,7 @@
   display: flex;
   margin: auto;
 }
+
+.button-plus {
+  margin-left: 5px;
+}
