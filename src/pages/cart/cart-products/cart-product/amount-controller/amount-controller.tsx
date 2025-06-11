@@ -4,17 +4,20 @@ import { CartItemType } from '../../../../../components/hooks/useProducts';
 import styles from './styles.module.css';
 import { Controller, useForm } from 'react-hook-form';
 import { useState } from 'react';
+import { useCart } from '../../../../../components/hooks/useCart';
 
 export function AmountController({ product }: { product: CartItemType }) {
   const { handleSubmit, getValues, setValue, control } = useForm({
     defaultValues: { amount: product.quantity },
   });
   const [operation, setOperation] = useState<'plus' | 'minus' | undefined>(undefined);
+  const { addToCart } = useCart();
 
-  const handleIncrement = () => {
+  const handleIncrement = async () => {
     let value = getValues('amount');
     value += 1;
     setValue('amount', value);
+    await addToCart(product.id, 1);
   };
 
   const handleDecrement = () => {
@@ -24,9 +27,9 @@ export function AmountController({ product }: { product: CartItemType }) {
     console.log(111);
   };
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     if (operation === 'plus') {
-      handleIncrement();
+      await handleIncrement();
       console.log('increment');
     } else if (operation === 'minus') {
       handleDecrement();
