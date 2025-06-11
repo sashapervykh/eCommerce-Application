@@ -1,6 +1,6 @@
 import { Button } from '@gravity-ui/uikit';
 import { CircleMinus, CirclePlus } from '@gravity-ui/icons';
-import { CartItemType } from '../../../../../components/hooks/useProducts';
+import { CartItemType, useProducts } from '../../../../../components/hooks/useProducts';
 import styles from './styles.module.css';
 import { Controller, useForm } from 'react-hook-form';
 import { useState } from 'react';
@@ -13,7 +13,7 @@ export function AmountController({ product }: { product: CartItemType }) {
   });
   const [operation, setOperation] = useState<'plus' | 'minus' | undefined>(undefined);
   const { addToCart, removeFromCart } = useCart();
-  // const { fetchCartItems } = useProducts();
+  const { fetchCartItems } = useProducts();
   const [previousAmount, setPreviousAmount] = useState<number>(product.quantity);
 
   // const handleIncrement = async () => {
@@ -71,6 +71,11 @@ export function AmountController({ product }: { product: CartItemType }) {
 
   const onSubmit = async () => {
     const currentAmount = getValues('amount');
+    if (currentAmount === 0) {
+      await removeFromCart(product.id);
+      await fetchCartItems();
+      return;
+    }
     const difference = currentAmount - previousAmount;
     if (difference > 0) {
       await addToCart(product.id, difference);
