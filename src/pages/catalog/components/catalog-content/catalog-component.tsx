@@ -11,6 +11,7 @@ import { returnCategoryData, CategoryData } from '../../../../utilities/return-c
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { NotFoundPage } from '../../../404/not-found';
+import { Pagination } from './pagination';
 
 export function CatalogContent({
   categoryKey: propertyCategoryKey,
@@ -31,17 +32,21 @@ export function CatalogContent({
     productsInfo,
     getProductsByCriteria,
     error,
-    isFiltersOpen,
     setIsFiltersOpen,
     notFound,
     fetchCartItems,
     isCartLoading,
     isResultsLoading,
+    totalProducts,
+    currentPage,
+    setCurrentPage,
   } = useProducts();
   const lastCriteriaReference = useRef<string | null>(null);
   const [categoryData, setCategoryData] = useState<CategoryData | null>(null);
   const [subcategoryData, setSubcategoryData] = useState<CategoryData | null>(null);
   const [_, setIsCategoryLoading] = useState<boolean>(false);
+
+  const itemsPerPage = 10;
 
   useEffect(() => {
     async function loadCategoryData() {
@@ -73,10 +78,13 @@ export function CatalogContent({
   }, [categoryKey, subcategoryKey, setIsFiltersOpen]);
 
   useEffect(() => {
+    const offset = (currentPage - 1) * itemsPerPage;
     const criteria = {
       ...INITIAL_CRITERIA(),
       categoryKey,
       subcategoryKey,
+      limit: itemsPerPage,
+      offset,
     };
     const criteriaKey = JSON.stringify(criteria);
 
@@ -87,7 +95,12 @@ export function CatalogContent({
     getProductsByCriteria(criteria);
     void fetchCartItems();
     lastCriteriaReference.current = criteriaKey;
-  }, [categoryKey, subcategoryKey, getProductsByCriteria, fetchCartItems]);
+  }, [categoryKey, subcategoryKey, currentPage, getProductsByCriteria, fetchCartItems]);
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   if (notFound) {
     return <NotFoundPage />;
@@ -139,15 +152,20 @@ export function CatalogContent({
       </div>
       <div className={styles['catalog-content']}>
         <FiltersControls categoryKey={categoryKey} subcategoryKey={subcategoryKey} />
-        {isResultsLoading && <Spin className={`${styles.spin} ${isFiltersOpen ? styles.hidden : ''}`}></Spin>}
-        {!isResultsLoading &&
-          (productsInfo.length === 0 ? (
-            <Text className={isFiltersOpen ? styles.hidden : ''} variant="body-2">
-              {'No products found'}
-            </Text>
-          ) : (
+        {isResultsLoading && <Spin />}
+        {!isResultsLoading && (
+          <>
             <ProductsList productsInfo={productsInfo} />
-          ))}
+            <div className={styles.paginationWrapper}>
+              <Pagination
+                currentPage={currentPage}
+                totalItems={totalProducts}
+                itemsPerPage={itemsPerPage}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

@@ -3,6 +3,8 @@ import { FiltersFieldsType } from '../pages/catalog/components/catalog-content/f
 export const INITIAL_CRITERIA: () => {
   sort: string | undefined;
   search: string | undefined;
+  limit: number;
+  offset: number;
   filters: {
     price: [number, number];
     area: [number, number];
@@ -18,6 +20,8 @@ export const INITIAL_CRITERIA: () => {
   return {
     sort: undefined,
     search: undefined,
+    limit: 10,
+    offset: 0,
     filters: {
       price: [0, 1000000],
       area: [0, 1000],

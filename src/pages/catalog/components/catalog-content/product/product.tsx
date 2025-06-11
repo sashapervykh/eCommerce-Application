@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ProductInfo } from './types';
 import styles from './styles.module.css';
 import { Card, Text, Spin } from '@gravity-ui/uikit';
@@ -9,6 +9,11 @@ export function ProductCard({ productInfo }: { productInfo: ProductInfo }) {
   const navigate = useNavigate();
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    setIsImageLoaded(false);
+    setHasError(false);
+  }, [productInfo.id]);
 
   return (
     <Card
