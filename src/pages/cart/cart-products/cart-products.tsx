@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { CartItemType, useProducts } from '../../../components/hooks/useProducts';
-import { Button, Skeleton, Spin, Text } from '@gravity-ui/uikit';
+import { CartItemType } from '../../../components/hooks/useProducts';
+import { Button, Spin, Text } from '@gravity-ui/uikit';
 import { useCart } from '../../../components/hooks/useCart';
 import styles from './styles.module.css';
 import { CartProduct } from './cart-product/cart-product';
@@ -11,75 +11,44 @@ import { formatPrice } from '../../../utilities/format-price';
 export function CartProducts() {
   const navigate = useNavigate();
   const {
+    cartPageData,
     productsInCartAmount,
     removingProducts,
     setRemovingProducts,
     productsWithChangedAmount,
     setProductsWithChangedAmount,
-    getTotalPrice,
+    isCartPageLoading,
+    getCartPageData,
   } = useCart();
-  const { cartItems, fetchCartItems, getProductByID, isCartLoading } = useProducts();
   const [cartProductsData, setCartProductsData] = useState<CartItemType[] | undefined>();
   const [totalPrice, setTotalPrice] = useState<number | undefined>(undefined);
   const isChangeInTheBasket =
     !Object.values(removingProducts).some(Boolean) && !Object.values(productsWithChangedAmount).some(Boolean);
 
   useEffect(() => {
-    void fetchCartItems();
+    void getCartPageData();
   }, []);
 
   useEffect(() => {
-    const result: CartItemType[] = [];
-    const changingInProcess =
-      Object.values(removingProducts).some(Boolean) || Object.values(productsWithChangedAmount).some(Boolean);
+    if (!cartPageData) return;
+    setTotalPrice(cartPageData.totalCartPrice);
+    setCartProductsData(cartPageData.cartProducts);
 
-    if (cartItems.length === 0) return;
-    if (!changingInProcess) setCartProductsData([]);
+    Object.keys(removingProducts)
+      .filter((key) => !cartPageData.cartProducts.find((element) => element.id === key))
+      .forEach((key) => {
+        removingProducts[key] = false;
+        setRemovingProducts(removingProducts);
+      });
 
-    const fetchAllProducts = async () => {
-      for (const item of cartItems) {
-        const productData = await getProductByID(item);
-        if (!productData) continue;
-        if (!changingInProcess) {
-          setCartProductsData((previous) => {
-            if (!previous) return [productData];
-            const isIncluded = previous.find((product) => product.id === productData.id);
-            return isIncluded ? previous : [...previous, productData];
-          });
-        }
-        if (changingInProcess) {
-          result.push(productData);
-        }
+    Object.keys(productsWithChangedAmount).forEach((key) => {
+      const changedProduct = cartPageData.cartProducts.find((product) => product.id === key);
+      if (!changedProduct || changedProduct.quantity === productsWithChangedAmount[key]) {
+        productsWithChangedAmount[key] = false;
+        setProductsWithChangedAmount(productsWithChangedAmount);
       }
-      if (changingInProcess) {
-        setCartProductsData(result);
-        Object.keys(removingProducts)
-          .filter((key) => !result.find((element) => element.id === key))
-          .forEach((key) => {
-            removingProducts[key] = false;
-            setRemovingProducts(removingProducts);
-          });
-        Object.keys(productsWithChangedAmount).forEach((key) => {
-          const changedProduct = result.find((product) => product.id === key);
-
-          if (!changedProduct) {
-            productsWithChangedAmount[key] = false;
-            setProductsWithChangedAmount(productsWithChangedAmount);
-            return;
-          }
-
-          if (changedProduct.quantity === productsWithChangedAmount[key]) {
-            productsWithChangedAmount[key] = false;
-            setProductsWithChangedAmount(productsWithChangedAmount);
-          }
-        });
-      }
-      const total = await getTotalPrice();
-      setTotalPrice(total);
-    };
-
-    void fetchAllProducts();
-  }, [cartItems]);
+    });
+  }, [cartPageData]);
 
   if (productsInCartAmount === 0)
     return (
@@ -99,20 +68,16 @@ export function CartProducts() {
       </>
     );
 
-  if ((isCartLoading && isChangeInTheBasket) || !cartProductsData) return <Spin className={styles.spinner}></Spin>;
+  if ((isCartPageLoading && isChangeInTheBasket) || !cartProductsData) return <Spin className={styles.spinner}></Spin>;
 
   return (
     <div className={styles['product-list']}>
-      {cartItems.map((cartItem, index) => {
-        return cartProductsData[index] ? (
-          <CartProduct key={cartItem.productId} product={cartProductsData[index]} />
-        ) : (
-          <Skeleton key={cartItem.productId} className={styles.skeleton} />
-        );
+      {cartProductsData.map((cartProduct, index) => {
+        return <CartProduct key={cartProduct.id} product={cartProductsData[index]} />;
       })}
       <TotalValue
         totalPrice={totalPrice ? formatPrice(totalPrice) : 'Calculating...'}
-        allProductsShown={Boolean(totalPrice) && cartItems.length === cartProductsData.length && isChangeInTheBasket}
+        allProductsShown={Boolean(totalPrice) && isChangeInTheBasket}
       />
     </div>
   );

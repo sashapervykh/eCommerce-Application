@@ -1,4 +1,4 @@
-import { LineItem, MyCartAddLineItemAction } from '@commercetools/platform-sdk';
+import { Cart, LineItem, MyCartAddLineItemAction } from '@commercetools/platform-sdk';
 import { customerAPI } from '../api/customer-api';
 import { getOrCreateAnonymId } from '../utilities/return-anonim-id';
 export interface BasketItem {
@@ -8,14 +8,62 @@ export interface BasketItem {
 
 const CART_ID_KEY = 'anonymous_cart_id';
 
-export async function getFullCartInfo() {
+export async function getFullCartInfo(): Promise<Cart | undefined> {
   try {
-    const response = await customerAPI.apiRoot().me().carts().get().execute();
-    const cart = response.body.results[0];
+    let cart;
+    if (customerAPI.isAnonymous) {
+      const cartId = localStorage.getItem(CART_ID_KEY);
+      const anonymousId = getOrCreateAnonymId();
+
+      if (cartId) {
+        try {
+          const response = await customerAPI.apiRoot().carts().withId({ ID: cartId }).get().execute();
+          cart = response.body;
+          if (cart.anonymousId !== anonymousId) {
+            throw new Error('Cart does not match anonymousId');
+          }
+        } catch (error) {
+          console.error('Invalid cart ID, creating new cart:', error);
+          localStorage.removeItem(CART_ID_KEY);
+        }
+      }
+
+      if (!cart) {
+        const response = await customerAPI
+          .apiRoot()
+          .carts()
+          .get({
+            queryArgs: {
+              where: `anonymousId="${anonymousId}"`,
+            },
+          })
+          .execute();
+        cart = response.body.results[0];
+
+        if (response.body.results.length == 0) {
+          const createCartResponse = await customerAPI
+            .apiRoot()
+            .carts()
+            .post({
+              body: {
+                currency: 'USD',
+                anonymousId: anonymousId,
+              },
+            })
+            .execute();
+          cart = createCartResponse.body;
+          localStorage.setItem(CART_ID_KEY, cart.id);
+        }
+      }
+    } else {
+      const response = await customerAPI.apiRoot().me().carts().get().execute();
+      cart = response.body.results[0];
+    }
+
     return cart;
   } catch (error) {
-    console.error('Error fetching full cart info:', error);
-    return null;
+    console.error('Error fetching basket items:', error);
+    return;
   }
 }
 

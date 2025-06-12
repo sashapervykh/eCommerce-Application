@@ -1,6 +1,6 @@
 import { Button, Card, Skeleton, Text } from '@gravity-ui/uikit';
 import styles from './styles.module.css';
-import { CartItemType, useProducts } from '../../../../components/hooks/useProducts';
+import { CartItemType } from '../../../../components/hooks/useProducts';
 import { AmountController } from './amount-controller/amount-controller';
 import { useCart } from '../../../../components/hooks/useCart';
 import { TrashBin } from '@gravity-ui/icons';
@@ -9,7 +9,7 @@ import { RemovedProduct } from '../../../../components/removing-message/removing
 
 export function CartProduct({ product }: { product: CartItemType }) {
   const { productsWithChangedAmount, removeFromCart, setRemovingProducts } = useCart();
-  const { fetchCartItems } = useProducts();
+  const { getCartPageData } = useCart();
 
   const { removingProducts } = useCart();
   const [isRemoving, setIsRemoving] = useState<boolean | undefined>(removingProducts[product.id]);
@@ -20,8 +20,9 @@ export function CartProduct({ product }: { product: CartItemType }) {
       previous[product.id] = true;
       return previous;
     });
+
     await removeFromCart(product.id);
-    await fetchCartItems();
+    await getCartPageData();
   };
 
   return (
