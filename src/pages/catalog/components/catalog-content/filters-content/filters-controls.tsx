@@ -16,9 +16,11 @@ import { NumberSlider } from './number-slider/number-slider';
 interface FiltersControlsProps {
   categoryKey?: string;
   subcategoryKey?: string;
+  itemsPerPage: number;
+  currentPage: number;
 }
 
-export function FiltersControls({ categoryKey, subcategoryKey }: FiltersControlsProps) {
+export function FiltersControls({ categoryKey, subcategoryKey, itemsPerPage }: FiltersControlsProps) {
   const { isFiltersOpen, criteriaData, getProductsByCriteria, setIsFiltersOpen } = useProducts();
   const methods = useForm<FiltersFieldsType>({
     defaultValues: INITIAL_FILTERS_FORM_STATE,
@@ -90,11 +92,12 @@ export function FiltersControls({ categoryKey, subcategoryKey }: FiltersControls
                 view="action"
                 onClick={() => {
                   methods.reset(INITIAL_FILTERS_FORM_STATE);
-
                   getProductsByCriteria({
                     ...INITIAL_CRITERIA(),
                     categoryKey,
                     subcategoryKey,
+                    limit: itemsPerPage,
+                    offset: 0,
                   });
                 }}
               >

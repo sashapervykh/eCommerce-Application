@@ -135,6 +135,14 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
         setIsResultsLoading(true);
         setError(false);
         setNotFound(false);
+        const filtersChanged = JSON.stringify(criteria.filters) !== JSON.stringify(criteriaData.filters);
+        const sortChanged = criteria.sort !== criteriaData.sort;
+        const searchChanged = criteria.search !== criteriaData.search;
+
+        if (filtersChanged || sortChanged || searchChanged) {
+          setCurrentPage(1);
+          criteria.offset = 0;
+        }
 
         const { sort, search, categoryKey, subcategoryKey, filters, limit = 10, offset = 0 } = criteria;
 
@@ -233,7 +241,7 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
         setIsResultsLoading(false);
       }
     },
-    [isInitialLoad, criteriaData, lastFilters, lastSort, lastSearch],
+    [isInitialLoad, criteriaData, lastFilters, lastSort, lastSearch, setCurrentPage],
   );
 
   const getProductDetails = useCallback(async (key: string) => {

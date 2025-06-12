@@ -12,6 +12,7 @@ export function SearchComponent() {
 
   const onSubmit = (data: { search: string }) => {
     criteriaData.search = data.search;
+    criteriaData.offset = 0;
     getProductsByCriteria(criteriaData);
   };
 

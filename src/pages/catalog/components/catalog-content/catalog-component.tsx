@@ -6,7 +6,6 @@ import { Breadcrumbs } from '../breadcrumbs/breadcrumbs';
 import { ProductsList } from './product/products';
 import { FiltersControls } from './filters-content/filters-controls';
 import { useProducts } from '../../../../components/hooks/useProducts';
-import { INITIAL_CRITERIA } from '../../../../constants/constants';
 import { returnCategoryData, CategoryData } from '../../../../utilities/return-category-data';
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -41,6 +40,7 @@ export function CatalogContent({
     totalProducts,
     currentPage,
     setCurrentPage,
+    criteriaData,
   } = useProducts();
   const lastCriteriaReference = useRef<string | null>(null);
   const [categoryData, setCategoryData] = useState<CategoryData | null>(null);
@@ -81,13 +81,16 @@ export function CatalogContent({
   useEffect(() => {
     const offset = (currentPage - 1) * itemsPerPage;
     const criteria = {
-      ...INITIAL_CRITERIA(),
+      ...criteriaData,
       categoryKey,
       subcategoryKey,
       limit: itemsPerPage,
       offset,
     };
-    const criteriaKey = JSON.stringify(criteria);
+    const criteriaKey = JSON.stringify({
+      ...criteria,
+      filters: criteria.filters,
+    });
 
     if (lastCriteriaReference.current === criteriaKey) {
       return;
@@ -96,7 +99,8 @@ export function CatalogContent({
     getProductsByCriteria(criteria);
     void fetchCartItems();
     lastCriteriaReference.current = criteriaKey;
-  }, [categoryKey, subcategoryKey, currentPage, getProductsByCriteria, fetchCartItems]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [categoryKey, subcategoryKey, currentPage, itemsPerPage]);
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
@@ -153,7 +157,12 @@ export function CatalogContent({
       </div>
       <div className={styles['catalog-container']}>
         <div className={styles['catalog-content']}>
-          <FiltersControls categoryKey={categoryKey} subcategoryKey={subcategoryKey} />
+          <FiltersControls
+            categoryKey={categoryKey}
+            subcategoryKey={subcategoryKey}
+            itemsPerPage={itemsPerPage}
+            currentPage={currentPage}
+          />
           {isResultsLoading && <Spin className={`${styles.spin} ${isFiltersOpen ? styles.hidden : ''}`}></Spin>}
           {!isResultsLoading &&
             (productsInfo.length === 0 ? (
