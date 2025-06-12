@@ -32,6 +32,7 @@ export function CatalogContent({
     productsInfo,
     getProductsByCriteria,
     error,
+    isFiltersOpen,
     setIsFiltersOpen,
     notFound,
     fetchCartItems,
@@ -150,26 +151,27 @@ export function CatalogContent({
         <SortComponent />
         <SearchComponent />
       </div>
-      <div className={styles['catalog-content']}>
-        <FiltersControls categoryKey={categoryKey} subcategoryKey={subcategoryKey} />
-        {isResultsLoading && <Spin />}
-        {!isResultsLoading && (
-          <>
-            <div className={styles['product-container']}>
-              <div className={styles['products-list']}>
-                <ProductsList productsInfo={productsInfo} />
-              </div>
-              <div className={styles['pagination-wrapper']}>
-                <Pagination
-                  currentPage={currentPage}
-                  totalItems={totalProducts}
-                  itemsPerPage={itemsPerPage}
-                  onPageChange={handlePageChange}
-                />
-              </div>
-            </div>
-          </>
-        )}
+      <div className={styles['catalog-container']}>
+        <div className={styles['catalog-content']}>
+          <FiltersControls categoryKey={categoryKey} subcategoryKey={subcategoryKey} />
+          {isResultsLoading && <Spin className={`${styles.spin} ${isFiltersOpen ? styles.hidden : ''}`}></Spin>}
+          {!isResultsLoading &&
+            (productsInfo.length === 0 ? (
+              <Text className={isFiltersOpen ? styles.hidden : ''} variant="body-2">
+                {'No products found'}
+              </Text>
+            ) : (
+              <ProductsList productsInfo={productsInfo} />
+            ))}
+        </div>
+        <div className={styles['pagination-wrapper']}>
+          <Pagination
+            currentPage={currentPage}
+            totalItems={totalProducts}
+            itemsPerPage={itemsPerPage}
+            onPageChange={handlePageChange}
+          />
+        </div>
       </div>
     </div>
   );
