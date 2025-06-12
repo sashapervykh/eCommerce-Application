@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { CartItemType, useProducts } from '../../../components/hooks/useProducts';
-import { Skeleton, Spin, Text } from '@gravity-ui/uikit';
+import { Button, Skeleton, Spin, Text } from '@gravity-ui/uikit';
 import { useCart } from '../../../components/hooks/useCart';
 import styles from './styles.module.css';
 import { CartProduct } from './cart-product/cart-product';
+import { useNavigate } from 'react-router-dom';
 
 export function CartProducts() {
+  const navigate = useNavigate();
   const {
     productsInCartAmount,
     removingProducts,
@@ -73,7 +75,23 @@ export function CartProducts() {
     void fetchAllProducts();
   }, [cartItems]);
 
-  if (productsInCartAmount === 0) return <Text variant="body-3">No product added to the order</Text>;
+  if (productsInCartAmount === 0)
+    return (
+      <>
+        <div className={styles['empty-cart']}>
+          <Text variant="body-3">No product added to the order</Text>
+          <Button
+            view="action"
+            className={styles['catalog-button']}
+            onClick={async () => {
+              await navigate('/catalog');
+            }}
+          >
+            Go to catalog
+          </Button>
+        </div>
+      </>
+    );
 
   if ((isCartLoading && isChangeInTheBasket) || !cartProductsData) return <Spin className={styles.spinner}></Spin>;
 
