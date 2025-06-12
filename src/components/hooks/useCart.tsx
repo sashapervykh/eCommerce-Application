@@ -5,6 +5,7 @@ import {
   getBasketItems,
   isProductInCart,
   BasketItem,
+  getFullCartInfo,
 } from '../../utilities/return-basket-items';
 
 type RemovingType = Record<string, boolean>;
@@ -17,6 +18,7 @@ interface CartContextType {
   removeFromCart: (productId: string, quantity?: number) => Promise<void>;
   isProductInCart: (productId: string) => Promise<boolean>;
   getBasketItems: () => Promise<BasketItem[]>;
+  getTotalPrice: () => Promise<number | undefined>;
   removingProducts: RemovingType;
   setRemovingProducts: React.Dispatch<React.SetStateAction<RemovingType>>;
   productsWithChangedAmount: ChangingType;
@@ -29,6 +31,12 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [productsInCartAmount, setProductsInCartAmount] = useState<number | undefined>(undefined);
   const [removingProducts, setRemovingProducts] = useState<RemovingType>({});
   const [productsWithChangedAmount, setProductsWithChangedAmount] = useState<ChangingType>({});
+
+  const getTotalPrice = async () => {
+    const cart = await getFullCartInfo();
+    if (!cart) return;
+    return cart.totalPrice.centAmount;
+  };
 
   const updateProductsInCartAmount = async () => {
     const cart = await getBasketItems();
@@ -54,6 +62,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     removeFromCart: removeProductFromCart,
     isProductInCart: checkProductInCart,
     getBasketItems: getBasketItems,
+    getTotalPrice,
     updateProductsInCartAmount: updateProductsInCartAmount,
     productsInCartAmount: productsInCartAmount,
     removingProducts,

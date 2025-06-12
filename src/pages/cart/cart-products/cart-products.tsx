@@ -5,6 +5,8 @@ import { useCart } from '../../../components/hooks/useCart';
 import styles from './styles.module.css';
 import { CartProduct } from './cart-product/cart-product';
 import { useNavigate } from 'react-router-dom';
+import { TotalValue } from '../total-value/total-value';
+import { formatPrice } from '../../../utilities/format-price';
 
 export function CartProducts() {
   const navigate = useNavigate();
@@ -14,9 +16,11 @@ export function CartProducts() {
     setRemovingProducts,
     productsWithChangedAmount,
     setProductsWithChangedAmount,
+    getTotalPrice,
   } = useCart();
   const { cartItems, fetchCartItems, getProductByID, isCartLoading } = useProducts();
   const [cartProductsData, setCartProductsData] = useState<CartItemType[] | undefined>();
+  const [totalPrice, setTotalPrice] = useState<number | undefined>(undefined);
   const isChangeInTheBasket =
     !Object.values(removingProducts).some(Boolean) && !Object.values(productsWithChangedAmount).some(Boolean);
 
@@ -70,6 +74,8 @@ export function CartProducts() {
           }
         });
       }
+      const total = await getTotalPrice();
+      setTotalPrice(total);
     };
 
     void fetchAllProducts();
@@ -104,6 +110,10 @@ export function CartProducts() {
           <Skeleton key={cartItem.productId} className={styles.skeleton} />
         );
       })}
+      <TotalValue
+        totalPrice={totalPrice ? formatPrice(totalPrice) : 'Calculating...'}
+        allProductsShown={Boolean(totalPrice) && cartItems.length === cartProductsData.length && isChangeInTheBasket}
+      />
     </div>
   );
 }
