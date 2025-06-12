@@ -37,3 +37,19 @@
   width: 100%;
   min-width: 150px;
 }
+
+.remove-button {
+  margin: 15px;
+}
+
+.remove-container {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+}
+
+.remove-icon {
+  position: relative;
+  display: flex;
+  margin: auto 0 auto 10px;
+}
