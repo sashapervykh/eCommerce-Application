@@ -179,7 +179,7 @@ export async function addToCart(productId: string, quantity = 1): Promise<void> 
   }
 }
 
-export async function removeFromCart(productId: string): Promise<void> {
+export async function removeFromCart(productId: string, quantity?: number): Promise<void> {
   try {
     let cart;
     if (customerAPI.isAnonymous) {
@@ -216,6 +216,7 @@ export async function removeFromCart(productId: string): Promise<void> {
               {
                 action: 'removeLineItem',
                 lineItemId: lineItem.id,
+                quantity: quantity,
               },
             ],
           },
@@ -234,6 +235,7 @@ export async function removeFromCart(productId: string): Promise<void> {
               {
                 action: 'removeLineItem',
                 lineItemId: lineItem.id,
+                quantity: quantity,
               },
             ],
           },

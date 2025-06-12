@@ -1,0 +1,91 @@
+import { useEffect, useState } from 'react';
+import { CartItemType, useProducts } from '../../../components/hooks/useProducts';
+import { Skeleton, Spin, Text } from '@gravity-ui/uikit';
+import { useCart } from '../../../components/hooks/useCart';
+import styles from './styles.module.css';
+import { CartProduct } from './cart-product/cart-product';
+
+export function CartProducts() {
+  const {
+    productsInCartAmount,
+    removingProducts,
+    setRemovingProducts,
+    productsWithChangedAmount,
+    setProductsWithChangedAmount,
+  } = useCart();
+  const { cartItems, fetchCartItems, getProductByID, isCartLoading } = useProducts();
+  const [cartProductsData, setCartProductsData] = useState<CartItemType[] | undefined>();
+  const isChangeInTheBasket =
+    !Object.values(removingProducts).some(Boolean) && !Object.values(productsWithChangedAmount).some(Boolean);
+
+  useEffect(() => {
+    void fetchCartItems();
+  }, []);
+
+  useEffect(() => {
+    const result: CartItemType[] = [];
+    const changingInProcess =
+      Object.values(removingProducts).some(Boolean) || Object.values(productsWithChangedAmount).some(Boolean);
+
+    if (cartItems.length === 0) return;
+    if (!changingInProcess) setCartProductsData([]);
+
+    const fetchAllProducts = async () => {
+      for (const item of cartItems) {
+        const productData = await getProductByID(item);
+        if (!productData) continue;
+        if (!changingInProcess) {
+          setCartProductsData((previous) => {
+            if (!previous) return [productData];
+            const isIncluded = previous.find((product) => product.id === productData.id);
+            return isIncluded ? previous : [...previous, productData];
+          });
+        }
+        if (changingInProcess) {
+          result.push(productData);
+        }
+      }
+      if (changingInProcess) {
+        setCartProductsData(result);
+        Object.keys(removingProducts)
+          .filter((key) => !result.find((element) => element.id === key))
+          .forEach((key) => {
+            removingProducts[key] = false;
+            setRemovingProducts(removingProducts);
+          });
+        Object.keys(productsWithChangedAmount).forEach((key) => {
+          const changedProduct = result.find((product) => product.id === key);
+
+          if (!changedProduct) {
+            productsWithChangedAmount[key] = false;
+            setProductsWithChangedAmount(productsWithChangedAmount);
+            return;
+          }
+
+          if (changedProduct.quantity === productsWithChangedAmount[key]) {
+            productsWithChangedAmount[key] = false;
+            setProductsWithChangedAmount(productsWithChangedAmount);
+          }
+        });
+      }
+    };
+
+    void fetchAllProducts();
+  }, [cartItems]);
+
+  if (productsInCartAmount === 0) return <Text variant="body-3">No product added to the order</Text>;
+
+  if ((isCartLoading && isChangeInTheBasket) || !cartProductsData) return <Spin className={styles.spinner}></Spin>;
+
+  return (
+    <div className={styles['product-list']}>
+      {cartItems.map((cartItem, index) => {
+        return cartProductsData[index] ? (
+          <CartProduct key={cartItem.productId} product={cartProductsData[index]} />
+        ) : (
+          <Skeleton key={cartItem.productId} className={styles.skeleton} />
+        );
+      })}
+    </div>
+  );
+}

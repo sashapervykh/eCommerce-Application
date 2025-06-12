@@ -4,6 +4,8 @@ import { ProductInfo } from '../../pages/catalog/components/catalog-content/prod
 import { returnProductsData } from '../../utilities/return-product-data';
 import { INITIAL_CRITERIA } from '../../constants/constants';
 import { getBasketItems, BasketItem } from '../../utilities/return-basket-items';
+import { Image } from '@commercetools/platform-sdk';
+import { formatPrice } from '../../utilities/format-price';
 
 interface CriteriaData {
   sort: string | undefined;
@@ -35,11 +37,22 @@ interface ProductsContextType {
   cartItems: BasketItem[];
   fetchCartItems: () => Promise<void>;
   isCartLoading: boolean;
+  getProductByID: (product: BasketItem) => Promise<CartItemType | undefined>;
 }
 
 interface ApiError {
   statusCode: number;
   message: string;
+}
+
+export interface CartItemType {
+  id: string;
+  name: string;
+  price: string;
+  totalPrice: string;
+  fullPrice?: string;
+  images?: Image[];
+  quantity: number;
 }
 
 function createFiltersQuery(filters: {
@@ -84,13 +97,6 @@ function createFiltersQuery(filters: {
 }
 
 const ProductsContext = createContext<ProductsContextType>({} as ProductsContextType);
-
-const formatPrice = (price: number | undefined): string => {
-  if (price === undefined) {
-    return '0.00';
-  }
-  return (price / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-};
 
 export const ProductsProvider = ({ children }: { children: React.ReactNode }) => {
   const [productsInfo, setProductsInfo] = useState<ProductInfo[] | null>(null);
@@ -273,6 +279,37 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     }
   }, []);
 
+  const getProductByID = async (product: BasketItem) => {
+    try {
+      const response = await customerAPI.apiRoot().products().withId({ ID: product.productId }).get().execute();
+
+      const productInfo = response.body;
+      const discountedPrice = productInfo.masterData.current.masterVariant.prices?.[0]?.discounted?.value.centAmount;
+      const price = productInfo.masterData.current.masterVariant.prices?.[0].value.centAmount;
+      let currentPrice: number | undefined;
+      let fullPrice: number | undefined;
+
+      if (discountedPrice) {
+        currentPrice = discountedPrice;
+        fullPrice = price;
+      } else {
+        currentPrice = price;
+      }
+
+      return {
+        id: productInfo.id,
+        name: productInfo.masterData.current.name['en-US'],
+        price: formatPrice(currentPrice),
+        totalPrice: formatPrice(currentPrice ? currentPrice * product.quantity : currentPrice),
+        fullPrice: formatPrice(fullPrice),
+        images: productInfo.masterData.current.masterVariant.images,
+        quantity: product.quantity,
+      };
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const isProductInCart = (productId: string) => {
     return cartItems.some((item) => item.productId === productId);
   };
@@ -294,6 +331,7 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     cartItems,
     fetchCartItems,
     isCartLoading: isCartLoading,
+    getProductByID,
   };
 
   return <ProductsContext.Provider value={ProductsContextValue}>{children}</ProductsContext.Provider>;

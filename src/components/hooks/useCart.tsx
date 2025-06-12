@@ -7,19 +7,28 @@ import {
   BasketItem,
 } from '../../utilities/return-basket-items';
 
+type RemovingType = Record<string, boolean>;
+type ChangingType = Record<string, boolean | number>;
+
 interface CartContextType {
   productsInCartAmount: number | undefined;
   updateProductsInCartAmount: () => void;
   addToCart: (productId: string, quantity?: number) => Promise<void>;
-  removeFromCart: (productId: string) => Promise<void>;
+  removeFromCart: (productId: string, quantity?: number) => Promise<void>;
   isProductInCart: (productId: string) => Promise<boolean>;
   getBasketItems: () => Promise<BasketItem[]>;
+  removingProducts: RemovingType;
+  setRemovingProducts: React.Dispatch<React.SetStateAction<RemovingType>>;
+  productsWithChangedAmount: ChangingType;
+  setProductsWithChangedAmount: React.Dispatch<React.SetStateAction<ChangingType>>;
 }
 
 const CartContext = createContext<CartContextType>({} as CartContextType);
 
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [productsInCartAmount, setProductsInCartAmount] = useState<number | undefined>(undefined);
+  const [removingProducts, setRemovingProducts] = useState<RemovingType>({});
+  const [productsWithChangedAmount, setProductsWithChangedAmount] = useState<ChangingType>({});
 
   const updateProductsInCartAmount = async () => {
     const cart = await getBasketItems();
@@ -31,8 +40,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     await updateProductsInCartAmount();
   };
 
-  const removeProductFromCart = async (productId: string) => {
-    await removeFromCart(productId);
+  const removeProductFromCart = async (productId: string, quantity?: number) => {
+    await removeFromCart(productId, quantity);
     await updateProductsInCartAmount();
   };
 
@@ -47,6 +56,10 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     getBasketItems: getBasketItems,
     updateProductsInCartAmount: updateProductsInCartAmount,
     productsInCartAmount: productsInCartAmount,
+    removingProducts,
+    setRemovingProducts,
+    productsWithChangedAmount,
+    setProductsWithChangedAmount,
   };
 
   return <CartContext.Provider value={CartContextValue}>{children}</CartContext.Provider>;
