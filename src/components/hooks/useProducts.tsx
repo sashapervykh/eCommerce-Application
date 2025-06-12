@@ -37,7 +37,6 @@ interface ProductsContextType {
   cartItems: BasketItem[];
   fetchCartItems: () => Promise<void>;
   isCartLoading: boolean;
-  getProductByID: (product: BasketItem) => Promise<CartItemType | undefined>;
 }
 
 interface ApiError {
@@ -279,37 +278,6 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     }
   }, []);
 
-  const getProductByID = async (product: BasketItem) => {
-    try {
-      const response = await customerAPI.apiRoot().products().withId({ ID: product.productId }).get().execute();
-
-      const productInfo = response.body;
-      const discountedPrice = productInfo.masterData.current.masterVariant.prices?.[0]?.discounted?.value.centAmount;
-      const price = productInfo.masterData.current.masterVariant.prices?.[0].value.centAmount;
-      let currentPrice: number | undefined;
-      let fullPrice: number | undefined;
-
-      if (discountedPrice) {
-        currentPrice = discountedPrice;
-        fullPrice = price;
-      } else {
-        currentPrice = price;
-      }
-
-      return {
-        id: productInfo.id,
-        name: productInfo.masterData.current.name['en-US'],
-        price: formatPrice(currentPrice),
-        totalPrice: formatPrice(currentPrice ? currentPrice * product.quantity : currentPrice),
-        fullPrice: formatPrice(fullPrice),
-        images: productInfo.masterData.current.masterVariant.images,
-        quantity: product.quantity,
-      };
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const isProductInCart = (productId: string) => {
     return cartItems.some((item) => item.productId === productId);
   };
@@ -331,7 +299,6 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     cartItems,
     fetchCartItems,
     isCartLoading: isCartLoading,
-    getProductByID,
   };
 
   return <ProductsContext.Provider value={ProductsContextValue}>{children}</ProductsContext.Provider>;
