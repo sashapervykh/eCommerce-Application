@@ -6,6 +6,7 @@ import { useCart } from '../hooks/useCart';
 export function CartButton({ buttonSize, buttonWidth }: { buttonSize: 'm' | 'l'; buttonWidth: 'max' | undefined }) {
   const navigate = useNavigate();
   const { productsInCartAmount, updateProductsInCartAmount } = useCart();
+
   updateProductsInCartAmount();
 
   return (

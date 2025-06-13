@@ -6,6 +6,7 @@ import {
   isProductInCart,
   BasketItem,
   getFullCartInfo,
+  deleteCart,
 } from '../../utilities/return-basket-items';
 import { formatPrice } from '../../utilities/format-price';
 import { Image } from '@commercetools/platform-sdk';
@@ -22,6 +23,8 @@ export interface CartProductType {
   quantity: number;
 }
 export interface CartPageDataType {
+  id: string;
+  version: number;
   totalCartPrice: number;
   cartProducts: CartProductType[];
 }
@@ -41,7 +44,8 @@ interface CartContextType {
   cartPageData: CartPageDataType | undefined;
   setCartPageData: React.Dispatch<React.SetStateAction<CartPageDataType | undefined>>;
   isCartPageLoading: boolean;
-  setIsCartPageLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  isCartDeleting: boolean;
+  clearCart: (id: string, version: number) => Promise<void>;
 }
 
 const CartContext = createContext<CartContextType>({} as CartContextType);
@@ -52,6 +56,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [productsWithChangedAmount, setProductsWithChangedAmount] = useState<ChangingType>({});
   const [cartPageData, setCartPageData] = useState<CartPageDataType | undefined>(undefined);
   const [isCartPageLoading, setIsCartPageLoading] = useState(false);
+  const [isCartDeleting, setIsCartDeleting] = useState(false);
 
   const getCartPageData = async () => {
     setIsCartPageLoading(true);
@@ -59,6 +64,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       const cart = await getFullCartInfo();
       if (!cart) throw new Error('Cart data is not received');
       setCartPageData({
+        id: cart.id,
+        version: cart.version,
         totalCartPrice: cart.totalPrice.centAmount,
         cartProducts: cart.lineItems.map((item) => {
           const discountedPrice = item.price.discounted?.value.centAmount;
@@ -85,7 +92,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       });
       setIsCartPageLoading(false);
     } catch (error) {
-      console.log('Error fetching cart data:', error);
+      console.error('Error fetching cart data:', error);
       setIsCartPageLoading(false);
     }
   };
@@ -109,6 +116,18 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     return await isProductInCart(productId);
   };
 
+  const clearCart = async (cartId: string, version: number) => {
+    try {
+      setIsCartDeleting(true);
+      await deleteCart(cartId, version);
+
+      await getCartPageData();
+      setIsCartDeleting(false);
+    } catch (error) {
+      console.error('Error while deleting the cart:', error);
+    }
+  };
+
   const CartContextValue = {
     addToCart: addProductToCart,
     removeFromCart: removeProductFromCart,
@@ -124,7 +143,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     cartPageData,
     setCartPageData,
     isCartPageLoading,
-    setIsCartPageLoading,
+    isCartDeleting,
+    clearCart,
   };
 
   return <CartContext.Provider value={CartContextValue}>{children}</CartContext.Provider>;

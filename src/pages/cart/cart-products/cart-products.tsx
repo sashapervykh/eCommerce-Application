@@ -12,18 +12,18 @@ export function CartProducts() {
   const navigate = useNavigate();
   const {
     cartPageData,
-    productsInCartAmount,
     removingProducts,
     setRemovingProducts,
     productsWithChangedAmount,
     setProductsWithChangedAmount,
     isCartPageLoading,
     getCartPageData,
+    isCartDeleting,
   } = useCart();
   const [cartProductsData, setCartProductsData] = useState<CartItemType[] | undefined>();
   const [totalPrice, setTotalPrice] = useState<number | undefined>(undefined);
   const isChangeInTheBasket =
-    !Object.values(removingProducts).some(Boolean) && !Object.values(productsWithChangedAmount).some(Boolean);
+    Object.values(removingProducts).some(Boolean) || Object.values(productsWithChangedAmount).some(Boolean);
 
   useEffect(() => {
     void getCartPageData();
@@ -50,7 +50,10 @@ export function CartProducts() {
     });
   }, [cartPageData]);
 
-  if (productsInCartAmount === 0)
+  if ((isCartPageLoading && !isChangeInTheBasket) || (isCartDeleting && !isChangeInTheBasket) || !cartProductsData)
+    return <Spin className={styles.spinner}></Spin>;
+
+  if (cartProductsData.length === 0)
     return (
       <>
         <div className={styles['empty-cart']}>
@@ -68,8 +71,6 @@ export function CartProducts() {
       </>
     );
 
-  if ((isCartPageLoading && isChangeInTheBasket) || !cartProductsData) return <Spin className={styles.spinner}></Spin>;
-
   return (
     <div className={styles['product-list']}>
       {cartProductsData.map((cartProduct, index) => {
@@ -77,7 +78,7 @@ export function CartProducts() {
       })}
       <TotalValue
         totalPrice={totalPrice ? formatPrice(totalPrice) : 'Calculating...'}
-        allProductsShown={Boolean(totalPrice) && isChangeInTheBasket}
+        allProductsShown={Boolean(totalPrice) && !isChangeInTheBasket}
       />
     </div>
   );

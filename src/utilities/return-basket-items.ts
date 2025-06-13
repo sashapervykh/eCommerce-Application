@@ -57,7 +57,21 @@ export async function getFullCartInfo(): Promise<Cart | undefined> {
       }
     } else {
       const response = await customerAPI.apiRoot().me().carts().get().execute();
+
       cart = response.body.results[0];
+      if (response.body.results.length == 0) {
+        const createCartResponse = await customerAPI
+          .apiRoot()
+          .me()
+          .carts()
+          .post({
+            body: {
+              currency: 'USD',
+            },
+          })
+          .execute();
+        cart = createCartResponse.body;
+      }
     }
 
     return cart;
@@ -116,7 +130,22 @@ export async function getBasketItems(): Promise<BasketItem[]> {
       }
     } else {
       const response = await customerAPI.apiRoot().me().carts().get().execute();
+
       cart = response.body.results[0];
+
+      if (response.body.results.length == 0) {
+        const createCartResponse = await customerAPI
+          .apiRoot()
+          .me()
+          .carts()
+          .post({
+            body: {
+              currency: 'USD',
+            },
+          })
+          .execute();
+        cart = createCartResponse.body;
+      }
     }
 
     if (cart.lineItems.length == 0) {
@@ -372,5 +401,19 @@ export async function mergeCarts(): Promise<void> {
     console.error('Error merging carts:', error);
     localStorage.removeItem(CART_ID_KEY);
     throw error;
+  }
+}
+
+export async function deleteCart(cartId: string, version: number) {
+  try {
+    localStorage.removeItem(CART_ID_KEY);
+    await customerAPI
+      .apiRoot()
+      .carts()
+      .withId({ ID: cartId })
+      .delete({ queryArgs: { version: version } })
+      .execute();
+  } catch (error) {
+    console.error('Error while deleting the cart:', error);
   }
 }
