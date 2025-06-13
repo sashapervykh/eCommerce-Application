@@ -33,7 +33,6 @@ interface CartContextType {
   removeFromCart: (productId: string, quantity?: number) => Promise<void>;
   isProductInCart: (productId: string) => Promise<boolean>;
   getBasketItems: () => Promise<BasketItem[]>;
-  getTotalPrice: () => Promise<number | undefined>;
   removingProducts: RemovingType;
   setRemovingProducts: React.Dispatch<React.SetStateAction<RemovingType>>;
   productsWithChangedAmount: ChangingType;
@@ -42,6 +41,7 @@ interface CartContextType {
   cartPageData: CartPageDataType | undefined;
   setCartPageData: React.Dispatch<React.SetStateAction<CartPageDataType | undefined>>;
   isCartPageLoading: boolean;
+  setIsCartPageLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const CartContext = createContext<CartContextType>({} as CartContextType);
@@ -90,12 +90,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const getTotalPrice = async () => {
-    const cart = await getFullCartInfo();
-    if (!cart) return;
-    return cart.totalPrice.centAmount;
-  };
-
   const updateProductsInCartAmount = async () => {
     const cart = await getBasketItems();
     setProductsInCartAmount(cart.length);
@@ -120,7 +114,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     removeFromCart: removeProductFromCart,
     isProductInCart: checkProductInCart,
     getBasketItems: getBasketItems,
-    getTotalPrice,
     updateProductsInCartAmount: updateProductsInCartAmount,
     productsInCartAmount: productsInCartAmount,
     removingProducts,
@@ -131,6 +124,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     cartPageData,
     setCartPageData,
     isCartPageLoading,
+    setIsCartPageLoading,
   };
 
   return <CartContext.Provider value={CartContextValue}>{children}</CartContext.Provider>;
