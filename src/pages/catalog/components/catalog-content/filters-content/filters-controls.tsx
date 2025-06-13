@@ -12,6 +12,7 @@ import { Xmark } from '@gravity-ui/icons';
 import { CheckComponent } from './check-component/check-component';
 import { FiltersFieldsType } from './types';
 import { NumberSlider } from './number-slider/number-slider';
+import { useEffect } from 'react';
 
 interface FiltersControlsProps {
   categoryKey?: string;
@@ -25,6 +26,15 @@ export function FiltersControls({ categoryKey, subcategoryKey, itemsPerPage }: F
   const methods = useForm<FiltersFieldsType>({
     defaultValues: INITIAL_FILTERS_FORM_STATE,
   });
+
+  useEffect(() => {
+    methods.reset({
+      price: criteriaData.filters.price,
+      area: criteriaData.filters.area,
+      ...criteriaData.filters.floors,
+      ...criteriaData.filters.developers,
+    });
+  }, [criteriaData, methods]);
 
   const onSubmit = (data: FiltersFieldsType) => {
     criteriaData.filters.area = data.area;

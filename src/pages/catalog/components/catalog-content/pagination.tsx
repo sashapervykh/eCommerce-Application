@@ -16,7 +16,7 @@ export function Pagination({ currentPage, totalItems, itemsPerPage, onPageChange
   }
 
   const getPageNumbers = () => {
-    const pages = [];
+    const pages: (number | string)[] = [];
     const maxVisiblePages = 5;
 
     if (totalPages <= maxVisiblePages) {
@@ -70,23 +70,27 @@ export function Pagination({ currentPage, totalItems, itemsPerPage, onPageChange
         </Button>
 
         <div className={styles['page-numbers']}>
-          {getPageNumbers().map((page, index) =>
-            page === '...' ? (
-              <Text key={index} variant="body-2" className={styles.ellipsis}>
-                ...
-              </Text>
-            ) : (
-              <Button
-                key={index}
-                view={currentPage === page ? 'outlined-action' : 'outlined'}
-                onClick={() => onPageChange(page as number)}
-                disabled={currentPage === page}
-                size="l"
-              >
-                {page}
-              </Button>
-            ),
-          )}
+          {getPageNumbers().map((page, index) => {
+            if (typeof page === 'string') {
+              return (
+                <Text key={index} variant="body-2" className={styles.ellipsis}>
+                  {page}
+                </Text>
+              );
+            } else {
+              return (
+                <Button
+                  key={index}
+                  view={currentPage === page ? 'outlined-action' : 'outlined'}
+                  onClick={() => onPageChange(page)}
+                  disabled={currentPage === page}
+                  size="l"
+                >
+                  {page}
+                </Button>
+              );
+            }
+          })}
         </div>
 
         <Button
