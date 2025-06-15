@@ -12,6 +12,8 @@ interface CriteriaData {
   search: string | undefined;
   categoryKey?: string;
   subcategoryKey?: string;
+  limit?: number;
+  offset?: number;
   filters: {
     price: [number, number];
     area: [number, number];
@@ -37,6 +39,9 @@ interface ProductsContextType {
   cartItems: BasketItem[];
   fetchCartItems: () => Promise<void>;
   isCartLoading: boolean;
+  totalProducts: number;
+  currentPage: number;
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
 }
 
 interface ApiError {
@@ -112,6 +117,8 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
   const [lastSort, setLastSort] = useState<string | undefined>(undefined);
   const [lastSearch, setLastSearch] = useState<string | undefined>(undefined);
   const [cartItems, setCartItems] = useState<BasketItem[]>([]);
+  const [totalProducts, setTotalProducts] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
   const fetchCartItems = useCallback(async () => {
     setIsCartLoading(true);
@@ -134,7 +141,7 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
         setError(false);
         setNotFound(false);
 
-        const { sort, search, categoryKey, subcategoryKey, filters } = criteria;
+        const { sort, search, categoryKey, subcategoryKey, filters, limit = 10, offset = 0 } = criteria;
 
         let categoryFilter: string | undefined;
         if (subcategoryKey) {
@@ -189,8 +196,9 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
           const sortChanged = sort !== lastSort;
           const searchChanged = search !== lastSearch;
           const categoryKeysChanged = categoryKey !== (criteriaData.subcategoryKey ?? criteriaData.categoryKey);
+          const pageChanged = criteria.offset !== criteriaData.offset;
 
-          if (!filtersChanged && !sortChanged && !searchChanged && !categoryKeysChanged) {
+          if (!filtersChanged && !sortChanged && !searchChanged && !categoryKeysChanged && !pageChanged) {
             setIsLoading(false);
             setIsResultsLoading(false);
             return;
@@ -213,12 +221,15 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
               fuzzy: true,
               sort,
               filter: allFilters,
+              limit,
+              offset,
             },
           })
           .execute();
 
         const productsInfo = returnProductsData(response.body.results);
         setProductsInfo(productsInfo);
+        setTotalProducts(response.body.total ?? 0);
       } catch (error) {
         console.error(error);
         setError(true);
@@ -298,7 +309,10 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     getBasketItems,
     cartItems,
     fetchCartItems,
-    isCartLoading: isCartLoading,
+    isCartLoading,
+    totalProducts,
+    currentPage,
+    setCurrentPage,
   };
 
   return <ProductsContext.Provider value={ProductsContextValue}>{children}</ProductsContext.Provider>;

@@ -12,17 +12,29 @@ import { Xmark } from '@gravity-ui/icons';
 import { CheckComponent } from './check-component/check-component';
 import { FiltersFieldsType } from './types';
 import { NumberSlider } from './number-slider/number-slider';
+import { useEffect } from 'react';
 
 interface FiltersControlsProps {
   categoryKey?: string;
   subcategoryKey?: string;
+  itemsPerPage: number;
+  currentPage: number;
 }
 
-export function FiltersControls({ categoryKey, subcategoryKey }: FiltersControlsProps) {
-  const { isFiltersOpen, criteriaData, getProductsByCriteria, setIsFiltersOpen } = useProducts();
+export function FiltersControls({ categoryKey, subcategoryKey, itemsPerPage }: FiltersControlsProps) {
+  const { isFiltersOpen, criteriaData, getProductsByCriteria, setIsFiltersOpen, setCurrentPage } = useProducts();
   const methods = useForm<FiltersFieldsType>({
     defaultValues: INITIAL_FILTERS_FORM_STATE,
   });
+
+  useEffect(() => {
+    methods.reset({
+      price: criteriaData.filters.price,
+      area: criteriaData.filters.area,
+      ...criteriaData.filters.floors,
+      ...criteriaData.filters.developers,
+    });
+  }, [criteriaData, methods]);
 
   const onSubmit = (data: FiltersFieldsType) => {
     criteriaData.filters.area = data.area;
@@ -37,8 +49,12 @@ export function FiltersControls({ categoryKey, subcategoryKey }: FiltersControls
         criteriaData.filters.developers[key] = value;
       }
     }
-
-    getProductsByCriteria(criteriaData);
+    setCurrentPage(1);
+    getProductsByCriteria({
+      ...criteriaData,
+      offset: 0,
+      limit: itemsPerPage,
+    });
     if (window.innerWidth < 570) {
       setIsFiltersOpen(false);
     }
@@ -90,11 +106,12 @@ export function FiltersControls({ categoryKey, subcategoryKey }: FiltersControls
                 view="action"
                 onClick={() => {
                   methods.reset(INITIAL_FILTERS_FORM_STATE);
-
                   getProductsByCriteria({
                     ...INITIAL_CRITERIA(),
                     categoryKey,
                     subcategoryKey,
+                    limit: itemsPerPage,
+                    offset: 0,
                   });
                 }}
               >
