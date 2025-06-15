@@ -22,7 +22,7 @@ interface FiltersControlsProps {
 }
 
 export function FiltersControls({ categoryKey, subcategoryKey, itemsPerPage }: FiltersControlsProps) {
-  const { isFiltersOpen, criteriaData, getProductsByCriteria, setIsFiltersOpen } = useProducts();
+  const { isFiltersOpen, criteriaData, getProductsByCriteria, setIsFiltersOpen, setCurrentPage } = useProducts();
   const methods = useForm<FiltersFieldsType>({
     defaultValues: INITIAL_FILTERS_FORM_STATE,
   });
@@ -49,8 +49,12 @@ export function FiltersControls({ categoryKey, subcategoryKey, itemsPerPage }: F
         criteriaData.filters.developers[key] = value;
       }
     }
-
-    getProductsByCriteria(criteriaData);
+    setCurrentPage(1);
+    getProductsByCriteria({
+      ...criteriaData,
+      offset: 0,
+      limit: itemsPerPage,
+    });
     if (window.innerWidth < 570) {
       setIsFiltersOpen(false);
     }

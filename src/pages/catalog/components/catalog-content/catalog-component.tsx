@@ -100,7 +100,7 @@ export function CatalogContent({
     void fetchCartItems();
     lastCriteriaReference.current = criteriaKey;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [categoryKey, subcategoryKey, currentPage, itemsPerPage]);
+  }, [categoryKey, subcategoryKey, currentPage, itemsPerPage, criteriaData.filters]);
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
