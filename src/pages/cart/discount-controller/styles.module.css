@@ -1,0 +1,7 @@
+.discount-wrapper {
+  display: grid;
+  margin-right: 0;
+  margin-left: auto;
+  grid-gap: 10px;
+  grid-template-columns: 1fr 2fr;
+}

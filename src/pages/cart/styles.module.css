@@ -9,3 +9,7 @@
   border-bottom: 1px solid var(--g-color-private-black-150);
   margin-bottom: 15px;
 }
+
+.controllers {
+  display: flex;
+}
