@@ -1,0 +1,21 @@
+.total-value-wrapper {
+  padding: 20px 0;
+  border-top: 1px solid var(--g-color-private-black-150);
+}
+
+.text-wrapper {
+  width: fit-content;
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  grid-gap: 10px;
+}
+
+.total-price {
+  font-weight: normal;
+  margin-right: 10px;
+}
+
+.skeleton {
+  width: 120px;
+  height: inherit;
+}
