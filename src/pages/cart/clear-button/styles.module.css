@@ -7,8 +7,12 @@
 
 .buttons-wrapper {
   max-width: 300px;
-  margin: auto 0;
+  margin: auto;
   display: grid;
   grid-gap: 10px;
   grid-template-columns: 1fr 1fr;
+}
+
+.clear-button {
+  margin-right: 10px;
 }
