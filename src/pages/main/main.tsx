@@ -8,12 +8,13 @@ export function HomePage() {
   return (
     <PageWrapper title="Space Real Estate">
       <div className={styles['content-container']}>
-        <h1 className={styles['page-title']}>
-          {userInfo?.firstName ? `Hello, ${userInfo.firstName}!` : ''} Welcome to Space Real Estate
-        </h1>
-
-        <div className={styles['data-preview']}>
-          <h2 className={styles['data-preview-title']}>We are in process of building our shop...</h2>
+        <div className={styles['page-data']}>
+          <h1 className={styles['page-title']}>
+            {userInfo?.firstName ? `Hello, ${userInfo.firstName}!` : ''} Welcome to Space Real Estate!
+          </h1>
+          <h3 className={styles['page-data-title']}>
+            We will help you spend your money tastefully and with undoubted benefit. Hurry! There are few houses left!
+          </h3>
         </div>
       </div>
     </PageWrapper>

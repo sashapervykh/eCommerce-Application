@@ -10,6 +10,7 @@ export function SortComponent() {
     const newCriteria = {
       ...criteriaData,
       sort: newSort,
+      offset: 0,
     };
     getProductsByCriteria(newCriteria);
   };

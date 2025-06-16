@@ -3,6 +3,7 @@ import { useProducts } from '../../components/hooks/useProducts';
 import { Card, Text, Spin, Button } from '@gravity-ui/uikit';
 import { useEffect, useState } from 'react';
 import { NotFoundPage } from '../404/not-found';
+import { AddToCartButton } from '../../components/add-to-cart-button/add-to-cart-button';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Zoom } from 'swiper/modules';
 import { ChevronLeft, ChevronRight, Xmark } from '@gravity-ui/icons';
@@ -22,7 +23,7 @@ type AttributeValue = AttributeValueObject | AttributeValueObject[] | string | n
 
 export function ProductPage() {
   const { productId } = useParams();
-  const { productDetails, getProductDetails, isLoading, error, notFound } = useProducts();
+  const { productDetails, getProductDetails, isLoading, error, notFound, fetchCartItems } = useProducts();
   const [initialSlide, setInitialSlide] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
@@ -72,8 +73,9 @@ export function ProductPage() {
   useEffect(() => {
     if (productId) {
       getProductDetails(productId);
+      void fetchCartItems();
     }
-  }, [productId, getProductDetails]);
+  }, [productId, getProductDetails, fetchCartItems]);
 
   if (notFound) {
     return <NotFoundPage />;
@@ -169,6 +171,9 @@ export function ProductPage() {
                 </ul>
               </Text>
             )}
+            <div className={styles['actions-wrapper']}>
+              <AddToCartButton product={productDetails} />
+            </div>
           </div>
         </div>
         <Button view="action" size="l" onClick={() => navigate('/catalog')} className={styles['back-button']}>

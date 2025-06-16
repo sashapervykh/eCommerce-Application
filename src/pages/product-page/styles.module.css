@@ -65,6 +65,11 @@
   height: 50vh;
 }
 
+.actions-wrapper > div {
+  margin-top: 15px;
+  width: 150px;
+}
+
 .back-button {
   margin-top: 20px;
 }

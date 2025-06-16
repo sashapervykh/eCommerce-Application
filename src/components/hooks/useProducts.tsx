@@ -3,15 +3,20 @@ import { customerAPI } from '../../api/customer-api';
 import { ProductInfo } from '../../pages/catalog/components/catalog-content/product/types';
 import { returnProductsData } from '../../utilities/return-product-data';
 import { INITIAL_CRITERIA } from '../../constants/constants';
+import { getBasketItems, BasketItem } from '../../utilities/return-basket-items';
+import { Image } from '@commercetools/platform-sdk';
+import { formatPrice } from '../../utilities/format-price';
 
 interface CriteriaData {
   sort: string | undefined;
   search: string | undefined;
   categoryKey?: string;
   subcategoryKey?: string;
+  limit?: number;
+  offset?: number;
   filters: {
-    price: number[];
-    area: number[];
+    price: [number, number];
+    area: [number, number];
     floors: Record<string, boolean>;
     developers: Record<string, boolean>;
   };
@@ -21,6 +26,7 @@ interface ProductsContextType {
   productsInfo: ProductInfo[] | null;
   productDetails: ProductInfo | null;
   isLoading: boolean;
+  isResultsLoading: boolean;
   getProductsByCriteria: (criteria: CriteriaData) => void;
   getProductDetails: (value: string) => void;
   error: boolean;
@@ -28,11 +34,29 @@ interface ProductsContextType {
   isFiltersOpen: boolean;
   setIsFiltersOpen: React.Dispatch<React.SetStateAction<boolean>>;
   criteriaData: CriteriaData;
+  isProductInCart: (productId: string) => boolean;
+  getBasketItems: () => Promise<BasketItem[]>;
+  cartItems: BasketItem[];
+  fetchCartItems: () => Promise<void>;
+  isCartLoading: boolean;
+  totalProducts: number;
+  currentPage: number;
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
 }
 
 interface ApiError {
   statusCode: number;
   message: string;
+}
+
+export interface CartItemType {
+  id: string;
+  name: string;
+  price: string;
+  totalPrice: string;
+  fullPrice?: string;
+  images?: Image[];
+  quantity: number;
 }
 
 function createFiltersQuery(filters: {
@@ -78,17 +102,12 @@ function createFiltersQuery(filters: {
 
 const ProductsContext = createContext<ProductsContextType>({} as ProductsContextType);
 
-const formatPrice = (price: number | undefined): string => {
-  if (price === undefined) {
-    return '0.00';
-  }
-  return (price / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-};
-
 export const ProductsProvider = ({ children }: { children: React.ReactNode }) => {
   const [productsInfo, setProductsInfo] = useState<ProductInfo[] | null>(null);
   const [productDetails, setProductDetails] = useState<ProductInfo | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isCartLoading, setIsCartLoading] = useState<boolean>(false);
+  const [isResultsLoading, setIsResultsLoading] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
   const [notFound, setNotFound] = useState<boolean>(false);
   const [isFiltersOpen, setIsFiltersOpen] = useState<boolean>(false);
@@ -97,15 +116,32 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
   const [lastFilters, setLastFilters] = useState<string[]>([]);
   const [lastSort, setLastSort] = useState<string | undefined>(undefined);
   const [lastSearch, setLastSearch] = useState<string | undefined>(undefined);
+  const [cartItems, setCartItems] = useState<BasketItem[]>([]);
+  const [totalProducts, setTotalProducts] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+
+  const fetchCartItems = useCallback(async () => {
+    setIsCartLoading(true);
+    try {
+      const items = await getBasketItems();
+      setCartItems(items);
+    } catch (error) {
+      console.error('Error fetching cart items:', error);
+      setCartItems([]);
+    } finally {
+      setIsCartLoading(false);
+    }
+  }, []);
 
   const getProductsByCriteria = useCallback(
-    async (criteria: CriteriaData) => {
+    async (criteria: CriteriaData = INITIAL_CRITERIA()) => {
       try {
         setIsLoading(true);
+        setIsResultsLoading(true);
         setError(false);
         setNotFound(false);
 
-        const { sort, search, categoryKey, subcategoryKey, filters } = criteria;
+        const { sort, search, categoryKey, subcategoryKey, filters, limit = 10, offset = 0 } = criteria;
 
         let categoryFilter: string | undefined;
         if (subcategoryKey) {
@@ -125,6 +161,7 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
             }
             setProductsInfo([]);
             setIsLoading(false);
+            setIsResultsLoading(false);
             return;
           }
         } else if (categoryKey) {
@@ -144,6 +181,7 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
             }
             setProductsInfo([]);
             setIsLoading(false);
+            setIsResultsLoading(false);
             return;
           }
         }
@@ -158,9 +196,11 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
           const sortChanged = sort !== lastSort;
           const searchChanged = search !== lastSearch;
           const categoryKeysChanged = categoryKey !== (criteriaData.subcategoryKey ?? criteriaData.categoryKey);
+          const pageChanged = criteria.offset !== criteriaData.offset;
 
-          if (!filtersChanged && !sortChanged && !searchChanged && !categoryKeysChanged) {
+          if (!filtersChanged && !sortChanged && !searchChanged && !categoryKeysChanged && !pageChanged) {
             setIsLoading(false);
+            setIsResultsLoading(false);
             return;
           }
         }
@@ -181,17 +221,21 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
               fuzzy: true,
               sort,
               filter: allFilters,
+              limit,
+              offset,
             },
           })
           .execute();
 
         const productsInfo = returnProductsData(response.body.results);
         setProductsInfo(productsInfo);
+        setTotalProducts(response.body.total ?? 0);
       } catch (error) {
         console.error(error);
         setError(true);
       } finally {
         setIsLoading(false);
+        setIsResultsLoading(false);
       }
     },
     [isInitialLoad, criteriaData, lastFilters, lastSort, lastSearch],
@@ -220,7 +264,6 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
       } else {
         currentPrice = formatPrice(price);
       }
-
       const productDetails: ProductInfo = {
         id: productInfo.id,
         key: productInfo.key ?? productInfo.masterData.current.name['en-US'].split(' ').join(''),
@@ -246,10 +289,15 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     }
   }, []);
 
+  const isProductInCart = (productId: string) => {
+    return cartItems.some((item) => item.productId === productId);
+  };
+
   const ProductsContextValue = {
     productsInfo,
     productDetails,
     isLoading,
+    isResultsLoading,
     getProductsByCriteria,
     getProductDetails,
     error,
@@ -257,6 +305,14 @@ export const ProductsProvider = ({ children }: { children: React.ReactNode }) =>
     isFiltersOpen,
     setIsFiltersOpen,
     criteriaData,
+    isProductInCart,
+    getBasketItems,
+    cartItems,
+    fetchCartItems,
+    isCartLoading,
+    totalProducts,
+    currentPage,
+    setCurrentPage,
   };
 
   return <ProductsContext.Provider value={ProductsContextValue}>{children}</ProductsContext.Provider>;

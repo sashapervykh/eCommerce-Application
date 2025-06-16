@@ -44,7 +44,7 @@ export function CatalogMenuButton({
     setIsSubmenuOpen(false);
 
     const handleResize = () => {
-      if (window.innerWidth > 767) {
+      if (window.innerWidth > 838) {
         setIsMenuOpen(false);
       }
     };
