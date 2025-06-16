@@ -38,7 +38,7 @@ export function DiscountController() {
           className={styles['discount-wrapper']}
           onSubmit={async (event) => {
             event.preventDefault();
-            const promo = getValues('promo');
+            const promo = getValues('promo').toLocaleUpperCase();
             const result = await addPromoCode(cartPageData.id, cartPageData.version, promo);
             if (typeof result === 'string') {
               setError(result);
