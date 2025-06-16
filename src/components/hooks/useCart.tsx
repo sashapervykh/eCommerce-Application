@@ -7,6 +7,10 @@ import {
   BasketItem,
   getFullCartInfo,
   deleteCart,
+  addPromoCodeCart,
+  checkPromoCodeExistence,
+  getPromoCodeByID,
+  removePromoCodeByID,
 } from '../../utilities/return-basket-items';
 import { formatPrice } from '../../utilities/format-price';
 import { Image } from '@commercetools/platform-sdk';
@@ -18,15 +22,20 @@ export interface CartProductType {
   name: string;
   price: string;
   totalPrice: string;
-  fullPrice?: string;
+  fullPrice?: number;
   images?: Image[];
   quantity: number;
+  fullProductPrice?: number;
 }
 export interface CartPageDataType {
   id: string;
   version: number;
+  code: string | undefined;
+  codeId: string | undefined;
+  isDiscountApplied: boolean;
   totalCartPrice: number;
   cartProducts: CartProductType[];
+  fullCartPrice: number;
 }
 
 interface CartContextType {
@@ -46,6 +55,9 @@ interface CartContextType {
   isCartPageLoading: boolean;
   isCartDeleting: boolean;
   clearCart: (id: string, version: number) => Promise<void>;
+  addPromoCode: (cartId: string, version: number, key: string) => Promise<string | undefined>;
+  removePromoCode: (cartId: string, version: number, codeId: string) => Promise<void>;
+  isDiscountInProcess: boolean;
 }
 
 const CartContext = createContext<CartContextType>({} as CartContextType);
@@ -57,38 +69,62 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [cartPageData, setCartPageData] = useState<CartPageDataType | undefined>(undefined);
   const [isCartPageLoading, setIsCartPageLoading] = useState(false);
   const [isCartDeleting, setIsCartDeleting] = useState(false);
+  const [isDiscountInProcess, setIsDiscountInProcess] = useState(false);
 
   const getCartPageData = async () => {
     setIsCartPageLoading(true);
     try {
       const cart = await getFullCartInfo();
       if (!cart) throw new Error('Cart data is not received');
+      console.log(cart);
+      const isDiscountApplied = cart.discountCodes[0] ? true : false;
+      let code: string | undefined;
+      let id: string | undefined;
+      if (isDiscountApplied) {
+        code = await getPromoCodeByID(cart.discountCodes[0].discountCode.id);
+        id = cart.discountCodes[0].discountCode.id;
+      }
+      let totalPriceBeforeDiscount = 0;
+
       setCartPageData({
         id: cart.id,
         version: cart.version,
+        isDiscountApplied: isDiscountApplied,
+        code: code,
+        codeId: id,
         totalCartPrice: cart.totalPrice.centAmount,
         cartProducts: cart.lineItems.map((item) => {
           const discountedPrice = item.price.discounted?.value.centAmount;
+          const promoPrice: number | undefined = item.discountedPricePerQuantity[0]?.discountedPrice.value.centAmount;
           const price = item.price.value.centAmount;
           let currentPrice: number | undefined;
           let fullPrice: number | undefined;
 
-          if (discountedPrice) {
-            currentPrice = discountedPrice;
+          if (promoPrice) {
+            currentPrice = promoPrice;
             fullPrice = price;
           } else {
-            currentPrice = price;
+            currentPrice = discountedPrice ?? price;
+            fullPrice = currentPrice === price ? undefined : price;
           }
+          if (fullPrice) {
+            totalPriceBeforeDiscount += fullPrice * item.quantity;
+          } else {
+            totalPriceBeforeDiscount += currentPrice * item.quantity;
+          }
+
           return {
             quantity: item.quantity,
             name: item.name['en-US'],
             id: item.productId,
             price: formatPrice(currentPrice),
-            fullPrice: formatPrice(fullPrice),
+            fullPrice: fullPrice,
             images: item.variant.images,
             totalPrice: formatPrice(item.totalPrice.centAmount),
+            fullProductPrice: fullPrice ? fullPrice * item.quantity : undefined,
           };
         }),
+        fullCartPrice: totalPriceBeforeDiscount,
       });
       setIsCartPageLoading(false);
     } catch (error) {
@@ -100,6 +136,30 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const updateProductsInCartAmount = async () => {
     const cart = await getBasketItems();
     setProductsInCartAmount(cart.length);
+  };
+
+  const addPromoCode = async (cartId: string, version: number, promo: string) => {
+    const isPromoExist = await checkPromoCodeExistence(promo);
+    if (isPromoExist) {
+      setIsDiscountInProcess(true);
+      await addPromoCodeCart(cartId, version, promo);
+      await getCartPageData();
+      setIsDiscountInProcess(false);
+      return;
+    } else if (isPromoExist === false) {
+      setIsDiscountInProcess(false);
+      return 'This code does not exist';
+    } else {
+      setIsDiscountInProcess(false);
+      return 'The promo code was not applied. Please try again';
+    }
+  };
+
+  const removePromoCode = async (cartId: string, version: number, codeId: string) => {
+    setIsDiscountInProcess(true);
+    await removePromoCodeByID(cartId, version, codeId);
+    await getCartPageData();
+    setIsDiscountInProcess(false);
   };
 
   const addProductToCart = async (productId: string, quantity = 1) => {
@@ -145,6 +205,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     isCartPageLoading,
     isCartDeleting,
     clearCart,
+    addPromoCode,
+    removePromoCode,
+    isDiscountInProcess,
   };
 
   return <CartContext.Provider value={CartContextValue}>{children}</CartContext.Provider>;

@@ -1,13 +1,10 @@
 import { useEffect, useState } from 'react';
-import { CartItemType } from '../../../components/hooks/useProducts';
 import { Button, Spin, Text } from '@gravity-ui/uikit';
-import { useCart } from '../../../components/hooks/useCart';
+import { CartProductType, useCart } from '../../../components/hooks/useCart';
 import styles from './styles.module.css';
 import { CartProduct } from './cart-product/cart-product';
 import { useNavigate } from 'react-router-dom';
 import { TotalValue } from '../total-value/total-value';
-import { formatPrice } from '../../../utilities/format-price';
-
 export function CartProducts() {
   const navigate = useNavigate();
   const {
@@ -20,7 +17,7 @@ export function CartProducts() {
     getCartPageData,
     isCartDeleting,
   } = useCart();
-  const [cartProductsData, setCartProductsData] = useState<CartItemType[] | undefined>();
+  const [cartProductsData, setCartProductsData] = useState<CartProductType[] | undefined>();
   const [totalPrice, setTotalPrice] = useState<number | undefined>(undefined);
   const isChangeInTheBasket =
     Object.values(removingProducts).some(Boolean) || Object.values(productsWithChangedAmount).some(Boolean);
@@ -76,10 +73,7 @@ export function CartProducts() {
       {cartProductsData.map((cartProduct, index) => {
         return <CartProduct key={cartProduct.id} product={cartProductsData[index]} />;
       })}
-      <TotalValue
-        totalPrice={totalPrice ? formatPrice(totalPrice) : 'Calculating...'}
-        allProductsShown={Boolean(totalPrice) && !isChangeInTheBasket}
-      />
+      <TotalValue allProductsShown={Boolean(totalPrice) && !isChangeInTheBasket} />
     </div>
   );
 }

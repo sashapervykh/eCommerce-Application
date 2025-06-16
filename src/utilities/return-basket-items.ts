@@ -417,3 +417,63 @@ export async function deleteCart(cartId: string, version: number) {
     console.error('Error while deleting the cart:', error);
   }
 }
+
+export async function addPromoCodeCart(cartId: string, version: number, promo: string) {
+  try {
+    await customerAPI
+      .apiRoot()
+      .carts()
+      .withId({ ID: cartId })
+      .post({ body: { version: version, actions: [{ action: 'addDiscountCode', code: promo }] } })
+      .execute();
+  } catch (error) {
+    console.error('Error while deleting the cart:', error);
+  }
+}
+
+export async function checkPromoCodeExistence(key: string) {
+  try {
+    await customerAPI.apiRoot().discountCodes().withKey({ key: key }).get().execute();
+    return true;
+  } catch (error) {
+    if (typeof error === 'object' && error && 'statusCode' in error && error.statusCode === 404) {
+      return false;
+    }
+    return;
+  }
+}
+
+export async function getPromoCodeByID(id: string) {
+  try {
+    const promoInfo = await customerAPI.apiRoot().discountCodes().withId({ ID: id }).get().execute();
+    return promoInfo.body.code;
+  } catch (error) {
+    console.log('error fetching promo code info:', error);
+  }
+}
+
+export async function removePromoCodeByID(cartId: string, version: number, codeId: string) {
+  try {
+    await customerAPI
+      .apiRoot()
+      .carts()
+      .withId({ ID: cartId })
+      .post({
+        body: {
+          version: version,
+          actions: [
+            {
+              action: 'removeDiscountCode',
+              discountCode: {
+                typeId: 'discount-code',
+                id: codeId,
+              },
+            },
+          ],
+        },
+      })
+      .execute();
+  } catch (error) {
+    console.error('Error while removing promo code from the cart:', error);
+  }
+}

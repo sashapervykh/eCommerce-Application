@@ -1,7 +1,3 @@
-.clear-button {
-  margin-bottom: 15px;
-}
-
 .modal-wrapper {
   padding: 20px;
   width: 600px;
@@ -11,8 +7,12 @@
 
 .buttons-wrapper {
   max-width: 300px;
-  margin: 15px auto 0;
+  margin: auto;
   display: grid;
   grid-gap: 10px;
   grid-template-columns: 1fr 1fr;
+}
+
+.clear-button {
+  margin-right: 10px;
 }
