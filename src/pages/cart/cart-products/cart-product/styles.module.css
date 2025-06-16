@@ -7,22 +7,36 @@
 }
 
 .image {
-  width: 100px;
-  height: 100px;
-  border-radius: 20px;
+  width: 150px;
+  height: 150px;
+  border-radius: 10px;
   margin-right: 15px;
 }
 
 .name {
+  display: flex;
   font-weight: bold;
   margin-right: 10px;
+  height: fit-content;
+}
+
+.part-wrapper {
+  display: flex;
+  width: 70%;
+  margin: auto;
+  justify-content: space-between;
 }
 
 .product-part {
   display: grid;
-  grid-template-columns: auto;
-  padding: 10px;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto;
+  padding: 20px;
   margin-right: 10px;
+}
+
+.product-element {
+  margin: 0;
 }
 
 .product-wrapper {
@@ -39,7 +53,7 @@
 }
 
 .remove-button {
-  margin: 15px;
+  margin: 0;
 }
 
 .remove-container {
@@ -52,4 +66,95 @@
   position: relative;
   display: flex;
   margin: auto 0 auto 10px;
+}
+
+.discounted-price {
+  color: rgb(11 100 11);
+  margin-right: 10px;
+}
+
+.full-price {
+  text-decoration: line-through;
+  font-weight: lighter;
+  color: rgb(168 174 179);
+}
+
+.total-wrapper {
+  display: flex;
+  height: fit-content;
+}
+
+.total-prices {
+  display: flex;
+  height: fit-content;
+  flex-direction: column;
+}
+
+@media (width <= 1044px) {
+  .part-wrapper {
+    width: 100%;
+  }
+}
+
+@media (width <= 862px) {
+  .product-part {
+    padding: 10px;
+    height: fit-content;
+  }
+
+  .image {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+@media (width <= 720px) {
+  .part-wrapper {
+    flex-direction: column;
+  }
+
+  .image {
+    width: 300px;
+    height: 300px;
+  }
+}
+
+@media (width <= 630px) {
+  .image {
+    max-width: 300px;
+    max-height: 300px;
+    width: 40vw;
+    height: 40vw;
+  }
+}
+
+@media (width <= 520px) {
+  .image {
+    max-width: 300px;
+    max-height: 300px;
+    width: 30vw;
+    height: 30vw;
+    margin-top: 10px;
+  }
+
+  .part-wrapper {
+    margin: auto;
+    padding: 0;
+    height: fit-content;
+  }
+
+  .product-part {
+    margin: 0;
+    padding: 0;
+  }
+
+  .remove-button {
+    display: flex;
+    width: fit-content;
+  }
+
+  .total {
+    min-width: 100px;
+    width: 50%;
+  }
 }

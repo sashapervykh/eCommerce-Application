@@ -1,12 +1,11 @@
 import { Button, Text } from '@gravity-ui/uikit';
 import { CircleMinus, CirclePlus } from '@gravity-ui/icons';
-import { CartItemType } from '../../../../../components/hooks/useProducts';
 import styles from './styles.module.css';
 import { Controller, useForm } from 'react-hook-form';
 import { useState } from 'react';
-import { useCart } from '../../../../../components/hooks/useCart';
+import { CartProductType, useCart } from '../../../../../components/hooks/useCart';
 
-export function AmountController({ product }: { product: CartItemType }) {
+export function AmountController({ product }: { product: CartProductType }) {
   const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | undefined>(undefined);
   const { handleSubmit, getValues, setValue, control } = useForm({
     defaultValues: { amount: product.quantity },
