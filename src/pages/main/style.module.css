@@ -54,3 +54,18 @@
   margin: 0;
   padding: 0.5rem;
 }
+
+.promo-title {
+  margin: auto;
+  text-align: center;
+  color: #333;
+  text-shadow: 1px 1px 3px rgb(0 0 0 / 50%);
+}
+
+.list {
+  font-size: 15px;
+}
+
+.list-item {
+  margin-left: 35px;
+}
