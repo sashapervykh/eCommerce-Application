@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { SquareXmark } from '@gravity-ui/icons';
 
 export function DiscountController() {
-  const { cartPageData, addPromoCode, removePromoCode } = useCart();
+  const { cartPageData, addPromoCode, removePromoCode, productsInCartAmount } = useCart();
   const [error, setError] = useState<string | undefined>(undefined);
   const { control, getValues, setValue } = useForm<{ promo: string }>({ defaultValues: { promo: '' } });
 
@@ -14,13 +14,13 @@ export function DiscountController() {
     if (cartPageData?.code) setValue('promo', cartPageData.code);
   }, [cartPageData?.code, setValue]);
 
-  if (!cartPageData) return;
+  if (!cartPageData || !productsInCartAmount) return;
 
   return (
     <>
       {cartPageData.code ? (
         <div className={styles['promo-applied-wrapper']}>
-          <Text variant="body-2" className={styles['promo-applied']}>{`Promo "${cartPageData.code}" applied`}</Text>
+          <Text variant="body-2" className={styles['promo-applied']}>{`Promo "${cartPageData.code}" is applied`}</Text>
           <SquareXmark
             className={styles['promo-applied-icon']}
             stroke="rgb(11, 100, 11)"

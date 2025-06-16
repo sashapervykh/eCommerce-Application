@@ -22,9 +22,10 @@ export interface CartProductType {
   name: string;
   price: string;
   totalPrice: string;
-  fullPrice?: string;
+  fullPrice?: number;
   images?: Image[];
   quantity: number;
+  fullProductPrice?: number;
 }
 export interface CartPageDataType {
   id: string;
@@ -34,6 +35,7 @@ export interface CartPageDataType {
   isDiscountApplied: boolean;
   totalCartPrice: number;
   cartProducts: CartProductType[];
+  fullCartPrice: number;
 }
 
 interface CartContextType {
@@ -82,6 +84,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         code = await getPromoCodeByID(cart.discountCodes[0].discountCode.id);
         id = cart.discountCodes[0].discountCode.id;
       }
+      let totalPriceBeforeDiscount = 0;
 
       setCartPageData({
         id: cart.id,
@@ -104,16 +107,24 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
             currentPrice = discountedPrice ?? price;
             fullPrice = currentPrice === price ? undefined : price;
           }
+          if (fullPrice) {
+            totalPriceBeforeDiscount += fullPrice * item.quantity;
+          } else {
+            totalPriceBeforeDiscount += currentPrice * item.quantity;
+          }
+
           return {
             quantity: item.quantity,
             name: item.name['en-US'],
             id: item.productId,
             price: formatPrice(currentPrice),
-            fullPrice: formatPrice(fullPrice),
+            fullPrice: fullPrice,
             images: item.variant.images,
             totalPrice: formatPrice(item.totalPrice.centAmount),
+            fullProductPrice: fullPrice ? fullPrice * item.quantity : undefined,
           };
         }),
+        fullCartPrice: totalPriceBeforeDiscount,
       });
       setIsCartPageLoading(false);
     } catch (error) {
