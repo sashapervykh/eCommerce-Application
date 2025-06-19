@@ -1,0 +1,25 @@
+.button-content {
+  display: flex;
+  width: fit-content;
+  height: fit-content;
+  margin: auto;
+  box-sizing: border-box;
+  padding-top: 8px;
+}
+
+.products-number {
+  display: flex;
+  box-sizing: border-box;
+  margin: auto auto auto 10px;
+  text-align: center;
+  padding: 2px;
+  width: fit-content;
+  height: 90%;
+}
+
+.cart {
+  display: block;
+  height: fit-content;
+  margin: auto;
+  justify-self: baseline;
+}

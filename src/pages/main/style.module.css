@@ -1,0 +1,71 @@
+.page-title {
+  text-align: center;
+  line-height: 2rem;
+  margin-bottom: 1rem;
+  color: #333;
+  text-shadow: 1px 1px 3px rgb(0 0 0 / 50%);
+}
+
+.data-preview {
+  margin-top: 1rem;
+  overflow: hidden;
+}
+
+.response-data {
+  background: #f5f5f5;
+  padding: 1rem;
+  border-radius: 4px;
+  text-align: left;
+  max-width: 100%;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.content-container {
+  width: 100%;
+  min-height: 90vh;
+  background-image: url('../../assets/images/planets.jpg');
+  background-size: cover;
+  background-position: center;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  box-sizing: border-box;
+  margin: 0 auto;
+  max-width: 100vw;
+}
+
+.page-data {
+  background-color: rgb(255 255 255 / 80%);
+  padding: 1rem;
+  border-radius: 8px;
+  max-width: 800px;
+  margin: 0 auto;
+  width: calc(100% - 2rem);
+  box-sizing: border-box;
+}
+
+.page-data-title {
+  color: #333;
+  line-height: 1.6;
+  text-align: center;
+  margin: 0;
+  padding: 0.5rem;
+}
+
+.promo-title {
+  margin: auto;
+  text-align: center;
+  color: #333;
+  text-shadow: 1px 1px 3px rgb(0 0 0 / 50%);
+}
+
+.list {
+  font-size: 15px;
+}
+
+.list-item {
+  margin-left: 35px;
+}

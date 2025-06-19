@@ -1,0 +1,16 @@
+.cart-content {
+  padding: 20px;
+}
+
+.cart-title {
+  display: flex;
+  width: inherit;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--g-color-private-black-150);
+  margin-bottom: 15px;
+}
+
+.controllers {
+  display: flex;
+  margin-bottom: 15px;
+}

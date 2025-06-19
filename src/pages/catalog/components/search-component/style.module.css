@@ -1,0 +1,12 @@
+.search-form {
+  display: flex;
+  max-width: 400px;
+  margin: 0 0 0 auto;
+}
+
+@media (width <= 590px) {
+  .search-form {
+    width: 100%;
+    max-width: none;
+  }
+}

@@ -1,0 +1,31 @@
+.h1 {
+  text-align: center;
+  margin-top: 0;
+  line-height: 2rem;
+}
+
+.container {
+  padding: 40px;
+  max-width: 600px;
+  margin: 20px auto;
+}
+
+.server-error {
+  display: flex;
+  text-align: center;
+}
+
+.nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.element-with-margin {
+  margin-bottom: 15px;
+}
+
+@media (width <= 370px) {
+  .container {
+    padding: 10px;
+  }
+}

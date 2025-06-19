@@ -1,0 +1,17 @@
+.add-to-cart-button {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: fit-content;
+  font-weight: bold;
+}
+
+.add-to-cart-button svg {
+  vertical-align: middle;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 20px;
+}

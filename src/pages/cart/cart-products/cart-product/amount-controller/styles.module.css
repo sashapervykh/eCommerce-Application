@@ -1,0 +1,63 @@
+.amount-form {
+  display: flex;
+  height: fit-content;
+  margin-bottom: -5px;
+}
+
+.amount-button {
+  width: fit-content;
+  height: fit-content;
+  margin: 0;
+  padding: 5px;
+  justify-content: center;
+}
+
+.amount-button:hover {
+  background: none;
+}
+
+.amount-label {
+  display: flex;
+  margin: auto 0 5px;
+  padding: 0;
+  max-width: 50px;
+  justify-content: space-around;
+}
+
+.amount-input {
+  display: flex;
+  margin: auto 0;
+  width: fit-content;
+  max-width: inherit;
+  height: fit-content;
+  text-align: center;
+  justify-content: center;
+  border: none;
+  background: none;
+}
+
+.icon {
+  display: flex;
+  margin: auto;
+}
+
+.button-plus {
+  margin-left: 5px;
+}
+
+.removing-wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  backdrop-filter: blur(10px);
+  z-index: 5;
+  display: flex;
+}
+
+.removing-message {
+  position: relative;
+  display: flex;
+  margin: auto;
+}

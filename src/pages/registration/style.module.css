@@ -1,0 +1,40 @@
+.nav {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.main {
+  margin: auto;
+  max-width: 600px;
+}
+
+.h1 {
+  text-align: center;
+  margin-top: 0;
+  line-height: 2rem;
+}
+
+.fieldset {
+  margin-bottom: 20px;
+  border: 1px solid #d8d8d8;
+  border-radius: 10px;
+}
+
+.button {
+  margin: 15px auto;
+  display: block;
+}
+
+.wrapper {
+  margin: 15px 0;
+}
+
+.container {
+  padding: 40px;
+  margin: 20px auto;
+}
+
+.alert {
+  margin: 20px 0;
+}
